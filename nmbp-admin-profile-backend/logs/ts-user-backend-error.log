@@ -1,0 +1,4 @@
+2026-02-20 10:53:43 [nmbp-admin-profile-backend] error: redis :: redis replica connection error ::  Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379 
+2026-02-20 10:53:43 [nmbp-admin-profile-backend] error: uncaughtException: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379
+Error: connect ECONNREFUSED 127.0.0.1:6379
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) 

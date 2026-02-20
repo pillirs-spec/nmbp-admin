@@ -1,0 +1,1136 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "nmbp-admin-backend",
+    "description": "Admin Backend APIs for the RBAC/UBAC Module. Provides endpoints for managing users, roles, menus, and password policies.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:7003",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Admin",
+      "description": "Admin service health check"
+    },
+    {
+      "name": "Users",
+      "description": "User management - create, update, list, and manage user accounts"
+    },
+    {
+      "name": "Roles",
+      "description": "Role management - create, update, and configure role-based access control"
+    },
+    {
+      "name": "Menus",
+      "description": "Menu management - create, update, and organize navigation menus"
+    },
+    {
+      "name": "Password Policies",
+      "description": "Password policy management - configure password rules and constraints"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT token obtained from the Auth service login endpoint"
+    }
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/admin/users/create": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create User",
+        "description": "Create a new user account with the given details. The mobile number is used as the username. A default password is auto-generated and sent via email.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "example": "Rajesh"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "Nayak"
+                },
+                "email_id": {
+                  "type": "string",
+                  "example": "rajeshnayak899@gmail.com"
+                },
+                "mobile_number": {
+                  "type": "string",
+                  "example": "8249834095"
+                },
+                "dob": {
+                  "type": "string",
+                  "example": "1997-07-21"
+                },
+                "gender": {
+                  "type": "number",
+                  "example": 1
+                },
+                "role_id": {
+                  "type": "number",
+                  "example": 2
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/update": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update User",
+        "description": "Update an existing user account details. The user_id must be an encrypted hash.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "example": "encryptedHash"
+                },
+                "first_name": {
+                  "type": "string",
+                  "example": "Rajesh"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "Nayak"
+                },
+                "email_id": {
+                  "type": "string",
+                  "example": "rajeshnayak899@gmail.com"
+                },
+                "mobile_number": {
+                  "type": "string",
+                  "example": "8249834095"
+                },
+                "dob": {
+                  "type": "string",
+                  "example": "1997-07-21"
+                },
+                "gender": {
+                  "type": "number",
+                  "example": 1
+                },
+                "role_id": {
+                  "type": "number",
+                  "example": 2
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/list/{roleId}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "List Users by Role ID",
+        "description": "Retrieve all users assigned to a specific role (passed as URL parameter)",
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/list": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "List Users (Paginated)",
+        "description": "Retrieve a paginated list of all users with optional search filter. Supports pagination via page_size and current_page.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "page_size": {
+                  "type": "number",
+                  "example": 50
+                },
+                "current_page": {
+                  "type": "number",
+                  "example": 1
+                },
+                "search_query": {
+                  "type": "string",
+                  "example": "8249834095"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userId}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get User by ID",
+        "description": "Retrieve detailed user information by user ID (passed as URL parameter)",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/resetPassword/{userId}": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Reset User Password",
+        "description": "Reset a user password to the default password by user ID (passed as URL parameter). The user will need to change it on next login.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/updateStatus": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update User Status",
+        "description": "Activate or deactivate a user account. The user_id must be an encrypted hash. Status: 1 = Active, 2 = Inactive",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string",
+                  "example": "encryptedHash"
+                },
+                "status": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/menus/add": {
+      "post": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "Create Menu",
+        "description": "Create a new navigation menu item with name, description, order, route URL, and icon class. Menu names must be unique.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "menu_name": {
+                  "type": "string",
+                  "example": "Categories"
+                },
+                "menu_description": {
+                  "type": "string",
+                  "example": "Menu to manage categories"
+                },
+                "menu_order": {
+                  "type": "number",
+                  "example": 1
+                },
+                "route_url": {
+                  "type": "string",
+                  "example": "/categories"
+                },
+                "icon_class": {
+                  "type": "string",
+                  "example": "fa fa-menu"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/menus/update": {
+      "post": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "Update Menu",
+        "description": "Update an existing menu item details including name, description, order, route URL, and icon class",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "menu_id": {
+                  "type": "number",
+                  "example": 1
+                },
+                "menu_name": {
+                  "type": "string",
+                  "example": "Categories"
+                },
+                "menu_description": {
+                  "type": "string",
+                  "example": "Menu to manage categories"
+                },
+                "menu_order": {
+                  "type": "number",
+                  "example": 1
+                },
+                "route_url": {
+                  "type": "string",
+                  "example": "/categories"
+                },
+                "icon_class": {
+                  "type": "string",
+                  "example": "fa fa-menu"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/menus/list": {
+      "get": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "List All Menus",
+        "description": "Retrieve the complete list of all navigation menu items",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/menus/{menuId}": {
+      "get": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "Get Menu by ID",
+        "description": "Retrieve a specific menu item by its ID (passed as URL parameter)",
+        "parameters": [
+          {
+            "name": "menuId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/menus/updateStatus": {
+      "post": {
+        "tags": [
+          "Menus"
+        ],
+        "summary": "Update Menu Status",
+        "description": "Endpoint to activate or deactivate a menu item by its ID",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "menuId": {
+                  "type": "number",
+                  "example": 1
+                },
+                "status": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/passwordPolicies/list": {
+      "get": {
+        "tags": [
+          "Password Policies"
+        ],
+        "summary": "List Password Policies",
+        "description": "Retrieve all configured password policies including expiry, history, complexity rules, and allowed special characters",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/passwordPolicies/add": {
+      "post": {
+        "tags": [
+          "Password Policies"
+        ],
+        "summary": "Create Password Policy",
+        "description": "Create a new password policy with rules for expiry, history, minimum length, complexity, and maximum invalid login attempts",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password_expiry": {
+                  "type": "number",
+                  "example": 10
+                },
+                "password_history": {
+                  "type": "number",
+                  "example": 10
+                },
+                "minimum_password_length": {
+                  "type": "number",
+                  "example": 8
+                },
+                "complexity": {
+                  "type": "number",
+                  "example": 3
+                },
+                "alphabetical": {
+                  "type": "number",
+                  "example": 1
+                },
+                "numeric": {
+                  "type": "number",
+                  "example": 1
+                },
+                "special_characters": {
+                  "type": "number",
+                  "example": 1
+                },
+                "allowed_special_characters": {
+                  "type": "string",
+                  "example": "!@#$%^&*()"
+                },
+                "maximum_invalid_attempts": {
+                  "type": "number",
+                  "example": 5
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/passwordPolicies/update": {
+      "post": {
+        "tags": [
+          "Password Policies"
+        ],
+        "summary": "Update Password Policy",
+        "description": "Update an existing password policy by its ID. All policy fields can be modified.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "example": 1
+                },
+                "password_expiry": {
+                  "type": "number",
+                  "example": 10
+                },
+                "password_history": {
+                  "type": "number",
+                  "example": 10
+                },
+                "minimum_password_length": {
+                  "type": "number",
+                  "example": 8
+                },
+                "complexity": {
+                  "type": "number",
+                  "example": 3
+                },
+                "alphabetical": {
+                  "type": "number",
+                  "example": 1
+                },
+                "numeric": {
+                  "type": "number",
+                  "example": 1
+                },
+                "special_characters": {
+                  "type": "number",
+                  "example": 1
+                },
+                "allowed_special_characters": {
+                  "type": "string",
+                  "example": "!@#$%^&*()"
+                },
+                "maximum_invalid_attempts": {
+                  "type": "number",
+                  "example": 5
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/passwordPolicies/{passwordPolicyId}": {
+      "get": {
+        "tags": [
+          "Password Policies"
+        ],
+        "summary": "Get Password Policy by ID",
+        "description": "Retrieve a specific password policy by its ID (passed as URL parameter)",
+        "parameters": [
+          {
+            "name": "passwordPolicyId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/list": {
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "List Roles (Paginated)",
+        "description": "Retrieve a paginated list of roles with optional search and active/inactive filter. Returns roles and total count.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "is_active": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "page_size": {
+                  "type": "number",
+                  "example": 50
+                },
+                "current_page": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "Admin"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/updateStatus": {
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Update Role Status",
+        "description": "Activate or deactivate a role. Status: 1 = Active, 2 = Inactive",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role_id": {
+                  "type": "number",
+                  "example": 2
+                },
+                "status": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/add": {
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Create Role",
+        "description": "Create a new role with a name, description, level, and menu-level permissions. Role names must be unique.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role_name": {
+                  "type": "string",
+                  "example": "Department Head"
+                },
+                "role_description": {
+                  "type": "string",
+                  "example": "Head of the Department"
+                },
+                "level": {
+                  "type": "string",
+                  "example": "Admin"
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "menu_id": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "permission_id": {
+                        "type": "number",
+                        "example": 2
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/update": {
+      "post": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Update Role",
+        "description": "Update an existing role details including name, description, level, status, and permissions",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "role_id": {
+                  "type": "number",
+                  "example": 2
+                },
+                "role_name": {
+                  "type": "string",
+                  "example": "Department Head"
+                },
+                "role_description": {
+                  "type": "string",
+                  "example": "Head of the Department"
+                },
+                "level": {
+                  "type": "string",
+                  "example": "Admin"
+                },
+                "status": {
+                  "type": "number",
+                  "example": 1
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "menu_id": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "permission_id": {
+                        "type": "number",
+                        "example": 2
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/menusList": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get Menus for Role Assignment",
+        "description": "Retrieve the list of menus available for assigning permissions to roles. Use query param isActive=1 for active menus only.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/defaultAccessList": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get Default Access List",
+        "description": "Retrieve the default access/permission matrix for all menus. Used as a template when creating new roles.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/combinedAccess": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get Combined Access",
+        "description": "Retrieve the combined access/permissions for the currently logged-in user based on their role",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/listLevels": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "List Role Levels",
+        "description": "Retrieve the available role hierarchy levels (excluding ADMIN). Used when creating or updating roles.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/accessList/{roleId}": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get Access List by Role ID",
+        "description": "Retrieve the menu-level permission/access list assigned to a specific role (passed as URL parameter)",
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles/{roleId}": {
+      "get": {
+        "tags": [
+          "Roles"
+        ],
+        "summary": "Get Role by ID",
+        "description": "Retrieve detailed role information by role ID (passed as URL parameter)",
+        "parameters": [
+          {
+            "name": "roleId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/health": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Health Check",
+        "description": "Verify that the Admin Backend service is running and responsive",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "rbac-ubac-module",
+  "version": "1.0.0",
+  "description": "RBAC/UBAC Module - Monorepo for all services",
+  "scripts": {
+    "install:all": "npm install && cd nmbp-admin-backend && npm install && cd ../nmbp-admin-frontend && npm install && cd ../nmbp-admin-profile-backend && npm install && cd ../nmbp-auth-backend && npm install",
+    "start": "concurrently \"npm run start:admin-backend\" \"npm run start:admin-frontend\" \"npm run start:user-backend\" \"npm run start:auth-backend\"",
+    "start:admin-backend": "cd nmbp-admin-backend && npm start",
+    "start:admin-frontend": "cd nmbp-admin-frontend && npm start",
+    "start:user-backend": "cd nmbp-admin-profile-backend && npm start",
+    "start:auth-backend": "cd nmbp-auth-backend && npm start",
+    "dev": "concurrently -n \"ADMIN-BE,ADMIN-FE,USER-BE,AUTH-BE\" -c \"bgBlue,bgGreen,bgYellow,bgMagenta\" \"npm run start:admin-backend\" \"npm run start:admin-frontend\" \"npm run start:user-backend\" \"npm run start:auth-backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "rbac",
+    "ubac",
+    "admin",
+    "auth"
+  ],
+  "author": "",
+  "license": "ISC"
+}

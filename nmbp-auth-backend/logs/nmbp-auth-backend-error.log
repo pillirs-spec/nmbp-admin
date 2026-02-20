@@ -1,0 +1,11 @@
+2026-02-20 12:19:58 [nmbp-auth-backend] error: adminRepository :: getUserByUserName :: userName :: 8766516289 :: Error :: connect ECONNREFUSED 127.0.0.1:5432 :: Error: connect ECONNREFUSED 127.0.0.1:5432 
+2026-02-20 12:19:58 [nmbp-auth-backend] error: adminService :: getUserByUserName :: userName :: 8766516289 :: Error :: connect ECONNREFUSED 127.0.0.1:5432 :: Error: connect ECONNREFUSED 127.0.0.1:5432 
+2026-02-20 12:19:58 [nmbp-auth-backend] error: adminController :: login :: Error :: connect ECONNREFUSED 127.0.0.1:5432 :: Error: connect ECONNREFUSED 127.0.0.1:5432 
+2026-02-20 13:14:12 [nmbp-auth-backend] error: redis :: redis replica connection error ::  Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379 
+2026-02-20 13:14:12 [nmbp-auth-backend] error: uncaughtException: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379
+Error: connect ECONNREFUSED 127.0.0.1:6379
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) 
+2026-02-20 13:14:12 [nmbp-auth-backend] error: redis primary connection error Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379 
+2026-02-20 13:14:12 [nmbp-auth-backend] error: uncaughtException: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379
+Error: connect ECONNREFUSED 127.0.0.1:6379
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) 

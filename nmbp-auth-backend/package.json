@@ -1,0 +1,106 @@
+{
+  "name": "nmbp-auth-backend",
+  "version": "1.0.0",
+  "description": "Manages Auth APIs",
+  "main": "src/main/app.ts",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha -r ts-node/register 'src/tests/*.test.ts'",
+    "start": "nodemon --exec ts-node src/main/app.ts",
+    "prestart": "npx ts-node src/main/swagger/swagger.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechknowkraftAI/temple-seva.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TechknowkraftAI/temple-seva/issues"
+  },
+  "homepage": "https://github.com/TechknowkraftAI/temple-seva#readme",
+  "devDependencies": {
+    "@types/chai": "^4.3.17",
+    "@types/express": "^4.17.21",
+    "@types/express-fileupload": "^1.5.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^22.5.0",
+    "@types/supertest": "^6.0.2",
+    "@types/swagger-ui-express": "^4.1.6",
+    "chai": "^5.1.1",
+    "express": "^4.19.2",
+    "mocha": "^10.7.3",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "chai": "^5.1.2",
+    "cross-env": "^7.0.3",
+    "describe": "^1.2.0",
+    "dotenv": "^16.4.5",
+    "express-fileupload": "^1.5.1",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "joi": "^17.13.3",
+    "moment": "^2.30.1",
+    "supertest": "^7.0.0",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1",
+    "ts-commons": "git+https://pillirs:tlp-k1-360.443174a175ff0cb792c581854ea632cefebac7b4610e71ff7a71d7bcda769e80@openforge.gov.in/plugins/git/common-components-negd/commons.git#v1.0.1",
+    "uuid": "^10.0.0"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      "node_modules/**/node_modules",
+      "src/main/swagger/swagger.json"
+    ],
+    "delay": "2000",
+    "env": {
+      "APP_ENV": "dev",
+      "PORT": 7001,
+      "HOST": "localhost",
+      "MODULE": "nmbp-auth-backend",
+      "INIT_COMMON_NOSQL_DB_REQUIRED": true,
+      "INIT_COMMON_NOSQL_HOST": "localhost",
+      "INIT_COMMON_NOSQL_PORT": 27017,
+      "INIT_COMMON_NOSQL_AUTH_DATABASE": "admin",
+      "INIT_COMMON_NOSQL_DATABASE": "reusable_components",
+      "INIT_COMMON_NOSQL_USER": "dev_local",
+      "INIT_COMMON_NOSQL_PASSWORD": "reusable_components",
+      "INIT_COMMON_REDIS_REQUIRED": true,
+      "INIT_COMMON_REDIS_HOST": "127.0.0.1",
+      "INIT_COMMON_REDIS_PORT": 6379,
+      "INIT_COMMON_REDIS_KEY_PREFIX": "dev|reusable_components",
+      "INIT_COMMON_PG_DB_REQUIRED": true,
+      "INIT_COMMON_MASTER_HOST": "localhost",
+      "INIT_COMMON_MASTER_USER": "postgres",
+      "INIT_COMMON_MASTER_DATABASE": "reusable_components",
+      "INIT_COMMON_MASTER_PASSWORD": "StrongPassword123",
+      "INIT_COMMON_MASTER_PORT": 5432,
+      "INIT_COMMON_NODEMAILER_USER": "info@oe.in",
+      "INIT_COMMON_NODEMAILER_PASSWORD": "a1TXLpy",
+      "INIT_COMMON_NODEMAILER_HOST": "smtro.zoho.in",
+      "INIT_COMMON_NODEMAILER_SERVICE": "ZOHO PRO",
+      "INIT_COMMON_NODEMAILER_PORT": 465,
+      "TS_DECRYPT_SENSITIVE_DATA": true,
+      "TS_ENABLE_ADMIN_EMAIL_FORGOT_PWD_OTP": false,
+      "TS_ENABLE_ADMIN_PHONE_FORGOT_PWD_OTP": false,
+      "TS_ENABLE_ADMIN_EMAIL_LOGIN_OTP": false,
+      "TS_ENABLE_ADMIN_PHONE_LOGIN_OTP": false,
+      "INIT_COMMON_SMS_GATEWAY_BASE_URL": "http://nimbusit.biz/api/SmsApi/SendleApi",
+      "INIT_COMMON_SMS_GATEWAY_PASSWORD": "ggul3GG",
+      "INIT_COMMON_SMS_GATEWAY_USER_ID": "Subiz",
+      "INIT_COMMON_DLT_SENDER_ID": "OZNT",
+      "INIT_COMMON_DLT_ENTITY_ID": "1201171350740034",
+      "INIT_COMMON_WHATSAPP_GATEWAY_BASE_URL": "https://api.pinbot.ai/v2/wamessage/senssage",
+      "INIT_COMMON_WHATSAPP_GATEWAY_API_KEY": "f0c84790-19c4-11ef-b22d-92d2c2d",
+      "INIT_COMMON_WHATSAPP_GATEWAY_FROM_MOBILE_NUMBER": "918528187"
+    }
+  }
+}

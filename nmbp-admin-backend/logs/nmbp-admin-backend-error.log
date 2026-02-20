@@ -1,0 +1,236 @@
+2026-02-20 12:08:01 [nmbp-admin-backend] error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/main/startup/routes.ts[0m:[93m9[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/formBuilderRouter' or its corresponding type declarations.
+
+[7m9[0m import formBuilderRouter from "../api/routes/formBuilderRouter";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m10[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/tenantsRouter' or its corresponding type declarations.
+
+[7m10[0m import tenantsRouter from "../api/routes/tenantsRouter";
+[7m  [0m [91m                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m11[0m:[93m28[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/projectsRouter' or its corresponding type declarations.
+
+[7m11[0m import projectsRouter from "../api/routes/projectsRouter";
+[7m  [0m [91m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/main/startup/routes.ts[0m:[93m9[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/formBuilderRouter' or its corresponding type declarations.
+
+[7m9[0m import formBuilderRouter from "../api/routes/formBuilderRouter";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m10[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/tenantsRouter' or its corresponding type declarations.
+
+[7m10[0m import tenantsRouter from "../api/routes/tenantsRouter";
+[7m  [0m [91m                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m11[0m:[93m28[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/projectsRouter' or its corresponding type declarations.
+
+[7m11[0m import projectsRouter from "../api/routes/projectsRouter";
+[7m  [0m [91m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+    at createTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at require (node:internal/modules/helpers:177:18)
+    at Object.<anonymous> (/home/pillirs/projects/nmbp/nmbp-admin-backend/src/main/app.ts:13:1)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1618:23)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12) 
+2026-02-20 12:23:20 [nmbp-admin-backend] error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/main/startup/routes.ts[0m:[93m9[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/formBuilderRouter' or its corresponding type declarations.
+
+[7m9[0m import formBuilderRouter from "../api/routes/formBuilderRouter";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m10[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/tenantsRouter' or its corresponding type declarations.
+
+[7m10[0m import tenantsRouter from "../api/routes/tenantsRouter";
+[7m  [0m [91m                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m11[0m:[93m28[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/projectsRouter' or its corresponding type declarations.
+
+[7m11[0m import projectsRouter from "../api/routes/projectsRouter";
+[7m  [0m [91m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/main/startup/routes.ts[0m:[93m9[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/formBuilderRouter' or its corresponding type declarations.
+
+[7m9[0m import formBuilderRouter from "../api/routes/formBuilderRouter";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m10[0m:[93m27[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/tenantsRouter' or its corresponding type declarations.
+
+[7m10[0m import tenantsRouter from "../api/routes/tenantsRouter";
+[7m  [0m [91m                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/startup/routes.ts[0m:[93m11[0m:[93m28[0m - [91merror[0m[90m TS2307: [0mCannot find module '../api/routes/projectsRouter' or its corresponding type declarations.
+
+[7m11[0m import projectsRouter from "../api/routes/projectsRouter";
+[7m  [0m [91m                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+    at createTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at require (node:internal/modules/helpers:177:18)
+    at Object.<anonymous> (/home/pillirs/projects/nmbp/nmbp-admin-backend/src/main/app.ts:13:1)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1618:23)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12) 
+2026-02-20 13:00:26 [nmbp-admin-backend] error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/controllers/index.ts[0m:[93m6[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module './tenantsController' or its corresponding type declarations.
+
+[7m6[0m import tenantsController from "./tenantsController";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/controllers/index.ts[0m:[93m7[0m:[93m32[0m - [91merror[0m[90m TS2307: [0mCannot find module './projectsController' or its corresponding type declarations.
+
+[7m7[0m import projectsController from "./projectsController";
+[7m [0m [91m                               ~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/controllers/index.ts[0m:[93m8[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderController' or its corresponding type declarations.
+
+[7m8[0m import formBuilderController from "./formBuilderController";
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/controllers/index.ts[0m:[93m6[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module './tenantsController' or its corresponding type declarations.
+
+[7m6[0m import tenantsController from "./tenantsController";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/controllers/index.ts[0m:[93m7[0m:[93m32[0m - [91merror[0m[90m TS2307: [0mCannot find module './projectsController' or its corresponding type declarations.
+
+[7m7[0m import projectsController from "./projectsController";
+[7m [0m [91m                               ~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/controllers/index.ts[0m:[93m8[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderController' or its corresponding type declarations.
+
+[7m8[0m import formBuilderController from "./formBuilderController";
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+    at createTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at require (node:internal/modules/helpers:177:18)
+    at Object.<anonymous> (/home/pillirs/projects/nmbp/nmbp-admin-backend/src/main/api/routes/adminRouter.ts:2:1)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1618:23)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12) 
+2026-02-20 13:01:07 [nmbp-admin-backend] error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/repositories/index.ts[0m:[93m5[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderRepository' or its corresponding type declarations.
+
+[7m5[0m import formBuilderRepository from "./formBuilderRepository";
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/repositories/index.ts[0m:[93m5[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderRepository' or its corresponding type declarations.
+
+[7m5[0m import formBuilderRepository from "./formBuilderRepository";
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+    at createTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at require (node:internal/modules/helpers:177:18)
+    at Object.<anonymous> (/home/pillirs/projects/nmbp/nmbp-admin-backend/src/main/api/services/usersService.ts:16:1)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1618:23)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12) 
+2026-02-20 13:01:19 [nmbp-admin-backend] error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/repositories/index.ts[0m:[93m5[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderRepository' or its corresponding type declarations.
+
+[7m5[0m import formBuilderRepository from "./formBuilderRepository";
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/repositories/index.ts[0m:[93m5[0m:[93m35[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderRepository' or its corresponding type declarations.
+
+[7m5[0m import formBuilderRepository from "./formBuilderRepository";
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+    at createTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at require (node:internal/modules/helpers:177:18)
+    at Object.<anonymous> (/home/pillirs/projects/nmbp/nmbp-admin-backend/src/main/api/services/usersService.ts:16:1)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1618:23)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12) 
+2026-02-20 13:01:38 [nmbp-admin-backend] error: uncaughtException: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/validations/index.ts[0m:[93m5[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module './tenantValidations' or its corresponding type declarations.
+
+[7m5[0m import tenantValidations from "./tenantValidations";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/validations/index.ts[0m:[93m6[0m:[93m32[0m - [91merror[0m[90m TS2307: [0mCannot find module './projectValidations' or its corresponding type declarations.
+
+[7m6[0m import projectValidations from "./projectValidations";
+[7m [0m [91m                               ~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/validations/index.ts[0m:[93m7[0m:[93m36[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderValidations' or its corresponding type declarations.
+
+[7m7[0m import formBuilderValidations from "./formBuilderValidations";
+[7m [0m [91m                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+TSError: ⨯ Unable to compile TypeScript:
+[96msrc/main/api/validations/index.ts[0m:[93m5[0m:[93m31[0m - [91merror[0m[90m TS2307: [0mCannot find module './tenantValidations' or its corresponding type declarations.
+
+[7m5[0m import tenantValidations from "./tenantValidations";
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/validations/index.ts[0m:[93m6[0m:[93m32[0m - [91merror[0m[90m TS2307: [0mCannot find module './projectValidations' or its corresponding type declarations.
+
+[7m6[0m import projectValidations from "./projectValidations";
+[7m [0m [91m                               ~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/main/api/validations/index.ts[0m:[93m7[0m:[93m36[0m - [91merror[0m[90m TS2307: [0mCannot find module './formBuilderValidations' or its corresponding type declarations.
+
+[7m7[0m import formBuilderValidations from "./formBuilderValidations";
+[7m [0m [91m                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+    at createTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1617:30)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Function.Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Module.require (node:internal/modules/cjs/loader:1231:19)
+    at require (node:internal/modules/helpers:177:18)
+    at Object.<anonymous> (/home/pillirs/projects/nmbp/nmbp-admin-backend/src/main/api/controllers/usersController.ts:9:1)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module.m._compile (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1618:23)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Object.require.extensions.<computed> [as .ts] (/home/pillirs/projects/nmbp/nmbp-admin-backend/node_modules/ts-node/src/index.ts:1621:12) 
+2026-02-20 13:14:12 [nmbp-admin-backend] error: redis :: redis replica connection error ::  Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379 
+2026-02-20 13:14:12 [nmbp-admin-backend] error: uncaughtException: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379
+Error: connect ECONNREFUSED 127.0.0.1:6379
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) 

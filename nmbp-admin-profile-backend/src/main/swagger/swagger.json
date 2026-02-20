@@ -1,0 +1,155 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "nmbp-admin-profile-backend",
+    "description": "User Backend APIs for the RBAC/UBAC Module. Provides endpoints for logged-in users to view and update their own profile information.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:7002",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Users",
+      "description": "User service health check"
+    },
+    {
+      "name": "Admin",
+      "description": "User self-service endpoints - view profile, update profile, and upload profile picture"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT token obtained from the Auth service login endpoint"
+    }
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/user/admin/updateProfilePic": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Upload Profile Picture",
+        "description": "Upload or replace the profile picture for the currently authenticated user. Accepts JPEG/PNG files only. Max file size is configured via EP_UPLOAD_FILE_SIZE_LIMIT (default 5MB).",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "required": true,
+            "type": "file",
+            "description": "Profile picture file to upload"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/user/admin/updateProfile": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update My Profile",
+        "description": "Update the profile details (first name, last name, email, date of birth) of the currently authenticated user",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "example": "Narsima"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "Chilkuri"
+                },
+                "email_id": {
+                  "type": "string",
+                  "example": "narsimachilkuri237@gmail.com"
+                },
+                "dob": {
+                  "type": "string",
+                  "example": "1997-08-16"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/user/admin/loggedUserInfo": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Logged-In User Info",
+        "description": "Retrieve the profile details (name, email, mobile, role, profile picture URL) of the currently authenticated user using the JWT token",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/user/health": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Health Check",
+        "description": "Verify that the User Backend service is running and responsive",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+@import "tailwindcss/base";
+@import "tailwindcss/utilities";
+@import "tailwindcss/components";
+
+html,
+body,
+input,
+textarea {
+  font-family: "Poppins" !important;
+}
+
+.devotee-tabs.mantine-focus-auto {
+  color: brown !important;
+  border-color: brown !important;
+}
+
+::-webkit-scrollbar {
+  width: 0.3rem;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ed8525;
+  border-radius: 1rem;
+}

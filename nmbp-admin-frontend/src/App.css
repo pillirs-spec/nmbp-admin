@@ -1,0 +1,20 @@
+.forget-password-button,
+.verfity-otp-button {
+  background: #0000FF !important ;
+}
+
+.using-otp-login {
+  background: #0000FF !important;
+}
+
+.forget-password-input {
+  background: #f0f0f0 !important;
+}
+
+.using-otp-login-input {
+  background: #f0f0f0 !important;
+}
+
+.verify-otp-label {
+  background: #f0f0f0 !important;
+}

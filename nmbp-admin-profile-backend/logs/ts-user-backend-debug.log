@@ -1,0 +1,57 @@
+2026-02-19 10:33:31 [nmbp-admin-profile-backend] info: redis :: Redis replica host not found. falling back to the primary redis host 
+2026-02-19 10:33:34 [nmbp-admin-profile-backend] info: objectStorageUtility :: Using Minio 
+2026-02-19 10:33:35 [nmbp-admin-profile-backend] info: app :: Server Started :: Listening to port [7002] 
+2026-02-19 10:33:35 [nmbp-admin-profile-backend] info: redis :: redis client connected 
+2026-02-19 10:33:35 [nmbp-admin-profile-backend] info: redis :: redis clientReader connected 
+2026-02-19 10:33:36 [nmbp-admin-profile-backend] info: mongoDB :: Connected successfully to MongoDB server 
+2026-02-19 10:33:36 [nmbp-admin-profile-backend] info: mongoDBRead :: Connected successfully to MongoDB Read server 
+2026-02-19 10:41:29 [nmbp-admin-profile-backend] info: redis :: Redis replica host not found. falling back to the primary redis host 
+2026-02-19 10:41:31 [nmbp-admin-profile-backend] info: objectStorageUtility :: Using Minio 
+2026-02-19 10:41:32 [nmbp-admin-profile-backend] info: app :: Server Started :: Listening to port [7002] 
+2026-02-19 10:41:32 [nmbp-admin-profile-backend] info: redis :: redis client connected 
+2026-02-19 10:41:32 [nmbp-admin-profile-backend] info: redis :: redis clientReader connected 
+2026-02-19 10:41:32 [nmbp-admin-profile-backend] info: mongoDB :: Connected successfully to MongoDB server 
+2026-02-19 10:41:32 [nmbp-admin-profile-backend] info: mongoDBRead :: Connected successfully to MongoDB Read server 
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] info: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] info: Read Token Successfully for User : 8766516289 
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] info: adminController :: getLoggedInUserInfo :: Request Received  
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] info: adminService :: getLoggedInUserInfo :: Request received :: user_id :: 3 
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] debug: adminService :: getLoggedInUserInfo :: cachedResult :: false 
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] debug: adminRepository :: getLoggedInUserInfo :: query :: {"text":"SELECT \n    U.user_id AS user_id,\n    U.user_name AS user_name,\n    TO_CHAR(U.dob, 'DD/MM/YYYY') AS dob,\n    U.gender AS gender,\n    U.email_id AS email_id,\n    U.first_name AS first_name,\n    U.last_name AS last_name,\n    U.mobile_number AS mobile_number,\n    U.display_name AS display_name,\n    R.role_id AS role_id,\n    R.role_name AS role_name,\n    U.profile_pic_url\nFROM \n    m_users U\nLEFT OUTER JOIN \n    m_roles R \nON \n    U.role_id = R.role_id\nWHERE \n    U.user_id = $1 \n    AND U.status IN (1, 4)\n","values":[3]} 
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] debug: adminRepository :: getLoggedInUserInfo :: db result :: [{"user_id":3,"user_name":"8766516289","dob":null,"gender":null,"email_id":"admin@gmail.com","first_name":"Admin","last_name":"Admin","mobile_number":"8766516289","display_name":"Admin Admin","role_id":8,"role_name":"Admin","profile_pic_url":null}] 
+2026-02-19 10:41:50 [nmbp-admin-profile-backend] debug: adminService :: getLoggedInUserInfo :: user :: {"user_id":3,"user_name":"8766516289","dob":null,"gender":null,"email_id":"admin@gmail.com","first_name":"Admin","last_name":"Admin","mobile_number":"8766516289","display_name":"Admin Admin","role_id":8,"role_name":"Admin","profile_pic_url":null} 
+2026-02-19 10:44:20 [nmbp-admin-profile-backend] info: redis :: Redis replica host not found. falling back to the primary redis host 
+2026-02-19 10:44:22 [nmbp-admin-profile-backend] info: objectStorageUtility :: Using Minio 
+2026-02-19 10:44:23 [nmbp-admin-profile-backend] info: app :: Server Started :: Listening to port [7002] 
+2026-02-19 10:44:23 [nmbp-admin-profile-backend] info: redis :: redis client connected 
+2026-02-19 10:44:23 [nmbp-admin-profile-backend] info: redis :: redis clientReader connected 
+2026-02-19 10:44:23 [nmbp-admin-profile-backend] info: mongoDB :: Connected successfully to MongoDB server 
+2026-02-19 10:44:23 [nmbp-admin-profile-backend] info: mongoDBRead :: Connected successfully to MongoDB Read server 
+2026-02-19 10:45:51 [nmbp-admin-profile-backend] info: redis :: Redis replica host not found. falling back to the primary redis host 
+2026-02-19 10:45:51 [nmbp-admin-profile-backend] info: objectStorageUtility :: Using Minio 
+2026-02-19 10:45:52 [nmbp-admin-profile-backend] info: app :: Server Started :: Listening to port [7002] 
+2026-02-19 10:45:52 [nmbp-admin-profile-backend] info: redis :: redis client connected 
+2026-02-19 10:45:52 [nmbp-admin-profile-backend] info: redis :: redis clientReader connected 
+2026-02-19 10:45:52 [nmbp-admin-profile-backend] info: mongoDB :: Connected successfully to MongoDB server 
+2026-02-19 10:45:52 [nmbp-admin-profile-backend] info: mongoDBRead :: Connected successfully to MongoDB Read server 
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] info: >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] info: Read Token Successfully for User : 8766516289 
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] info: adminController :: getLoggedInUserInfo :: Request Received  
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] info: adminService :: getLoggedInUserInfo :: Request received :: user_id :: 3 
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] debug: adminService :: getLoggedInUserInfo :: cachedResult :: false 
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] debug: adminRepository :: getLoggedInUserInfo :: query :: {"text":"SELECT \n    U.user_id AS user_id,\n    U.user_name AS user_name,\n    TO_CHAR(U.dob, 'DD/MM/YYYY') AS dob,\n    U.gender AS gender,\n    U.email_id AS email_id,\n    U.first_name AS first_name,\n    U.last_name AS last_name,\n    U.mobile_number AS mobile_number,\n    U.display_name AS display_name,\n    R.role_id AS role_id,\n    R.role_name AS role_name,\n    U.profile_pic_url\nFROM \n    m_users U\nLEFT OUTER JOIN \n    m_roles R \nON \n    U.role_id = R.role_id\nWHERE \n    U.user_id = $1 \n    AND U.status IN (1, 4)\n","values":[3]} 
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] debug: adminRepository :: getLoggedInUserInfo :: db result :: [{"user_id":3,"user_name":"8766516289","dob":null,"gender":null,"email_id":"admin@gmail.com","first_name":"Admin","last_name":"Admin","mobile_number":"8766516289","display_name":"Admin Admin","role_id":8,"role_name":"Admin","profile_pic_url":null}] 
+2026-02-19 11:53:03 [nmbp-admin-profile-backend] debug: adminService :: getLoggedInUserInfo :: user :: {"user_id":3,"user_name":"8766516289","dob":null,"gender":null,"email_id":"admin@gmail.com","first_name":"Admin","last_name":"Admin","mobile_number":"8766516289","display_name":"Admin Admin","role_id":8,"role_name":"Admin","profile_pic_url":null} 
+2026-02-19 11:59:55 [nmbp-admin-profile-backend] info: redis :: Redis replica host not found. falling back to the primary redis host 
+2026-02-19 11:59:59 [nmbp-admin-profile-backend] info: objectStorageUtility :: Using Minio 
+2026-02-19 12:00:02 [nmbp-admin-profile-backend] info: app :: Server Started :: Listening to port [7002] 
+2026-02-19 12:00:02 [nmbp-admin-profile-backend] info: redis :: redis client connected 
+2026-02-19 12:00:02 [nmbp-admin-profile-backend] info: redis :: redis clientReader connected 
+2026-02-19 12:00:02 [nmbp-admin-profile-backend] info: mongoDB :: Connected successfully to MongoDB server 
+2026-02-19 12:00:02 [nmbp-admin-profile-backend] info: mongoDBRead :: Connected successfully to MongoDB Read server 
+2026-02-20 10:53:42 [nmbp-admin-profile-backend] info: redis :: redis replica connection end undefined 
+2026-02-20 10:53:43 [nmbp-admin-profile-backend] info: redis :: redis primary connection end undefined 
+2026-02-20 10:53:43 [nmbp-admin-profile-backend] error: redis :: redis replica connection error ::  Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379 
+2026-02-20 10:53:43 [nmbp-admin-profile-backend] error: uncaughtException: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379
+Error: connect ECONNREFUSED 127.0.0.1:6379
+    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) 

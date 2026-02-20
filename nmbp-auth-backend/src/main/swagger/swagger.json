@@ -1,0 +1,297 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "nmbp-auth-backend",
+    "description": "Auth Backend APIs for the RBAC/UBAC Module. Handles authentication, login (password & OTP), logout, token validation, and forgot password flows.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:7001",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Auth service health check"
+    },
+    {
+      "name": "Admin",
+      "description": "Authentication endpoints - login, logout, OTP, token validation, and password reset"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT token obtained from the login endpoint"
+    }
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/auth/admin/validateToken": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Validate Token",
+        "description": "Verify a JWT token and return the decoded payload. Pass the token in the Authorization header.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/admin/login": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Login (Password)",
+        "description": "Authenticate with username (mobile number) and password. Returns a JWT token on success. Password must be AES-encrypted if decryptSensitiveData is enabled. Account locks after exceeding max invalid attempts.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_name": {
+                  "type": "string",
+                  "example": "1234567890"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "encryptedPassword"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/admin/logout": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Logout",
+        "description": "Logout the currently authenticated user. Invalidates the session and clears cached user data from Redis.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/admin/getForgetPasswordOtp": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Request Forgot Password OTP",
+        "description": "Generate and send a one-time password (OTP) to the registered mobile number for the forgot password flow. Returns a txnId to use in the verify step.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mobile_number": {
+                  "type": "number",
+                  "example": 8169104556
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/admin/verifyForgetPasswordOtp": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Verify Forgot Password OTP",
+        "description": "Verify the OTP received for forgot password. On success, returns a new txnId to use in the reset password step. OTP must be AES-encrypted if decryptSensitiveData is enabled.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string",
+                  "example": "encryptedOtp"
+                },
+                "txnId": {
+                  "type": "string",
+                  "example": "uuid"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/admin/resetForgetPassword": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Reset Forgot Password",
+        "description": "Set a new password after OTP verification. Requires the txnId from the verify step. Passwords must be AES-encrypted if decryptSensitiveData is enabled. New password must differ from the current password and meet complexity requirements (min 8 chars, at least 1 letter and 1 digit).",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "txnId": {
+                  "type": "string",
+                  "example": "uuid"
+                },
+                "newPassword": {
+                  "type": "string",
+                  "example": "encryptedPasswordHash"
+                },
+                "confirmPassword": {
+                  "type": "string",
+                  "example": "encryptedPasswordHash"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/admin/getLoginOtp": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Request Login OTP",
+        "description": "Generate and send a 6-digit OTP to the registered mobile number for OTP-based login. Returns a txnId to use in the verify step. If an OTP was already generated, returns the existing txnId.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "mobileNumber": {
+                  "type": "string",
+                  "example": "8169104556"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/admin/verifyLoginOtp": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Verify Login OTP",
+        "description": "Verify the OTP for OTP-based login. On success, returns a JWT token. OTP must be AES-encrypted if decryptSensitiveData is enabled.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string",
+                  "example": "encryptedOtpHash"
+                },
+                "txnId": {
+                  "type": "string",
+                  "example": "uuid"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/auth/health": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Health Check",
+        "description": "Verify that the Auth Backend service is running and responsive",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    }
+  }
+}

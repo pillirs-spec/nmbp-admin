@@ -1,0 +1,100 @@
+{
+  "name": "nmbp-admin-profile-backend",
+  "version": "1.0.0",
+  "description": "Manages User APIs",
+  "main": "src/main/app.ts",
+  "scripts": {
+    "test": "mocha -r ts-node/register 'src/tests/*.test.ts'",
+    "start": "nodemon --exec ts-node src/main/app.ts",
+    "prestart": "npx ts-node src/main/swagger/swagger.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TechknowkraftAI/temple-seva.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TechknowkraftAI/temple-seva/issues"
+  },
+  "homepage": "https://github.com/TechknowkraftAI/temple-seva#readme",
+  "devDependencies": {
+    "@types/chai": "^4.3.17",
+    "@types/express": "^4.17.21",
+    "@types/express-fileupload": "^1.5.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^22.5.0",
+    "@types/supertest": "^6.0.2",
+    "@types/swagger-ui-express": "^4.1.6",
+    "chai": "^5.1.1",
+    "express": "^4.19.2",
+    "mocha": "^10.7.3",
+    "nodemon": "^3.1.4",
+    "supertest": "^7.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "express-fileupload": "^1.5.1",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "joi": "^17.13.3",
+    "moment": "^2.30.1",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^10.0.0",
+    "ts-commons": "git+https://pillirs:tlp-k1-360.443174a175ff0cb792c581854ea632cefebac7b4610e71ff7a71d7bcda769e80@openforge.gov.in/plugins/git/common-components-negd/commons.git#v1.0.1"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      "node_modules/**/node_modules",
+      "src/main/swagger/swagger.json"
+    ],
+    "delay": "2000",
+    "env": {
+      "APP_ENV": "dev",
+      "PORT": 7002,
+      "HOST": "localhost",
+      "MODULE": "nmbp-admin-profile-backend",
+      "INIT_COMMON_NOSQL_DB_REQUIRED": true,
+      "INIT_COMMON_NOSQL_HOST": "localhost",
+      "INIT_COMMON_NOSQL_PORT": 27017,
+      "INIT_COMMON_NOSQL_AUTH_DATABASE": "admin",
+      "INIT_COMMON_NOSQL_DATABASE": "reusable_components",
+      "INIT_COMMON_NOSQL_USER": "dev_local",
+      "INIT_COMMON_NOSQL_PASSWORD": "reusable_components",
+      "INIT_COMMON_REDIS_REQUIRED": true,
+      "INIT_COMMON_REDIS_HOST": "127.0.0.1",
+      "INIT_COMMON_REDIS_PORT": 6379,
+      "INIT_COMMON_REDIS_KEY_PREFIX": "dev|reusable_components",
+      "INIT_COMMON_PG_DB_REQUIRED": true,
+      "INIT_COMMON_MASTER_HOST": "localhost",
+      "INIT_COMMON_MASTER_USER": "postgres",
+      "INIT_COMMON_MASTER_DATABASE": "reusable_components",
+      "INIT_COMMON_MASTER_PASSWORD": "StrongPassword123",
+      "INIT_COMMON_MASTER_PORT": 5432,
+      "INIT_COMMON_NODEMAILER_USER": "info@onte.in",
+      "INIT_COMMON_NODEMAILER_PASSWORD": "a1TXXeLpy",
+      "INIT_COMMON_NODEMAILER_HOST": "smpro.zoho.in",
+      "INIT_COMMON_NODEMAILER_SERVICE": "ZO PRO",
+      "INIT_COMMON_NODEMAILER_PORT": 465,
+      "INIT_COMMON_USE_MINIO": true,
+      "INIT_COMMON_MINIO_ENDPOINT": "apiminio.dev.onte.in",
+      "INIT_COMMON_MINIO_ENABLE_SSL": true,
+      "INIT_COMMON_MINIO_ACCESS_KEY": "dev",
+      "INIT_COMMON_MINIO_SECRET_KEY": "by20KifceCIJ",
+      "INIT_COMMON_LOG_LEVEL": "debug",
+      "INIT_COMMON_SMS_GATEWAY_BASE_URL": "http://nimbusit.biz/api/SmsApi/SendgleApi",
+      "INIT_COMMON_SMS_GATEWAY_PASSWORD": "ggu12GG",
+      "INIT_COMMON_SMS_GATEWAY_USER_ID": "Sudbiz",
+      "INIT_COMMON_DLT_SENDER_ID": "ORT",
+      "INIT_COMMON_DLT_ENTITY_ID": "1201171350746034",
+      "INIT_COMMON_WHATSAPP_GATEWAY_BASE_URL": "https://api.pinbot.ai/v2/wamessage/senessage",
+      "INIT_COMMON_WHATSAPP_GATEWAY_API_KEY": "f0c84790-19c4-11ef-bd-92672d2d0c2d",
+      "INIT_COMMON_WHATSAPP_GATEWAY_FROM_MOBILE_NUMBER": "918528187"
+    }
+  }
+}
