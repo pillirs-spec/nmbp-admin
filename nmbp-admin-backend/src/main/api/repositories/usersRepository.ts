@@ -40,6 +40,8 @@ const usersRepository = {
           user.mobile_number,
           user.password,
           user.role_id,
+          user.state_id,
+          user.district_id,
           user.email_id,
           user.created_by,
           user.updated_by,
@@ -76,6 +78,8 @@ const usersRepository = {
           user.email_id,
           user.updated_by,
           user.role_id,
+          user.state_id,
+          user.district_id,
           `${user.first_name} ${user.last_name}`,
         ],
       };

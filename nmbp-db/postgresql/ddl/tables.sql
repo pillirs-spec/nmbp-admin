@@ -44,6 +44,8 @@ CREATE TABLE m_users (
     mobile_number BIGINT,
     email_id VARCHAR(255),
     role_id INT REFERENCES m_roles(role_id),
+    state_id INT REFERENCES m_states(state_id),
+    district_id INT REFERENCES m_districts(district_id),
     dob DATE,
     gender SMALLINT,
     password VARCHAR(255),
@@ -92,4 +94,28 @@ CREATE TABLE m_countries (
     country_code VARCHAR(10),
     dial_code VARCHAR(10)
 );
+
+CREATE table m_states (
+state_id SERIAL PRIMARY KEY,
+state_name VARCHAR(100) NOT NULL UNIQUE,
+state_type VARCHAR(100) NOT NULL CHECK (state_type IN ('STATE', 'UNION_TERRITORY')),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
+CREATE TABLE m_districts (
+    district_id SERIAL PRIMARY KEY,
+    district_name VARCHAR(100) NOT NULL,
+    state_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT fk_state
+        FOREIGN KEY (state_id)
+        REFERENCES states(state_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+        
+    CONSTRAINT unique_district_per_state
+        UNIQUE (district_name, state_id)
+);
+
 

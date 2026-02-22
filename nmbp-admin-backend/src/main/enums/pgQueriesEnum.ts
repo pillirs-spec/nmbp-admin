@@ -5,9 +5,9 @@ export enum UserQueries {
   UPDATE_USER_STATUS = `UPDATE m_users SET status = $2, updated_by = $3, date_updated = NOW() WHERE user_id = $1`,
   EXISTS_BY_MOBILE_NUMBER = `SELECT EXISTS (SELECT 1 FROM m_users WHERE mobile_number = $1 AND status <> 2)`,
   EXISTS_BY_USER_ID = `SELECT EXISTS (SELECT 1 FROM m_users WHERE user_id = $1)`,
-  CREATE_USER = `INSERT INTO m_users(user_name, first_name, last_name, display_name, dob, gender, mobile_number, password, role_id, email_id, created_by, updated_by, date_created, date_updated)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW()) RETURNING user_id`,
-  UPDATE_USER = `UPDATE m_users SET first_name = $2, last_name = $3, dob = $4, gender = $5, mobile_number = $6, email_id = $7, updated_by = $8, role_id = $9, display_name = $10, date_updated = NOW() WHERE user_id = $1`,
+  CREATE_USER = `INSERT INTO m_users(user_name, first_name, last_name, display_name, dob, gender, mobile_number, password, role_id, state_id, district_id, email_id, created_by, updated_by,  date_created, date_updated)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW()) RETURNING user_id`,
+  UPDATE_USER = `UPDATE m_users SET first_name = $2, last_name = $3, dob = $4, gender = $5, mobile_number = $6, email_id = $7, updated_by = $8, role_id = $9, state_id = $10, district_id = $11, display_name = $12, date_updated = NOW() WHERE user_id = $1`,
   GET_USERS_BY_ROLE_ID = `SELECT user_id, user_name, initcap(display_name) as display_name, mobile_number from m_users where role_id = $1 AND status <> 2`,
   RESET_PASSWORD_FOR_USER_ID = `UPDATE m_users SET password = $2, password_last_updated = NOW(), date_updated = NOW() WHERE user_id = $1`,
   USERS_COUNT = `SELECT count(*) as count from vw_m_users WHERE status <> 2`,
@@ -22,6 +22,14 @@ export enum MenuQueries {
   GET_MENU_BY_ID = `SELECT menu_name, menu_description, status, menu_order, route_url, icon_class, date_created, date_updated FROM m_menus WHERE menu_id = $1 AND status <> 2`,
   LIST_MENUS = `SELECT menu_id, menu_name, menu_description, status, menu_order, route_url, icon_class FROM m_menus WHERE status <> 2 ORDER BY menu_order, date_updated DESC`,
   UPDATE_MENU_STATUS = `UPDATE m_menus SET status = $2, date_updated = NOW() WHERE menu_id = $1`,
+}
+
+export enum StateQueries {
+  LIST_STATES = `SELECT state_id, state_name, created_at FROM m_states ORDER BY state_name ASC`,
+}
+
+export enum DistrictQueries {
+  LIST_DISTRICTS_BY_STATE = `SELECT district_id, district_name FROM m_districts WHERE state_id = $1 ORDER BY district_name ASC`,
 }
 
 export enum PasswordPolicyQueries {

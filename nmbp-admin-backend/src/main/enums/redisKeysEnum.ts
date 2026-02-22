@@ -5,6 +5,8 @@ export enum RedisKeys {
   USERS_BY_ROLE_ID = "users|role:${roleId}",
   USERS_COUNT = "users_count",
   MENUS = "menus",
+  STATES = "states",
+  DISTRICTS_BY_STATE = "districts|state:${state_id}",
   MENU_BY_ID = "menu:${menuId}",
   PASSWORD_POLICIES = "password_policies",
   PASSWORD_POLICY_BY_ID = "password_policy:${passwordPolicyId}",

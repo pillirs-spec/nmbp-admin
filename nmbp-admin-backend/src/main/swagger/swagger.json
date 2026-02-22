@@ -61,44 +61,6 @@
             "required": true,
             "type": "string",
             "description": "JWT token for authentication"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "first_name": {
-                  "type": "string",
-                  "example": "Rajesh"
-                },
-                "last_name": {
-                  "type": "string",
-                  "example": "Nayak"
-                },
-                "email_id": {
-                  "type": "string",
-                  "example": "rajeshnayak899@gmail.com"
-                },
-                "mobile_number": {
-                  "type": "string",
-                  "example": "8249834095"
-                },
-                "dob": {
-                  "type": "string",
-                  "example": "1997-07-21"
-                },
-                "gender": {
-                  "type": "number",
-                  "example": 1
-                },
-                "role_id": {
-                  "type": "number",
-                  "example": 2
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -161,6 +123,14 @@
                 "role_id": {
                   "type": "number",
                   "example": 2
+                },
+                "state_id": {
+                  "type": "number",
+                  "example": 21
+                },
+                "district_id": {
+                  "type": "number",
+                  "example": 189
                 }
               }
             }
@@ -1102,6 +1072,59 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/locations/states": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "List All States",
+        "description": "This API is used to fetch all the states.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/locations/districts/{state_id}": {
+      "get": {
+        "tags": [
+          "Locations"
+        ],
+        "summary": "List Districts by State ID",
+        "description": "This API is used to fetch all the districts for a given state ID.",
+        "parameters": [
+          {
+            "name": "state_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the state to fetch districts for"
           },
           {
             "name": "Authorization",

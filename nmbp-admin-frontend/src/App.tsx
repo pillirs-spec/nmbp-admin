@@ -27,9 +27,9 @@ const StatesManagement = lazy(
   () => import("./pages/Admin/StatesManagement/StatesManagement"),
 );
 
-// const UserManagement = lazy(
-//   () => import("./pages/Admin/UserManagement/UserManagement"),
-// );
+const UserManagement = lazy(
+  () => import("./pages/Admin/UserManagement/UserManagement"),
+);
 const RoleManagement = lazy(
   () => import("./pages/Admin/RoleManagement/RoleManagement"),
 );
@@ -93,10 +93,10 @@ function App() {
               path="/dashboard"
               element={<PrivateRoutes element={<Dashboard />} />}
             />
-            {/* <Route
+            <Route
               path="/user-management"
               element={<PrivateRoutes element={<UserManagement />} />}
-            /> */}
+            />
             <Route
               path="/state-activities"
               element={<PrivateRoutes element={<StatesManagement />} />}

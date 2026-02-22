@@ -36,30 +36,30 @@ const usersController = {
                     dob: '1997-07-21',
                     gender: 1,
                     role_id: 2
+                    state_id: 21,
+                    district_id: 189
                 }
             }
         */
       const plainToken = req.plainToken;
       const user: IUser = new usersModel.User(req.body);
-      logger.debug(`${logPrefix} :: Parsed parameters  :: user :: ${user}`);
+      logger.debug(
+        `${logPrefix} :: Parsed parameters  :: user :: ${JSON.stringify(user)}`,
+      );
 
       const { error } = usersValidations.validateCreateUser(user);
 
       if (error) {
         if (error.details != null)
-          return res
-            .status(STATUS.BAD_REQUEST)
-            .send({
-              errorCode: errorCodes.users.USER00000.errorCode,
-              errorMessage: error.details[0].message,
-            });
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.users.USER00000.errorCode,
+            errorMessage: error.details[0].message,
+          });
         else
-          return res
-            .status(STATUS.BAD_REQUEST)
-            .send({
-              errorCode: errorCodes.users.USER00000.errorCode,
-              errorMessage: error.message,
-            });
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.users.USER00000.errorCode,
+            errorMessage: error.message,
+          });
       }
 
       const roleExists = await rolesRepository.existsByRoleId(user.role_id);
@@ -114,6 +114,8 @@ const usersController = {
                         dob: '1997-07-21',
                         gender: 1,
                         role_id: 2,
+                        state_id: 21,
+                        district_id: 189
                     }
                 }    
             */
@@ -131,19 +133,15 @@ const usersController = {
 
       if (error) {
         if (error.details != null)
-          return res
-            .status(STATUS.BAD_REQUEST)
-            .send({
-              errorCode: errorCodes.users.USER00000.errorCode,
-              errorMessage: error.details[0].message,
-            });
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.users.USER00000.errorCode,
+            errorMessage: error.details[0].message,
+          });
         else
-          return res
-            .status(STATUS.BAD_REQUEST)
-            .send({
-              errorCode: errorCodes.users.USER00000.errorCode,
-              errorMessage: error.message,
-            });
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.users.USER00000.errorCode,
+            errorMessage: error.message,
+          });
       }
 
       const roleExists = await rolesRepository.existsByRoleId(user.role_id);
@@ -366,19 +364,15 @@ const usersController = {
 
       if (error) {
         if (error.details != null)
-          return res
-            .status(STATUS.BAD_REQUEST)
-            .send({
-              errorCode: errorCodes.users.USER00000.errorCode,
-              errorMessage: error.details[0].message,
-            });
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.users.USER00000.errorCode,
+            errorMessage: error.details[0].message,
+          });
         else
-          return res
-            .status(STATUS.BAD_REQUEST)
-            .send({
-              errorCode: errorCodes.users.USER00000.errorCode,
-              errorMessage: error.message,
-            });
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.users.USER00000.errorCode,
+            errorMessage: error.message,
+          });
       }
 
       user.user_id = parseInt(encDecHelper.decryptPayload(user.user_id));

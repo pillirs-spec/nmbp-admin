@@ -18,7 +18,7 @@ const CommonDrawer: React.FC<CommonDrawerProps> = ({
       position={position}
       title={title}
       closeButtonProps={closeButtonProps}
-      size="xl"
+      size="lg"
       padding="md"
       withCloseButton={true}
     >

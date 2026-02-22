@@ -2,24 +2,26 @@ import { IUser } from "../../types/custom";
 import { UserStatus } from "../../enums";
 
 class User implements IUser {
-    user_id: number;
-    user_name: string;
-    display_name: string;
-    first_name: string;
-    last_name: string;
-    mobile_number: number;
-    email_id: string;
-    gender: number;
-    dob: string;
-    role_id: number;
-    password: string;
-    invalid_attempts: string;
-    status: number;
-    last_logged_in: string;
-    date_created: string;
-    date_updated: string;
-    created_by: number;
-    updated_by: number;
+  user_id: number;
+  user_name: string;
+  display_name: string;
+  first_name: string;
+  last_name: string;
+  mobile_number: number;
+  email_id: string;
+  gender: number;
+  dob: string;
+  role_id: number;
+  state_id: number;
+  district_id: number;
+  password: string;
+  invalid_attempts: string;
+  status: number;
+  last_logged_in: string;
+  date_created: string;
+  date_updated: string;
+  created_by: number;
+  updated_by: number;
 
   constructor(user: IUser) {
     this.user_id = user.user_id;
@@ -32,6 +34,8 @@ class User implements IUser {
     this.gender = user.gender;
     this.dob = user.dob;
     this.role_id = user.role_id;
+    this.state_id = user.state_id;
+    this.district_id = user.district_id;
     this.password = user.password;
     this.invalid_attempts = user.invalid_attempts;
     this.status = user.status || UserStatus.ACTIVE;
@@ -40,7 +44,7 @@ class User implements IUser {
     this.date_updated = user.date_updated;
     this.created_by = user.created_by;
     this.updated_by = user.updated_by;
-    }
+  }
 }
 
-export { User }
+export { User };

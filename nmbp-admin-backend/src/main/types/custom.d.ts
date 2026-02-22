@@ -18,6 +18,12 @@ export interface IMenu {
   date_updated: string | undefined;
 }
 
+export interface IState {
+  state_id: number;
+  state_name: string;
+  date_created: string | undefined;
+}
+
 export interface IPasswordPolicy {
   id: number;
   password_expiry: number;
@@ -56,6 +62,8 @@ export interface IUser {
   gender: number;
   dob: string;
   role_id: number;
+  state_id: number;
+  district_id: number;
   password: string;
   invalid_attempts: string;
   status: UserStatus;

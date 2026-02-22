@@ -6,6 +6,7 @@ import usersRouter from "../api/routes/usersRouter";
 import menusRouter from "../api/routes/menusRouter";
 import passwordPolicyRouter from "../api/routes/passwordPoliciesRouter";
 import rolesRouter from "../api/routes/rolesRouter";
+import masterRouter from "../api/routes/masterRouter";
 
 export default function (app: Express): void {
   app.use(express.json());
@@ -36,5 +37,6 @@ export default function (app: Express): void {
   app.use("/api/v1/admin/menus", menusRouter);
   app.use("/api/v1/admin/passwordPolicies", passwordPolicyRouter);
   app.use("/api/v1/admin/roles", rolesRouter);
+  app.use("/api/v1/admin/locations", masterRouter);
   app.use("/api/v1/admin", adminRouter);
 }

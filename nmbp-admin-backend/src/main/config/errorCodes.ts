@@ -49,6 +49,17 @@ const users = {
   },
 };
 
+const states = {
+  STATES00000: {
+    errorCode: "STATES00000",
+    errorMessage: "Internal Server Error",
+  },
+  STATES00001: {
+    errorCode: "STATES00001",
+    errorMessage: "No State Found!",
+  },
+};
+
 const roles = {
   ROLE00000: {
     errorCode: "ROLE0000",
@@ -223,4 +234,5 @@ export {
   tenants,
   projects,
   formBuilder,
+  states,
 };

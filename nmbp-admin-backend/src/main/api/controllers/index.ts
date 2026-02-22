@@ -3,6 +3,7 @@ import usersController from "./usersController";
 import menusController from "./menusController";
 import passwordPoliciesController from "./passwordPoliciesController";
 import rolesController from "./rolesController";
+import masterController from "./masterController";
 
 export {
   adminController,
@@ -10,4 +11,5 @@ export {
   passwordPoliciesController,
   rolesController,
   usersController,
+  masterController,
 };
