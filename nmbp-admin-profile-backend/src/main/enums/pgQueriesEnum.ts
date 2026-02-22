@@ -1,5 +1,5 @@
 export enum UserQueries {
-    GET_LOGGED_IN_USER_INFO = `SELECT 
+  GET_LOGGED_IN_USER_INFO = `SELECT 
     U.user_id AS user_id,
     U.user_name AS user_name,
     TO_CHAR(U.dob, 'DD/MM/YYYY') AS dob,
@@ -11,6 +11,10 @@ export enum UserQueries {
     U.display_name AS display_name,
     R.role_id AS role_id,
     R.role_name AS role_name,
+    U.state_id AS state_id,
+    S.state_name AS state_name,
+    U.district_id AS district_id,
+    D.district_name AS district_name,
     U.profile_pic_url
 FROM 
     m_users U
@@ -18,16 +22,21 @@ LEFT OUTER JOIN
     m_roles R 
 ON 
     U.role_id = R.role_id
+LEFT OUTER JOIN m_states S
+    ON U.state_id = S.state_id
+
+LEFT OUTER JOIN m_districts D
+    ON U.district_id = D.district_id
 WHERE 
     U.user_id = $1 
     AND U.status IN (1, 4)
 `,
 
-    UPDATE_PROFILE_PIC = `UPDATE m_users 
+  UPDATE_PROFILE_PIC = `UPDATE m_users 
                          SET profile_pic_url = $2, updated_by = $1, date_updated = NOW() 
                          WHERE user_id = $1`,
 
-    UPDATE_PROFILE = `UPDATE m_users 
+  UPDATE_PROFILE = `UPDATE m_users 
                      SET first_name = $2, 
                          last_name = $3, 
                          email_id = $4, 
@@ -35,5 +44,5 @@ WHERE
                          display_name = $6, 
                          updated_by = $1, 
                          date_updated = NOW() 
-                     WHERE user_id = $1`
+                     WHERE user_id = $1`,
 }
