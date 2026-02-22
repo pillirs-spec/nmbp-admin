@@ -31,13 +31,13 @@ const ForgetPassword: React.FC = () => {
       showToast(
         "Please enter a valid 10-digit mobile number",
         "Error",
-        ToastType.ERROR
+        ToastType.ERROR,
       );
       return;
     }
     try {
       const response = await forgotPasswordService.sendOtp(
-        form.values.mobileNumber
+        form.values.mobileNumber,
       );
       if (response.data) {
         setIsOtpSent(true);
@@ -54,7 +54,7 @@ const ForgetPassword: React.FC = () => {
       const encryptedOtp = encDec.encrypt(form.values.otp);
       const response = await forgotPasswordService.verifyOtp(
         form.values.txnId,
-        encryptedOtp
+        encryptedOtp,
       );
       if (response.status === 200 && response.data && response.data.data) {
         navigate("/reset-password", {
@@ -132,7 +132,7 @@ const ForgetPassword: React.FC = () => {
             className="flex justify-center mt-3"
             onClick={() => navigate("/login")}
           >
-            <button className="font-[500] text-[#0000FF] rounded-lg">
+            <button className="font-[500] text-[#003366] rounded-lg">
               Back
             </button>
           </div>

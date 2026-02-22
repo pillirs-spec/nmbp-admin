@@ -9,6 +9,15 @@ textarea {
   font-family: "Poppins" !important;
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: "Noto Sans", sans-serif !important;
+  background-color: #f9fafb !important;
+}
+
 .devotee-tabs.mantine-focus-auto {
   color: brown !important;
   border-color: brown !important;
@@ -23,6 +32,6 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ed8525;
+  background: #1f293729 !important;
   border-radius: 1rem;
 }

@@ -368,7 +368,7 @@ const Form = () => {
                           height: "32px",
                           borderRadius: "50%",
                           backgroundColor:
-                            index <= currentStep ? "#0000FF" : "#E5E7EB",
+                            index <= currentStep ? "#003366" : "#E5E7EB",
                           color: index <= currentStep ? "white" : "#6B7280",
                           display: "flex",
                           alignItems: "center",
@@ -397,7 +397,7 @@ const Form = () => {
                             width: "100%",
                             height: "2px",
                             backgroundColor:
-                              index < currentStep ? "#0000FF" : "#E5E7EB",
+                              index < currentStep ? "#003366" : "#E5E7EB",
                             zIndex: -1,
                           }}
                         />

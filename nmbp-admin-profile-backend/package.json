@@ -73,7 +73,7 @@
       "INIT_COMMON_PG_DB_REQUIRED": true,
       "INIT_COMMON_MASTER_HOST": "localhost",
       "INIT_COMMON_MASTER_USER": "postgres",
-      "INIT_COMMON_MASTER_DATABASE": "reusable_components",
+      "INIT_COMMON_MASTER_DATABASE": "nmbp",
       "INIT_COMMON_MASTER_PASSWORD": "StrongPassword123",
       "INIT_COMMON_MASTER_PORT": 5432,
       "INIT_COMMON_NODEMAILER_USER": "info@onte.in",

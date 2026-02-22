@@ -26,7 +26,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
   });
 
   const [defaultAccessList, setDefaultAccessList] = useState<IDefaultAccess[]>(
-    []
+    [],
   );
   const [levels, setLevels] = useState<{ value: string; label: string }[]>([]);
 
@@ -48,7 +48,6 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
       log(LogLevel.ERROR, "RoleList :: getDefaultAccessList", error);
     }
   };
-
 
   const getAccessList = async (roleId: number) => {
     try {
@@ -115,7 +114,6 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        
         await getDefaultAccessList();
         await listLevels();
 
@@ -166,9 +164,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
     };
 
     fetchData();
-  }, [roleId]); 
-
-  
+  }, [roleId]);
 
   const getPermissions = (menuId: number) => {
     const access = form.values.permissions.find((p) => p.menu_id === menuId);
@@ -181,7 +177,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
   const handlePermissionChange = (
     menuId: number,
     permission: MenuAccess,
-    checked: boolean
+    checked: boolean,
   ) => {
     const permissionId = permission === MenuAccess.READ ? 2 : 1;
     const updatedPermissions = checked
@@ -190,7 +186,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
           { menu_id: menuId, permission_id: permissionId },
         ]
       : form.values.permissions.filter(
-          (p) => !(p.menu_id === menuId && p.permission_id === permissionId)
+          (p) => !(p.menu_id === menuId && p.permission_id === permissionId),
         );
 
     form.setValues((prevValues) => ({
@@ -207,7 +203,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
       acc[item.menu_id].push(item);
       return acc;
     },
-    {}
+    {},
   );
 
   const handleSubmit = async (values: {
@@ -225,7 +221,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
           values.role_name,
           values.role_description,
           // values.level,
-          values.permissions
+          values.permissions,
         );
         if (response.status === 200)
           showToast("Role Updated", "Success", ToastType.SUCCESS);
@@ -234,7 +230,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
           values.role_name,
           values.role_description,
           // values.level,
-          values.permissions
+          values.permissions,
         );
         if (response.status === 200)
           showToast("Role Added", "Success", ToastType.SUCCESS);
@@ -304,7 +300,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
                             handlePermissionChange(
                               Number(menuId),
                               MenuAccess.READ,
-                              e.currentTarget.checked
+                              e.currentTarget.checked,
                             )
                           }
                         />
@@ -315,14 +311,14 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
                             handlePermissionChange(
                               Number(menuId),
                               MenuAccess.WRITE,
-                              e.currentTarget.checked
+                              e.currentTarget.checked,
                             )
                           }
                         />
                       </div>
                     </div>
                   </div>
-                )
+                ),
               )}
             </div>
           </div>
@@ -349,7 +345,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
           }}
         >
           <Button
-            color="#0000FF"
+            color="#003366"
             onClick={() => handleSubmit(form.values)}
             fullWidth
           >

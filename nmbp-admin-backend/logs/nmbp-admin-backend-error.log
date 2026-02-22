@@ -234,3 +234,17 @@ TSError: ⨯ Unable to compile TypeScript:
 2026-02-20 13:14:12 [nmbp-admin-backend] error: uncaughtException: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379
 Error: connect ECONNREFUSED 127.0.0.1:6379
     at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) 
+2026-02-21 12:06:58 [nmbp-admin-backend] error: nodemailerUtils :: sendEmail :: Email Sent Failed :: Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12914535ad.69 - gsmtp 
+2026-02-21 12:06:58 [nmbp-admin-backend] error: usersService :: sharePasswordToUser :: passwordDetails :: [object Object] :: Error :: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12914535ad.69 - gsmtp :: Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12914535ad.69 - gsmtp 
+2026-02-21 12:06:58 [nmbp-admin-backend] error: usersService :: createUser :: user :: {"user_name":"9888888888","display_name":"Rajesh Pilli","first_name":"Rajesh","last_name":"Pilli","mobile_number":"9888888888","email_id":"pillirajesh@ymail.com","role_id":12,"status":1,"created_by":1,"updated_by":1}  :: Failed to send password notification :: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12914535ad.69 - gsmtp 
+2026-02-21 12:08:42 [nmbp-admin-backend] error: nodemailerUtils :: sendEmail :: Email Sent Failed :: Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12977405ad.69 - gsmtp 
+2026-02-21 12:08:42 [nmbp-admin-backend] error: usersService :: sharePasswordToUser :: passwordDetails :: [object Object] :: Error :: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12977405ad.69 - gsmtp :: Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12977405ad.69 - gsmtp 
+2026-02-21 12:08:42 [nmbp-admin-backend] error: usersService :: createUser :: user :: {"user_name":"9777777777","display_name":"Priya Rao","first_name":"Priya","last_name":"Rao","mobile_number":"9777777777","email_id":"priya@gmamil.com","role_id":13,"status":1,"created_by":1,"updated_by":1}  :: Failed to send password notification :: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to
+535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2ad75029f11sm12977405ad.69 - gsmtp 

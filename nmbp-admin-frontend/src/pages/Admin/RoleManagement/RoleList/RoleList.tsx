@@ -66,7 +66,7 @@ const RolesList = forwardRef<
 
   const handleUpdateRoleStatus = async (
     roleId: number,
-    status: RolesStatus
+    status: RolesStatus,
   ) => {
     try {
       const response = await rolesListService.updateRoleStatus(roleId, status);
@@ -77,7 +77,7 @@ const RolesList = forwardRef<
           return prevRoles.filter((role) => role.role_id !== roleId);
         } else {
           return prevRoles.map((role) =>
-            role.role_id === roleId ? { ...role, status } : role
+            role.role_id === roleId ? { ...role, status } : role,
           );
         }
       });
@@ -137,7 +137,7 @@ const RolesList = forwardRef<
           <img src={searchIcon} alt="search-icon" />
         </div>
         <div className="flex justify-end">
-          <Button style={{ background: "#0000FF" }} onClick={openDrawer}>
+          <Button style={{ background: "#003366" }} onClick={openDrawer}>
             Add Role
           </Button>
         </div>
@@ -157,7 +157,7 @@ const RolesList = forwardRef<
                   row.role_id,
                   row.status === RolesStatus.ACTIVE
                     ? RolesStatus.INACTIVE
-                    : RolesStatus.ACTIVE
+                    : RolesStatus.ACTIVE,
                 )
               }
               checked={row.status === RolesStatus.ACTIVE}

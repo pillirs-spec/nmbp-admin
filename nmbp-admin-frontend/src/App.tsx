@@ -23,18 +23,22 @@ const ResetPassword = lazy(
 
 const Dashboard = lazy(() => import("./pages/Admin/Dashboard/Dashboard"));
 
-const UserManagement = lazy(
-  () => import("./pages/Admin/UserManagement/UserManagement"),
+const StatesManagement = lazy(
+  () => import("./pages/Admin/StatesManagement/StatesManagement"),
 );
+
+// const UserManagement = lazy(
+//   () => import("./pages/Admin/UserManagement/UserManagement"),
+// );
 const RoleManagement = lazy(
   () => import("./pages/Admin/RoleManagement/RoleManagement"),
 );
 const SideBarMenu = lazy(
   () => import("./components/common/SideBarMenu/SideBarMenu"),
 );
-const PasswordPolicy = lazy(
-  () => import("./pages/Admin/PasswordPolicy/PasswordPolicy"),
-);
+// const PasswordPolicy = lazy(
+//   () => import("./pages/Admin/PasswordPolicy/PasswordPolicy"),
+// );
 
 function App() {
   const { userToken, isAuthenticated, logout } = useAuth();
@@ -48,19 +52,20 @@ function App() {
 
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <Header />
-      <div className="flex flex-col md:flex-row w-full">
+      {isAuthenticated && <Header />}
+      <div
+        className={`flex flex-col md:flex-row w-full ${isAuthenticated ? "" : ""}`}
+      >
         {isAuthenticated && (
-          <aside className="w-full md:w-[20%] hidden md:block ">
+          <aside className="w-full md:w-[20%] hidden md:block sticky top-32">
             <SideBarMenu />
           </aside>
         )}
         <main
-          className={`w-full h-screen relative ${
-            isAuthenticated
-              ? "md:w-[80%] sm:w-[100%] xs:w-[100%] pt-20 sm:pt-16 md:pt-20"
-              : ""
-          } ${!location.state ? "" : ""}`}
+          className={`w-full ${isAuthenticated ? "" : ""} flex-1 ${
+            isAuthenticated ? "md:w-[80%]" : "w-full"
+          }`}
+          // style={isAuthenticated ? { height: "calc(100vh - 128px)" } : {}}
         >
           <Routes>
             <Route
@@ -88,18 +93,22 @@ function App() {
               path="/dashboard"
               element={<PrivateRoutes element={<Dashboard />} />}
             />
-            <Route
+            {/* <Route
               path="/user-management"
               element={<PrivateRoutes element={<UserManagement />} />}
+            /> */}
+            <Route
+              path="/state-activities"
+              element={<PrivateRoutes element={<StatesManagement />} />}
             />
             <Route
               path="/role-management"
               element={<PrivateRoutes element={<RoleManagement />} />}
             />
-            <Route
+            {/* <Route
               path="/password-policy"
               element={<PrivateRoutes element={<PasswordPolicy />} />}
-            />
+            /> */}
           </Routes>
         </main>
       </div>

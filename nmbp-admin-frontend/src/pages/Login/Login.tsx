@@ -35,7 +35,7 @@ const Login: React.FC = () => {
       const encryptedPassword = encDec.encrypt(values.password);
       const response = await loginService.loginWithPassword(
         values.mobile_number,
-        encryptedPassword
+        encryptedPassword,
       );
 
       if (response.data && response.data.data) {
@@ -59,12 +59,12 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-screen pt-20 bg-white flex justify-center items-center px-5 md:px-0 ">
+    <div className="w-full h-screen bg-white flex justify-center items-center px-5 md:px-0 overflow-hidden">
       <div className="w-[400px] lg:w-[450px] shadow shadow-gray-400 rounded-[32px] px-5 py-4">
         <div className="flex justify-center">
           <img src={HeaderLogo} alt="Temple Logo" className="h-20 w-20 mb-4" />
         </div>
-        <h1 className="text-[#0000FF] font-bold text-3xl sm:text-4xl text-center mt-2 mb-5">
+        <h1 className="text-[#003366] font-bold text-3xl sm:text-4xl text-center mt-2 mb-5">
           Admin Login
         </h1>
         {/* <p className="text-[#404040] font-[500] text-lg sm:text-xl text-center">
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
             <div className="w-full sm:w-3/4">
               <input
                 id="mobile_number"
-                 maxLength={10}
+                maxLength={10}
                 type="text"
                 className="border  py-3 px-4 text-sm w-full bg-[#F0F0F0] rounded-3xl outline-none"
                 error={form.errors.user_name}
@@ -126,14 +126,14 @@ const Login: React.FC = () => {
                 <FontAwesomeIcon
                   icon={faEyeSlash}
                   className="absolute top-4 right-4 cursor-pointer"
-                  color="#0000FF"
+                  color="#003366"
                   onClick={() => setShowPassword(!showPassword)}
                 />
               ) : (
                 <FontAwesomeIcon
                   icon={faEye}
                   className="absolute top-4 right-4 cursor-pointer"
-                  color="#0000FF"
+                  color="#003366"
                   onClick={() => setShowPassword(!showPassword)}
                 />
               )}
@@ -151,11 +151,11 @@ const Login: React.FC = () => {
                 onClick={handleForgotPassword}
               >
                 <FontAwesomeIcon
-                  color="#0000FF"
+                  color="#003366"
                   icon={faLock}
                   className="relative top-[1px]"
                 />
-                <p className="text-xs font-[500] text-[#0000FF]">
+                <p className="text-xs font-[500] text-[#003366]">
                   Forgot Password
                 </p>
               </div>
@@ -163,7 +163,7 @@ const Login: React.FC = () => {
             <div className="w-full sm:w-3/4">
               <button
                 type="submit"
-                className="bg-[#0000FF] font-[500] text-white w-full rounded-lg py-2"
+                className="bg-[#003366] font-[500] text-white w-full rounded-lg py-2"
               >
                 Sign In
               </button>
@@ -176,7 +176,7 @@ const Login: React.FC = () => {
             </div>
             <div className="w-full sm:w-3/4 mb-5">
               <button
-                className="bg-transparent border border-[#0000FF] font-[500] text-[#0000FF] w-full rounded-lg py-2"
+                className="bg-transparent border border-[#003366] font-[500] text-[#003366] w-full rounded-lg py-2"
                 onClick={handleLoginWithOtp}
               >
                 Login Using OTP

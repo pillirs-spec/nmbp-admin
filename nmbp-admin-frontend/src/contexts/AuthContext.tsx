@@ -1,13 +1,12 @@
 import React, { createContext, ReactNode, useState, useEffect } from "react";
 import { appPreferences } from "../utils";
 import { IMenu } from "../components/common/SideBarMenu/sideBarMenuTypes";
-import { IUser } from "../pages/Admin/UserManagement/UserList/usersListTypes";
 
 interface AuthContextProps {
   isAuthenticated: boolean;
   sideMenuOpen: boolean;
   setSideMenuOpen: (open: boolean) => void;
-  userDetails: IUser;
+  userDetails: any;
   userToken: string;
   accessDetails: IMenu[];
   login: () => void;
@@ -18,7 +17,7 @@ interface AuthContextProps {
 }
 
 export const AuthContext = createContext<AuthContextProps | undefined>(
-  undefined
+  undefined,
 );
 
 interface AuthProviderProps {
@@ -58,7 +57,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setAccessDetails(accessDetails);
     await appPreferences.setItem(
       "accessDetails",
-      JSON.stringify(accessDetails)
+      JSON.stringify(accessDetails),
     );
   };
 

@@ -85,28 +85,30 @@ const SideBarMenu: React.FC = () => {
   }, [accessDetails, selectedMenu, location.pathname, navigate]);
   return (
     <Box
-      bg={"#fff"}
-      className="w-full md:w-[20%] text-black h-screen fixed border-e border-gray-300 top-[85px] overflow-y-auto"
+      bg={"#F9FAFB"}
+      className=" w-full md:w-[20%] fixed top-32 border-e border-gray-300 overflow-y-auto h-[calc(100vh-1rem)]"
     >
-      <Flex className="flex-col space-y-0.5">
+      <Flex className="flex-col space-y-0.5 mx-3">
         {accessDetails?.map((menu, index) => (
           <Link
             key={`menu-${index}`}
             onClick={() => setSideMenuOpen(false)}
             to={menu.route_url}
             state={{ access: menu.access, menu_name: menu.menu_name }}
-            className={`flex items-center p-2 text-gray-900 transition-colors duration-300 !mt-0
-              hover:bg-gray-100 active:bg-gray-200 border-b border-gray-300 ${location.pathname.includes(menu.route_url)
-                ? "border-l-[6px] border-l-[#0000FF]"
-                : "border-l-[6px] border-l-[#ffffff]"
+            className={`flex items-center py-2 px-3 text-[#374151] transition-colors duration-300 !mt-2
+              hover:bg-[#E5EFF9] active:bg-[#E5EFF9] rounded-lg ${
+                location.pathname.includes(menu.route_url)
+                  ? "bg-[#E5EFF9] text-[#003366] font-bold"
+                  : ""
               }`}
           >
-            <i className={menu.icon_class + " text-lg"}></i>
+            {/* <i className={menu.icon_class + " text-lg"}></i> */}
             <span
-              className={`ml-2 text-sm ${location.pathname.includes(menu.route_url)
-                ? "text-[#0000FF] font-bold"
-                : ""
-                }`}
+              className={`ml-2 text-sm ${
+                location.pathname.includes(menu.route_url)
+                  ? "text-[#003366] font-bold"
+                  : ""
+              }`}
             >
               {menu.menu_name}
             </span>

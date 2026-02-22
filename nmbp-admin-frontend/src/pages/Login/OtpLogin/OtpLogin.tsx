@@ -35,7 +35,7 @@ const OtpLogin: React.FC = () => {
       showToast(
         "Please enter a valid 10-digit mobile number",
         "Error",
-        ToastType.ERROR
+        ToastType.ERROR,
       );
       return;
     }
@@ -59,7 +59,7 @@ const OtpLogin: React.FC = () => {
       const encryptedOtp = encDec.encrypt(form.values.otp);
       const response = await LoginOtpService.verifyOtp(
         encryptedOtp,
-        form.values.txnId
+        form.values.txnId,
       );
       if (response.data && response.data.data) {
         log(LogLevel.INFO, "Login :: handleVerifyOtp", response);
@@ -132,7 +132,7 @@ const OtpLogin: React.FC = () => {
                   className="flex justify-center mt-3"
                   onClick={() => navigate("/login")}
                 >
-                  <button className="font-[500] text-[#0000FF] rounded-lg">
+                  <button className="font-[500] text-[#003366] rounded-lg">
                     Back
                   </button>
                 </div>
