@@ -74,7 +74,7 @@ const Header: React.FC = () => {
 
       {/* Top Navigation Bar */}
       {isAuthenticated && (
-        <div className="fixed top-0 right-0 h-auto w-full bg-[#003366] text-white px-6 py-2 flex justify-between items-center text-sm z-40">
+        <div className=" w-full bg-[#003366] text-white px-6 py-2 flex flex-col md:flex-row md:justify-between items-center text-sm z-40">
           <button className="hover:opacity-80 transition">
             <img
               src={GovernmentOfIndia}
@@ -82,7 +82,7 @@ const Header: React.FC = () => {
               className="hover:opacity-80 transition"
             />
           </button>
-          <div className="flex items-center divide-x divide-[#F9FAFB]">
+          <div className="flex items-center divide-x divide-[#F9FAFB] px-3">
             <button className="px-4 hover:opacity-80 transition">
               Skip to Main Content
             </button>
@@ -118,7 +118,7 @@ const Header: React.FC = () => {
 
       {/* Main Header */}
       {isAuthenticated && (
-        <div className="fixed top-9 right-0 w-full bg-white border-b border-gray-300 px-6 py-2 flex items-center justify-between z-40">
+        <div className="w-full bg-white border-b border-gray-300 px-6 py-2 flex items-center justify-between z-40">
           {/* Left Section */}
           <div className="flex items-center gap-6">
             {/* Logo */}
@@ -207,7 +207,7 @@ const Header: React.FC = () => {
                 </HoverCard>
 
                 <div
-                  className="hidden md:block md:hidden lg:hidden"
+                  className="hidden md:hidden lg:hidden"
                   onClick={() => setSideMenuOpen(true)}
                 >
                   <FontAwesomeIcon

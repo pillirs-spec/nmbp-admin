@@ -16,7 +16,7 @@ const StatesManagement: React.FC = () => {
   };
 
   return (
-    <div className="mt-32 p-5">
+    <div className="p-5">
       <StatesList />
     </div>
   );

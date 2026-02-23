@@ -149,7 +149,7 @@ const UserList = forwardRef<
         totalCount={usersCount}
         renderActions={(user: any) => (
           <div className="flex space-x-2">
-            <Switch
+            {/* <Switch
               color="#14B584"
               size="sm"
               onChange={() =>
@@ -169,12 +169,12 @@ const UserList = forwardRef<
                 UserStatus.LOGGED_IN,
                 UserStatus.LOGGED_OUT,
               ].includes(user.status)}
-            />{" "}
+            />{" "} */}
             <Tooltip
               label="Edit"
               withArrow
               arrowPosition="center"
-              color="#0000FF"
+              color="#003366"
             >
               <img
                 src={editIcon}

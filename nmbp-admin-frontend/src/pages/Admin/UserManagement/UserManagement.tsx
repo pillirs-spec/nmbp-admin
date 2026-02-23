@@ -15,7 +15,7 @@ const UserManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-5 mt-32">
+    <div className="p-5">
       <UserList
         access={access}
         ref={userListRef}
