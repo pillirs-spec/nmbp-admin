@@ -27,6 +27,20 @@ const StatesManagement = lazy(
   () => import("./pages/Admin/StatesManagement/StatesManagement"),
 );
 
+const QrManagement = lazy(
+  () => import("./pages/Admin/QrManagement/QrManagement"),
+);
+
+const AddQr = lazy(() => import("./components/AddQr/AddQr"));
+
+const PledgeReportManagement = lazy(
+  () => import("./pages/Admin/PledgeReportManagement/PledgeReportManagement"),
+);
+
+const BareauManagement = lazy(
+  () => import("./pages/Admin/BureauStatusManagement/BureauStatusManagement"),
+);
+
 const UserManagement = lazy(
   () => import("./pages/Admin/UserManagement/UserManagement"),
 );
@@ -98,8 +112,24 @@ function App() {
               element={<PrivateRoutes element={<UserManagement />} />}
             />
             <Route
+              path="/qr-management"
+              element={<PrivateRoutes element={<QrManagement />} />}
+            />
+            <Route
+              path="/qr-management/add-qr"
+              element={<PrivateRoutes element={<AddQr />} />}
+            />
+            <Route
               path="/state-activities"
               element={<PrivateRoutes element={<StatesManagement />} />}
+            />
+            <Route
+              path="/pledge-reports"
+              element={<PrivateRoutes element={<PledgeReportManagement />} />}
+            />
+            <Route
+              path="/bureau-status-report"
+              element={<PrivateRoutes element={<BareauManagement />} />}
             />
             <Route
               path="/role-management"

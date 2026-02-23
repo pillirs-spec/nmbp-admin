@@ -126,7 +126,7 @@ const UserList = forwardRef<
       >
         <AddOrUpdateUser user_id={userId} close={closeSlider} />
       </CommonDrawer>
-      <h5 className="text-2xl font-bold text-[#374151]">User Management</h5>
+      <h5 className="text-2xl font-semibold text-[#374151]">User Management</h5>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-0 mt-5">
         <div className="border border-[#C2C2C2] rounded-full px-3 py-1 flex items-center">
           <input
