@@ -23,6 +23,8 @@ const ResetPassword = lazy(
 
 const Dashboard = lazy(() => import("./pages/Admin/Dashboard/Dashboard"));
 
+const AddEvent = lazy(() => import("./components/AddEvent/AddEvent"));
+
 const StatesManagement = lazy(
   () => import("./pages/Admin/StatesManagement/StatesManagement"),
 );
@@ -106,6 +108,10 @@ function App() {
             <Route
               path="/dashboard"
               element={<PrivateRoutes element={<Dashboard />} />}
+            />
+            <Route
+              path="/dashboard/add-event"
+              element={<PrivateRoutes element={<AddEvent />} />}
             />
             <Route
               path="/user-management"

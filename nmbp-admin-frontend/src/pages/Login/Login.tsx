@@ -9,6 +9,11 @@ import { LogLevel, ToastType } from "../../enums";
 import { loginService } from "./loginService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faLock } from "@fortawesome/free-solid-svg-icons";
+import GovtLogo from "../../assets/naming-logo.svg";
+import NamingLogo from "../../assets/naming-logo.svg";
+import BannerImage from "../../assets/login-banner.svg";
+import NationalEmblem from "../../assets/emblem.svg";
+import "./Login.css";
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -59,25 +64,40 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-screen bg-white flex justify-center items-center px-5 md:px-0 overflow-hidden">
-      <div className="w-[400px] lg:w-[450px] shadow shadow-gray-400 rounded-[32px] px-5 py-4">
-        <div className="flex justify-center">
-          <img src={HeaderLogo} alt="Temple Logo" className="h-20 w-20 mb-4" />
+    <div className="grid  grid-cols-12 ">
+      <div className="hidden md:flex col-span-7 bg-[#E5EFF9] rounded-tr-3xl rounded-br-3xl relative">
+        <div className="w-full relative ">
+          <img
+            src={GovtLogo}
+            alt="govt-logo"
+            className="h-28 z-50 absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2"
+          />
+          <img
+            src={BannerImage}
+            alt="banner-image"
+            className="absolute bottom-0 left-0"
+          />
         </div>
-        <h1 className="text-[#003366] font-bold text-3xl sm:text-4xl text-center mt-2 mb-5">
-          Admin Login
-        </h1>
+      </div>
+      <div className="col-span-12 md:col-span-5 h-screen px-5 md:px-8 py-4 overflow-y-auto flex flex-col justify-center">
+        <div className="flex flex-col items-center">
+          <img src={NationalEmblem} alt="national-emblem" className=" mb-4" />
+          <h1 className="text-[#374151] font-semibold text-xl sm:text-4xl mt-2 !text-left">
+            Admin Login
+          </h1>
+        </div>
+
         {/* <p className="text-[#404040] font-[500] text-lg sm:text-xl text-center">
           Login to your Admin Account
         </p> */}
         <form onSubmit={form.onSubmit(handleLogin)}>
-          <div className="mt-10 mb-2 flex flex-col justify-center items-center space-y-4">
+          <div className="mt-10 mb-2 flex flex-col justify-center items-center space-y-4 ">
             <div className="w-full sm:w-3/4">
               <input
                 id="mobile_number"
                 maxLength={10}
                 type="text"
-                className="border  py-3 px-4 text-sm w-full bg-[#F0F0F0] rounded-3xl outline-none"
+                className="border border-[#D1D5DB]  py-3 px-4 text-sm w-full  rounded-lg outline-none"
                 error={form.errors.user_name}
                 {...form.getInputProps("mobile_number")}
                 placeholder="Mobile Number"
@@ -117,7 +137,7 @@ const Login: React.FC = () => {
                 id="password"
                 maxLength={25}
                 type={showPassword ? "text" : "password"}
-                className="border w-full py-3 px-4 text-sm  bg-[#F0F0F0] rounded-3xl outline-none"
+                className="border border-[#D1D5DB] w-full py-3 px-4 text-sm rounded-lg outline-none"
                 error={form.errors.password}
                 {...form.getInputProps("password")}
                 placeholder="Password"

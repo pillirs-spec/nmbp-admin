@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import HeaderLogo from "../../../assets/national- emblem.svg";
+import HeaderLogo from "../../../assets/national-emblem.svg";
 
 import SideBarMenu from "../SideBarMenu/SideBarMenu";
 import { useAuth, useLogger } from "../../../hooks";
