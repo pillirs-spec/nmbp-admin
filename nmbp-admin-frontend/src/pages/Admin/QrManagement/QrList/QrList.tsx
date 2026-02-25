@@ -369,7 +369,7 @@ const QrList = () => {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex justify-between items-start">
               <div>
@@ -416,9 +416,9 @@ const QrList = () => {
         </div>
 
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
-          <div className="grid grid-cols-12 gap-20 mb-6">
+          <div className="grid grid-cols-12 gap-5  mb-6">
             {/* Search Bar */}
-            <div className="col-span-7 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
+            <div className="col-span-12 md:col-span-7 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] bg-[#F9FAFB] text-sm "
@@ -432,7 +432,7 @@ const QrList = () => {
               />
             </div>
 
-            <div className="relative col-span-5 ">
+            <div className="relative col-span-12 md:col-span-5 ">
               <select
                 value={filterActivity}
                 onChange={(e) => {

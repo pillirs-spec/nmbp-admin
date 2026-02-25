@@ -130,20 +130,20 @@ const DistrictDashboard = () => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-2xl font-semibold text-[#374151]">Dashboard</h2>
-            <p className="text-sm text-[#6B7280] mt-1">
+            <p className="text-sm text-[#6B7280] mt-1 text-wrap">
               Last updated: 27 Aug 2024, 02:00 PM
             </p>
           </div>
           <button
             onClick={handleAddEvent}
-            className="bg-[#003366] px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
+            className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
           >
             Add Event +
           </button>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex justify-between items-start">
               <div>

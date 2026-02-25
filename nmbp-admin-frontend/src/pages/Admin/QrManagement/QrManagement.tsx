@@ -11,7 +11,7 @@ const QrManagement = () => {
   const [userId, setUserId] = useState<number | null>(null);
 
   return (
-    <div className="p-5">
+    <div className="p-5 mt-40 md:mt-0">
       <QrList />
     </div>
   );

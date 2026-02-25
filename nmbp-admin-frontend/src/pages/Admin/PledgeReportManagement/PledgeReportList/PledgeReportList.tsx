@@ -207,7 +207,7 @@ const PledgeReportList = () => {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex justify-between items-start">
               <div>
@@ -255,7 +255,7 @@ const PledgeReportList = () => {
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
           <div className="grid grid-cols-12 gap-6 mb-6">
             {/* Search Bar */}
-            <div className="col-span-6 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
+            <div className="col-span-12 md:col-span-6 lg:col-span-6 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] bg-[#F9FAFB] text-sm"
@@ -269,7 +269,7 @@ const PledgeReportList = () => {
               />
             </div>
 
-            <div className="relative col-span-2">
+            <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <select
                 value={filterDistrict}
                 onChange={(e) => {
@@ -285,7 +285,7 @@ const PledgeReportList = () => {
               </select>
             </div>
 
-            <div className="relative col-span-2">
+            <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <select
                 value={filterState}
                 onChange={(e) => {
@@ -299,7 +299,7 @@ const PledgeReportList = () => {
                 <option>Karnataka</option>
               </select>
             </div>
-            <div className="relative col-span-2">
+            <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <input
                 type="date"
                 value={dateRange.start}

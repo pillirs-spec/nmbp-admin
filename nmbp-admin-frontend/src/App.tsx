@@ -68,20 +68,30 @@ function App() {
 
   return (
     <Suspense fallback={<LoadingFallback />}>
-      {isAuthenticated && <Header />}
+      <div className={isAuthenticated ? "fixed top-0 left-0 right-0 z-50" : ""}>
+        {isAuthenticated && <Header />}
+      </div>
       <div
-        className={`flex flex-col md:flex-row w-full ${isAuthenticated ? "" : ""}`}
+        className="flex w-full"
+        style={
+          isAuthenticated
+            ? { marginTop: "128px", height: "calc(100vh - 128px)" }
+            : {}
+        }
       >
         {isAuthenticated && (
-          <aside className="w-full md:w-[20%] hidden md:block sticky top-32">
+          <aside
+            className="w-[20%] hidden md:block fixed left-0 overflow-y-auto border-r border-gray-300"
+            style={{ top: "150px", height: "calc(100vh - 128px)" }}
+          >
             <SideBarMenu />
           </aside>
         )}
         <main
-          className={`w-full ${isAuthenticated ? "" : ""} flex-1 ${
-            isAuthenticated ? "md:w-[80%]" : "w-full"
+          className={`w-full md:flex-1 overflow-y-auto ${
+            isAuthenticated ? "md:ml-[20%]" : "w-full"
           }`}
-          // style={isAuthenticated ? { height: "calc(100vh - 128px)" } : {}}
+          style={isAuthenticated ? { height: "calc(100vh - 128px)" } : {}}
         >
           <Routes>
             <Route

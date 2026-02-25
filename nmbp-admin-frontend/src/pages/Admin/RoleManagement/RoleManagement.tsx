@@ -6,17 +6,22 @@ import { MenuAccess } from "../../../enums";
 const RoleManagement: React.FC = () => {
   const location = useLocation();
   const access = location.state ? location.state.access : MenuAccess.READ;
-  const menuName = location.state ? location.state.menu_name : "Role Management";
+  const menuName = location.state
+    ? location.state.menu_name
+    : "Role Management";
   const [roleId, setRoleId] = useState<number | null>(null);
   const rolesListRef = useRef<{ refresh: () => void } | null>(null);
-
 
   const handleUpdateRole = (roleId: number) => {
     setRoleId(roleId);
   };
   return (
-    <div className="p-5">
-      <RoleList access={access} ref={rolesListRef} handleUpdateRole={handleUpdateRole} />
+    <div className="p-5 mt-40 md:mt-0">
+      <RoleList
+        access={access}
+        ref={rolesListRef}
+        handleUpdateRole={handleUpdateRole}
+      />
     </div>
   );
 };

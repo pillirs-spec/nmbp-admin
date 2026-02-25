@@ -351,7 +351,7 @@ const StatesList = () => {
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
           <div className="grid grid-cols-12 gap-4 mb-6">
             {/* Search Bar */}
-            <div className="col-span-6 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-white">
+            <div className="col-span-12 sm:col-span-6 lg:col-span-6 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-white">
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] text-sm"
@@ -365,7 +365,7 @@ const StatesList = () => {
               />
             </div>
 
-            <div className="relative col-span-2">
+            <div className="relative col-span-12 sm:col-span-6 lg:col-span-2">
               <select
                 value={filterActivity}
                 onChange={(e) => {
@@ -382,7 +382,7 @@ const StatesList = () => {
               </select>
             </div>
 
-            <div className="relative col-span-2">
+            <div className="relative col-span-12 sm:col-span-6 lg:col-span-2">
               <select
                 value={filterDistrict}
                 onChange={(e) => {
@@ -401,7 +401,7 @@ const StatesList = () => {
               </select>
             </div>
 
-            <div className="relative col-span-2">
+            <div className="relative col-span-12 sm:col-span-6 lg:col-span-2">
               <select
                 value={filterState}
                 onChange={(e) => {

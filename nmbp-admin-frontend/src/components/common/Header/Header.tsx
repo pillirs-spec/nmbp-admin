@@ -58,59 +58,85 @@ const Header: React.FC = () => {
 
   return (
     <>
+      {/* Mobile Sidebar Drawer */}
       {sideMenuOpen ? (
-        <div className=" bg-white border-l border-l-gray-500 h-screen w-[90%] z-50 sm:w-3/4 overflow-y-auto">
+        <>
           <div
-            className="flex justify-end items-center shadow p-3"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
             onClick={() => setSideMenuOpen(false)}
-          >
-            <FontAwesomeIcon icon={faXmark} />
+          />
+          <div className="fixed top-0 left-0 bottom-0 w-[75%] bg-white z-50 md:hidden overflow-y-auto shadow-lg">
+            <div
+              className="flex justify-between items-center p-4 border-b border-gray-200"
+              onClick={() => setSideMenuOpen(false)}
+            >
+              <h3 className="font-semibold text-[#374151]">Menu</h3>
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="cursor-pointer text-gray-600"
+              />
+            </div>
+            <div className="p-4">
+              <SideBarMenu />
+            </div>
           </div>
-          <div className="p-3">
-            <SideBarMenu />
-          </div>
-        </div>
+        </>
       ) : null}
 
       {/* Top Navigation Bar */}
       {isAuthenticated && (
-        <div className=" w-full bg-[#003366] text-white px-6 py-2 flex flex-col md:flex-row md:justify-between items-center text-sm z-40">
-          <button className="hover:opacity-80 transition">
-            <img
-              src={GovernmentOfIndia}
-              alt="Government of India"
-              className="hover:opacity-80 transition"
-            />
-          </button>
-          <div className="flex items-center divide-x divide-[#F9FAFB] px-3">
-            <button className="px-4 hover:opacity-80 transition">
+        <div className="w-full bg-[#003366] text-white px-4 md:px-6 py-2 flex flex-col items-start md:flex-row md:justify-between md:items-center text-sm gap-4 md:gap-0">
+          {/* Left: Logo and Hamburger */}
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <button
+              className="md:hidden p-1 hover:opacity-80 transition"
+              onClick={() => setSideMenuOpen(true)}
+            >
+              <FontAwesomeIcon icon={faBars} size="lg" />
+            </button>
+            <button className="hover:opacity-80 transition">
+              <img
+                src={GovernmentOfIndia}
+                alt="Government of India"
+                className="hover:opacity-80 transition"
+              />
+            </button>
+          </div>
+
+          {/* Right: Controls */}
+          <div className="flex items-center divide-x divide-[#F9FAFB] px-2 md:px-3 ">
+            <button className="px-2 md:px-4 hover:opacity-80 transition text-xs md:text-sm whitespace-nowrap">
               Skip to Main Content
             </button>
 
-            <button className="px-4 hover:opacity-80 transition text-[#F9FAFB]">
+            <button className="px-2 md:px-4 hover:opacity-80 transition text-[#F9FAFB] text-xs md:text-sm">
               A<sup>-</sup>
             </button>
 
-            <button className="px-4 hover:opacity-80 transition text-[#F9FAFB]">
+            <button className="px-2 md:px-4 hover:opacity-80 transition text-[#F9FAFB] text-xs md:text-sm">
               A
             </button>
 
-            <button className="px-4 hover:opacity-80 transition text-[#F9FAFB]">
+            <button className="px-2 md:px-4 hover:opacity-80 transition text-[#F9FAFB] text-xs md:text-sm">
               A<sup>+</sup>
             </button>
 
-            <button className="px-4 hover:opacity-80 transition">
-              <img src={Constrast} alt="Contrast" className="h-4" />
+            <button className="px-2 md:px-4 hover:opacity-80 transition">
+              <img src={Constrast} alt="Contrast" className="h-3 md:h-4" />
             </button>
 
-            <button className="px-4 hover:opacity-80 transition">
-              <img src={Accessiblity} alt="Accessibility" className="h-4" />
+            <button className="px-2 md:px-4 hover:opacity-80 transition">
+              <img
+                src={Accessiblity}
+                alt="Accessibility"
+                className="h-3 md:h-4"
+              />
             </button>
 
-            <button className="px-4 !text-sm hover:opacity-80 transition flex items-center">
-              <img src={Globe} alt="Globe" className="h-4 mr-1" />
+            <button className="px-2 md:px-4 !text-xs md:!text-sm hover:opacity-80 transition flex items-center whitespace-nowrap gap-1">
+              <img src={Globe} alt="Globe" className="h-3 md:h-4" />
               English
-              <img src={ArrowDropDown} alt="Arrow" className="h-4 ml-1" />
+              <img src={ArrowDropDown} alt="Arrow" className="h-3 md:h-4" />
             </button>
           </div>
         </div>
@@ -118,7 +144,7 @@ const Header: React.FC = () => {
 
       {/* Main Header */}
       {isAuthenticated && (
-        <div className="w-full bg-white border-b border-gray-300 px-6 py-2 flex items-center justify-between z-40">
+        <div className="w-full bg-white border-b border-gray-300 px-6 py-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* Left Section */}
           <div className="flex items-center gap-6">
             {/* Logo */}
@@ -141,7 +167,7 @@ const Header: React.FC = () => {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center justify-start sm:justify-end gap-8">
             {isAuthenticated ? (
               <>
                 <CommonDrawer
@@ -159,8 +185,8 @@ const Header: React.FC = () => {
 
                 <HoverCard width={250} shadow="md">
                   <HoverCard.Target>
-                    <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition">
-                      <div className="text-right">
+                    <div className="flex items-center  gap-4 cursor-pointer hover:opacity-80 transition">
+                      <div className="order-2">
                         <div className="font-semibold text-[#374151]">
                           {userDetails?.display_name
                             ? userDetails?.display_name
@@ -172,7 +198,7 @@ const Header: React.FC = () => {
                             : userData?.role_name || "District Nodal Officer"}
                         </div>
                       </div>
-                      <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-[#C8DBF0] text-[#001933] font-bold text-lg">
+                      <div className="order-1 flex items-center justify-center w-12 h-12 rounded-lg bg-[#C8DBF0] text-[#001933] font-bold text-lg">
                         {userDetails?.display_name
                           ? userDetails.display_name
                               .split(" ")

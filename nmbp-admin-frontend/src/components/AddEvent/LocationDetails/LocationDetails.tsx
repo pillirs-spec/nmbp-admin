@@ -29,7 +29,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   return (
     <div className="p-5">
       {/* Step Indicator */}
-      <div className="mb-8 flex items-center">
+      <div className="mb-8 flex items-center px-20">
         {steps.map((step, index) => (
           <React.Fragment key={step.number}>
             <div className="flex flex-col items-center">

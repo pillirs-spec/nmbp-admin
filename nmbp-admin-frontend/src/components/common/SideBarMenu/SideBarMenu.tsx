@@ -86,7 +86,7 @@ const SideBarMenu: React.FC = () => {
   return (
     <Box
       bg={"#F9FAFB"}
-      className=" w-full border-e border-gray-300 overflow-y-auto h-[calc(100vh-9rem)]"
+      className=" w-full overflow-y-auto h-[calc(100vh-9rem)]"
     >
       <Flex className="flex-col space-y-0.5 mx-3">
         {accessDetails?.map((menu, index) => (
