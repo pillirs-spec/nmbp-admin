@@ -10,6 +10,7 @@ import { useToast } from "./hooks/useToast";
 import { useAuth, useLogger } from "./hooks";
 import { LogLevel } from "./enums";
 import LoadingFallback from "./components/common/LoadingFallback/LoadingFallback";
+import ViewEvent from "./components/ViewEvent/ViewEvent";
 
 const Header = lazy(() => import("./components/common/Header/Header"));
 const Login = lazy(() => import("./pages/Login/Login"));
@@ -41,6 +42,21 @@ const PledgeReportManagement = lazy(
 
 const BareauManagement = lazy(
   () => import("./pages/Admin/BureauStatusManagement/BureauStatusManagement"),
+);
+
+const DistrictActivitiesManagement = lazy(
+  () =>
+    import("./pages/Admin/DistrictActivityManagement/DistrictActivityManagement"),
+);
+
+const ImportantDocumentsManagement = lazy(
+  () =>
+    import("./pages/Admin/ImportantDocumentsManagement/ImportantDocumentsManagement"),
+);
+
+const SateOrDistrictNodalOiiicersManagement = lazy(
+  () =>
+    import("./pages/Admin/StateOrDistrictNodalOiiicersManagement/StateOrDistrictNodalOiiicersManagement"),
 );
 
 const UserManagement = lazy(
@@ -146,6 +162,40 @@ function App() {
             <Route
               path="/bureau-status-report"
               element={<PrivateRoutes element={<BareauManagement />} />}
+            />
+            <Route
+              path="/district-activities"
+              element={
+                <PrivateRoutes element={<DistrictActivitiesManagement />} />
+              }
+            />
+
+            <Route
+              path="/important-documents"
+              element={
+                <PrivateRoutes element={<ImportantDocumentsManagement />} />
+              }
+            />
+
+            <Route
+              path="/dno-list"
+              element={
+                <PrivateRoutes
+                  element={<SateOrDistrictNodalOiiicersManagement />}
+                />
+              }
+            />
+
+            <Route
+              path="/district-activities/view"
+              element={<PrivateRoutes element={<ViewEvent />} />}
+            />
+
+            <Route
+              path="/important-documents"
+              element={
+                <PrivateRoutes element={<ImportantDocumentsManagement />} />
+              }
             />
             <Route
               path="/role-management"
