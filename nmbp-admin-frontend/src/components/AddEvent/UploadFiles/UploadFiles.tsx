@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import UploadIcon from "../../../assets/upload.svg";
+import EditIcon from "../../../assets/edit.svg";
+import DeleteIcon from "../../../assets/delete.svg";
+import UploadFile from "../../../assets/upload.svg";
 
 interface UploadFilesProps {
   formData: any;
@@ -119,9 +121,9 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
       </div>
 
       {/* Form Container */}
-      <div className="bg-white rounded-[20px] border border-[#E5E7EB] p-6">
+      <div className="bg-[#F9FAFB] rounded-[20px] border border-[#E5E7EB]">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6 p-6">
           <h2 className="font-semibold text-[#374151] mb-1">
             Upload Photos/Videos
           </h2>
@@ -131,15 +133,15 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
         </div>
 
         {/* Upload Grid */}
-        <div className="grid grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-3 gap-6 mb-6 bg-white p-6">
           {/* Uploaded Files */}
           {uploadedFiles.map((file) => (
             <div
               key={file.id}
-              className="relative border border-[#E5E7EB] rounded-lg overflow-hidden bg-[#F9FAFB]"
+              className="relative border border-[#E5E7EB] rounded-lg overflow-hidden"
             >
               {/* Image Preview */}
-              <div className="h-48 bg-gray-200 flex items-center justify-center">
+              <div className="h-48 bg-[#F9FAFB] flex items-center justify-center">
                 {file.type === "image" ? (
                   <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-4xl">
                     🖼️
@@ -152,56 +154,31 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
               </div>
 
               {/* File Info */}
-              <div className="p-3 bg-white border-t border-[#E5E7EB]">
-                <p className="text-sm font-medium text-[#374151] truncate mb-1">
-                  {file.name}
-                </p>
-                <p className="text-xs text-[#6B7280]">{file.size}</p>
-              </div>
-
-              {/* Action Icons */}
-              <div className="absolute top-3 right-3 flex gap-2">
-                <button
-                  onClick={() => handleEditFile(file.id)}
-                  className="w-8 h-8 bg-white rounded-md flex items-center justify-center shadow-md hover:bg-gray-50 transition"
-                >
-                  <svg
-                    className="w-4 h-4 text-[#374151]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              <div className="flex justify-between items-center">
+                <div className="p-3 bg-white ">
+                  <p className="text-sm font-medium text-[#374151] truncate mb-1">
+                    {file.name}
+                  </p>
+                  <p className="text-xs text-[#6B7280]">{file.size}</p>
+                </div>
+                <div className="p-3 flex gap-2">
+                  <button
+                    onClick={() => handleEditFile(file.id)}
+                    className="w-8 h-8  flex items-center justify-center  hover:bg-gray-100 hover:rounded-lg transition"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => handleDeleteFile(file.id)}
-                  className="w-8 h-8 bg-white rounded-md flex items-center justify-center shadow-md hover:bg-red-50 transition"
-                >
-                  <svg
-                    className="w-4 h-4 text-red-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                    <img src={EditIcon} alt="edit" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteFile(file.id)}
+                    className="w-8 h-8 flex items-center justify-center  hover:bg-red-50 hover:rounded-lg transition"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
+                    <img src={DeleteIcon} alt="delete" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
 
-          {/* Upload Area */}
           <div className="relative border-2 border-dashed border-[#E5E7EB] rounded-lg bg-[#F9FAFB] hover:bg-gray-50 transition cursor-pointer flex items-center justify-center min-h-[280px]">
             <input
               type="file"
@@ -212,19 +189,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
             />
             <div className="flex flex-col items-center p-6">
               <div className="w-12 h-12 bg-[#E5E7EB] rounded-full flex items-center justify-center mb-4">
-                <svg
-                  className="w-6 h-6 text-[#6B7280]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
+                <img src={UploadFile} alt="upload-icon" />
               </div>
               <p className="text-sm font-semibold text-[#374151] mb-1 text-center">
                 Click to Upload Photos/Videos
@@ -237,7 +202,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center pt-6 border-t border-[#E5E7EB]">
+        <div className="flex justify-between items-center p-6">
           <button
             onClick={handleCancel}
             className="px-6 py-2 border-[1px] border-[#003366] text-[#003366] font-[500] rounded-lg hover:bg-blue-50 transition text-sm"

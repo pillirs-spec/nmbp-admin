@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import LocationIcon from "../../../assets/location-icon.svg";
+import LockIcon from "../../../assets//lock.svg";
 
 interface LocationDetailsProps {
   formData: any;
@@ -29,7 +29,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   return (
     <div className="p-5">
       {/* Step Indicator */}
-      <div className="mb-8 flex items-center px-20">
+      <div className="mb-8 flex items-center">
         {steps.map((step, index) => (
           <React.Fragment key={step.number}>
             <div className="flex flex-col items-center">
@@ -72,7 +72,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
       {/* Form Container */}
       <div className="bg-[#F9FAFB] rounded-[20px] border border-[#E5E7EB]">
         {/* Form Header */}
-        <div className="p-6 border-b border-[#E5E7EB]">
+        <div className="p-6">
           <h2 className="font-semibold text-[#374151] mb-1">
             Upload Images/Videos
           </h2>
@@ -87,15 +87,15 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
             {/* Left Section - Form Fields */}
             <div className="space-y-6">
               {/* District Field */}
-              <div>
+              <div className="">
                 <label className="block text-sm font-medium text-[#374151] mb-2">
                   District <span className="text-red-500">*</span>{" "}
-                  <span className="text-[#6B7280] cursor-pointer">ⓘ</span>
+                  <img src={LockIcon} alt="Locked" className="inline" />
                 </label>
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-md outline-none text-[#374151] text-sm appearance-none bg-white focus:border-[#003366] transition"
+                  className="w-full px-4 py-2 border border-[#D1D5DB] rounded-md outline-none text-[#374151] text-sm appearance-none bg-[#F3F4F6] focus:border-[#003366] transition"
                 >
                   <option>Harda</option>
                   <option>Amroha</option>
@@ -245,7 +245,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center p-6 border-t border-[#E5E7EB] bg-[#F9FAFB]">
+        <div className="flex justify-between items-center p-6">
           <button
             onClick={handleCancel}
             className="px-6 py-2 border-[1px] border-[#003366] text-[#003366] font-[500] rounded-lg hover:bg-blue-50 transition text-sm"
