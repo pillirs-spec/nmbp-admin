@@ -10,11 +10,17 @@ import { useLogger } from "../../../../hooks";
 
 interface Submission {
   id: number;
+  state_name: string;
+  district_name: string;
   activity: string;
   activity_date: string;
   participants: number;
   male_participants: number;
   female_participants: number;
+  cordinating_department: string;
+  no_of_educational_institutions: number;
+  location: string;
+  created_at: string;
 }
 
 interface DashboardListProps {
@@ -36,43 +42,73 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
   const mockSubmissions: Submission[] = [
     {
       id: 1,
+      state_name: "Uttar Pradesh",
+      district_name: "Lucknow",
       activity: "Community Awareness",
       activity_date: "2024-01-15",
       participants: 45,
       male_participants: 28,
       female_participants: 17,
+      cordinating_department: "Department of Social Welfare",
+      no_of_educational_institutions: 5,
+      location: "Community Center, Lucknow",
+      created_at: "2024-01-16T10:30:00Z",
     },
     {
       id: 2,
+      state_name: "Maharashtra",
+      district_name: "Pune",
       activity: "Training Program",
       activity_date: "2024-02-20",
       participants: 62,
       male_participants: 35,
       female_participants: 27,
+      cordinating_department: "Department of Health",
+      no_of_educational_institutions: 3,
+      location: "Training Hall, Pune",
+      created_at: "2024-02-21T14:45:00Z",
     },
     {
       id: 3,
+      state_name: "Tamil Nadu",
+      district_name: "Chennai",
       activity: "Health Camp",
       activity_date: "2024-03-10",
       participants: 38,
       male_participants: 22,
       female_participants: 16,
+      cordinating_department: "Department of Health",
+      no_of_educational_institutions: 4,
+      location: "Community Hall, Chennai",
+      created_at: "2024-03-11T09:15:00Z",
     },
     {
       id: 4,
+      state_name: "West Bengal",
+      district_name: "Kolkata",
       activity: "Educational Workshop",
       activity_date: "2024-04-05",
       participants: 55,
       male_participants: 31,
       female_participants: 24,
+      cordinating_department: "Department of Education",
+      no_of_educational_institutions: 6,
+      location: "Education Center, Kolkata",
+      created_at: "2024-04-06T11:00:00Z",
     },
     {
       id: 5,
+      state_name: "Rajasthan",
+      district_name: "Jaipur",
       activity: "Women Empowerment",
       activity_date: "2024-05-12",
       participants: 78,
       male_participants: 28,
       female_participants: 50,
+      cordinating_department: "Department of Social Welfare",
+      no_of_educational_institutions: 2,
+      location: "Community Center, Jaipur",
+      created_at: "2024-05-13T13:30:00Z",
     },
   ];
 
@@ -139,9 +175,9 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
               <h2 className="text-2xl font-semibold text-[#374151]">
                 Dashboard
               </h2>
-              <p className="text-sm text-[#6B7280] mt-1 text-wrap">
+              {/* <p className="text-sm text-[#6B7280] mt-1 text-wrap">
                 Last updated: 27 Aug 2024, 02:00 PM
-              </p>
+              </p> */}
             </div>
             <button
               onClick={handleAddEvent}
@@ -152,7 +188,7 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
           </div>
 
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
               <div className="flex justify-between items-start">
                 <div>
@@ -210,13 +246,13 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 <img src={PrizeIcon} alt="prize-icon" className="" />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* My Submissions Section */}
           <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
-            <h3 className="text-lg font-semibold text-[#374151] mb-6">
+            {/* <h3 className="text-lg font-semibold text-[#374151] mb-6">
               My Submissions
-            </h3>
+            </h3> */}
 
             <div className="grid grid-cols-12 gap-6 mb-6">
               {/* Search Bar */}
@@ -274,6 +310,12 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 <thead style={{ backgroundColor: "#F9FAFB" }}>
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      State
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      District
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Activity
                     </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
@@ -288,6 +330,18 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Female Participants
                     </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      Cordinating Department
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      No. of Educational Institutions
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      Location
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      Created At
+                    </th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Action
                     </th>
@@ -300,6 +354,13 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                         key={index}
                         className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0"
                       >
+                        <td className="px-6 py-4 text-sm text-[#374151]">
+                          {submission.state_name}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-[#374151]">
+                          {submission.district_name}
+                        </td>
                         <td className="px-6 py-4 text-sm text-[#374151]">
                           {submission.activity}
                         </td>
@@ -315,9 +376,19 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
                           {submission.female_participants}
                         </td>
-                        <td className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]">
-                          View
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
+                          {submission.cordinating_department}
                         </td>
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
+                          {submission.no_of_educational_institutions}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
+                          {submission.location}
+                        </td>
+                        <td>{submission.created_at}</td>
+                        {/* <td className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]">
+                          View
+                        </td> */}
                       </tr>
                     ))
                   ) : (

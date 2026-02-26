@@ -454,7 +454,9 @@ const PledgeReportList = () => {
                 <option>50</option>
                 <option>100</option>
               </select>
-              of <span className="font-semibold">{totalCount}</span> items
+              of{" "}
+              <span className="font-medium text-[#374151]">{totalCount}</span>{" "}
+              items
             </div>
           </div>
         </div>

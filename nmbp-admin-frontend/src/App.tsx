@@ -38,6 +38,8 @@ const QrManagement = lazy(
 
 const AddQr = lazy(() => import("./components/AddQr/AddQr"));
 
+const AddDocument = lazy(() => import("./components/AddDocument/AddDocument"));
+
 const PledgeReportManagement = lazy(
   () => import("./pages/Admin/PledgeReportManagement/PledgeReportManagement"),
 );
@@ -58,6 +60,10 @@ const ImportantDocumentsManagement = lazy(
 
 const NodalOiiicersManagement = lazy(
   () => import("./pages/Admin/NodalOfficersManagement/NodalOfficersManagement"),
+);
+
+const FeedbackManagement = lazy(
+  () => import("./pages/Admin/FeebackManagement/FeebackManagement"),
 );
 
 const UserManagement = lazy(
@@ -141,6 +147,10 @@ function App() {
               element={<PrivateRoutes element={<AddEvent />} />}
             />
             <Route
+              path="/feedback"
+              element={<PrivateRoutes element={<FeedbackManagement />} />}
+            />
+            <Route
               path="/user-management"
               element={<PrivateRoutes element={<UserManagement />} />}
             />
@@ -176,6 +186,11 @@ function App() {
               element={
                 <PrivateRoutes element={<ImportantDocumentsManagement />} />
               }
+            />
+
+            <Route
+              path="/important-documents/add"
+              element={<PrivateRoutes element={<AddDocument />} />}
             />
 
             <Route
