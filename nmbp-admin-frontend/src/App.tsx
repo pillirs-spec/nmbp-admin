@@ -99,7 +99,7 @@ function App() {
         {isAuthenticated && (
           <aside
             className="w-[20%] hidden md:block fixed left-0 overflow-y-auto border-r border-gray-300"
-            style={{ top: "150px", height: "calc(100vh - 128px)" }}
+            style={{ top: "135px", height: "calc(100vh - 128px)" }}
           >
             <SideBarMenu />
           </aside>
