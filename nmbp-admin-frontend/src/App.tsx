@@ -22,7 +22,9 @@ const ResetPassword = lazy(
   () => import("./pages/Login/ResetPassword/ResetPassword"),
 );
 
-const Dashboard = lazy(() => import("./pages/Admin/Dashboard/Dashboard"));
+const DashboardManagement = lazy(
+  () => import("./pages/Admin/DashboardManagement/DashboardManagement"),
+);
 
 const AddEvent = lazy(() => import("./components/AddEvent/AddEvent"));
 
@@ -54,9 +56,8 @@ const ImportantDocumentsManagement = lazy(
     import("./pages/Admin/ImportantDocumentsManagement/ImportantDocumentsManagement"),
 );
 
-const SateOrDistrictNodalOiiicersManagement = lazy(
-  () =>
-    import("./pages/Admin/StateOrDistrictNodalOiiicersManagement/StateOrDistrictNodalOiiicersManagement"),
+const NodalOiiicersManagement = lazy(
+  () => import("./pages/Admin/NodalOfficersManagement/NodalOfficersManagement"),
 );
 
 const UserManagement = lazy(
@@ -133,7 +134,7 @@ function App() {
             />
             <Route
               path="/dashboard"
-              element={<PrivateRoutes element={<Dashboard />} />}
+              element={<PrivateRoutes element={<DashboardManagement />} />}
             />
             <Route
               path="/dashboard/add-event"
@@ -178,12 +179,8 @@ function App() {
             />
 
             <Route
-              path="/dno-list"
-              element={
-                <PrivateRoutes
-                  element={<SateOrDistrictNodalOiiicersManagement />}
-                />
-              }
+              path="/nodal-officers-list"
+              element={<PrivateRoutes element={<NodalOiiicersManagement />} />}
             />
 
             <Route
