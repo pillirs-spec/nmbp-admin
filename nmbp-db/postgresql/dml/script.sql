@@ -283,6 +283,9 @@ INSERT INTO password_policies
 VALUES
     (1, 99, 99, 8, 1, 1, 0, 0, '!@#$%^&*()', 99, NOW(), NOW());
 
+
+    INSERT INTO m_activities (activity_id, activity_name, activity_timestamp) VALUES (1, 'Slogan Writing Competition', NOW(), 2, 'Rangoli Making Competition', NOW(), 3, 'Drawing Competition', NOW(), 4, 'Marathon / Walkthon / yclothon', NOW());
+
 -- Reset sequences to next available value
 SELECT setval('m_roles_role_id_seq', (SELECT MAX(role_id) FROM m_roles));
 SELECT setval('m_permissions_permission_id_seq', (SELECT MAX(permission_id) FROM m_permissions));

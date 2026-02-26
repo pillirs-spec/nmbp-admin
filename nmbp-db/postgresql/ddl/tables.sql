@@ -119,3 +119,10 @@ CREATE TABLE m_districts (
 );
 
 
+CREATE TABLE m_activities (
+    activity_id SERIAL PRIMARY KEY,
+    activity_name VARCHAR(500) NOT NULL,
+    activity_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+);
+
+

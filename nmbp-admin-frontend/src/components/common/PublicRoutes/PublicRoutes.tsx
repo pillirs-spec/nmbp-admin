@@ -12,7 +12,7 @@ const PublicRoutes: React.FC<PublicRoutesProps> = ({ element }) => {
       {!isAuthenticated ? (
         element
       ) : (
-        <Navigate to="/dashboard" state={{ from: location }} replace />
+        <Navigate to="/user-management" state={{ from: location }} replace />
       )}
     </div>
   );

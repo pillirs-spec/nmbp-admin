@@ -17,7 +17,7 @@ interface Officer {
   contactEmail: string;
 }
 
-const DistrictNodalOfficersList = () => {
+const StateNodalOfficersList = () => {
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -156,7 +156,7 @@ const DistrictNodalOfficersList = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-semibold text-[#374151]">
-            List of DNO's
+            List of SNO's
           </h2>
           <button
             onClick={handleExport}
@@ -242,7 +242,7 @@ const DistrictNodalOfficersList = () => {
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] text-sm"
-                placeholder="Search for DNO / District"
+                placeholder="Search for SNO / District"
                 onChange={(e) => debouncedHandleSearch(e.target.value)}
               />
               <img
@@ -277,6 +277,9 @@ const DistrictNodalOfficersList = () => {
               <thead style={{ backgroundColor: "#F9FAFB" }}>
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                    State Name
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     District Name
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
@@ -301,6 +304,9 @@ const DistrictNodalOfficersList = () => {
                       onClick={() => setSelectedOfficer(officer)}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0 cursor-pointer"
                     >
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        {officer.stateName}
+                      </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
                         {officer.districtName}
                       </td>
@@ -471,4 +477,4 @@ const DistrictNodalOfficersList = () => {
   );
 };
 
-export default DistrictNodalOfficersList;
+export default StateNodalOfficersList;

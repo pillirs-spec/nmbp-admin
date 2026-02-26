@@ -179,7 +179,12 @@ function App() {
             />
 
             <Route
-              path="/nodal-officers-list"
+              path="/state-nodal-officers-list"
+              element={<PrivateRoutes element={<NodalOiiicersManagement />} />}
+            />
+
+            <Route
+              path="/district-nodal-officers-list"
               element={<PrivateRoutes element={<NodalOiiicersManagement />} />}
             />
 
