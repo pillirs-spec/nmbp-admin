@@ -5,7 +5,10 @@ import searchIcon from "../../../../assets/search-icon.svg";
 import { useLogger } from "../../../../hooks";
 import { LogLevel } from "../../../../enums";
 import UploadIcon from "../../../../assets/upload-icon.png";
+import PledgeContributionIcon from "../../../../assets/total_pledge.svg";
+import EyeIcon from "../../../../assets/eye.svg";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface Activity {
   id: number;
@@ -17,13 +20,15 @@ interface Activity {
   total_participants: number;
   males_females: string;
   date_of_activity: string;
+  total_contribution: number;
+  rank: number;
   total_educational_institutes: number;
   department: string;
   location: string;
   media: string;
 }
 
-const StatesList = () => {
+const QrList = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -33,6 +38,7 @@ const StatesList = () => {
   const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const { log } = useLogger();
+  const navigate = useNavigate();
 
   const pageSize = 200;
 
@@ -48,6 +54,8 @@ const StatesList = () => {
       males_females: "60/40",
       date_of_activity: "2024-05-01",
       total_educational_institutes: 20,
+      total_contribution: 5,
+      rank: 2,
       department: "Education",
       location: "Amroha City Park",
       media: "image1.jpg",
@@ -63,6 +71,8 @@ const StatesList = () => {
       males_females: "30/20",
       date_of_activity: "2024-05-03",
       total_educational_institutes: 10,
+      total_contribution: 15,
+      rank: 1,
       department: "Education",
       location: "Auraiya Community Hall",
       media: "image2.jpg",
@@ -75,6 +85,8 @@ const StatesList = () => {
       total_activity: 22,
       completed_activity: 22,
       total_participants: 80,
+      total_contribution: 12,
+      rank: 5,
       males_females: "50/30",
       date_of_activity: "2024-05-05",
       total_educational_institutes: 15,
@@ -90,6 +102,8 @@ const StatesList = () => {
       total_activity: 45,
       completed_activity: 45,
       total_participants: 200,
+      total_contribution: 7,
+      rank: 3,
       males_females: "120/80",
       date_of_activity: "2024-05-10",
       total_educational_institutes: 25,
@@ -104,6 +118,8 @@ const StatesList = () => {
       activity_name: "Drawing Competition",
       total_activity: 66,
       completed_activity: 66,
+      total_contribution: 51,
+      rank: 12,
       total_participants: 150,
       males_females: "90/60",
       date_of_activity: "2024-05-12",
@@ -120,6 +136,8 @@ const StatesList = () => {
       total_activity: 37,
       completed_activity: 37,
       total_participants: 120,
+      total_contribution: 15,
+      rank: 22,
       males_females: "70/50",
       date_of_activity: "2024-05-15",
       total_educational_institutes: 18,
@@ -136,6 +154,8 @@ const StatesList = () => {
       total_activity: 37,
       completed_activity: 37,
       total_participants: 120,
+      total_contribution: 50,
+      rank: 21,
       males_females: "70/50",
       date_of_activity: "2024-05-15",
       total_educational_institutes: 18,
@@ -151,6 +171,8 @@ const StatesList = () => {
       total_activity: 37,
       completed_activity: 37,
       total_participants: 120,
+      total_contribution: 23,
+      rank: 13,
       males_females: "70/50",
       date_of_activity: "2024-05-15",
       total_educational_institutes: 18,
@@ -167,6 +189,8 @@ const StatesList = () => {
       total_activity: 37,
       completed_activity: 37,
       total_participants: 120,
+      total_contribution: 25,
+      rank: 12,
       males_females: "70/50",
       date_of_activity: "2024-05-15",
       total_educational_institutes: 18,
@@ -182,6 +206,8 @@ const StatesList = () => {
       activity_name: "Marathon Run",
       total_activity: 37,
       completed_activity: 37,
+      total_contribution: 34,
+      rank: 12,
       total_participants: 120,
       males_females: "70/50",
       date_of_activity: "2024-05-15",
@@ -198,6 +224,8 @@ const StatesList = () => {
       activity_name: "Marathon Run",
       total_activity: 37,
       completed_activity: 37,
+      total_contribution: 5,
+      rank: 2,
       total_participants: 120,
       males_females: "70/50",
       date_of_activity: "2024-05-15",
@@ -292,15 +320,7 @@ const StatesList = () => {
   };
 
   const handleAddActivity = () => {
-    try {
-      log(
-        LogLevel.INFO,
-        "StatesList :: handleAddActivity",
-        "Add Activity clicked",
-      );
-    } catch (error) {
-      log(LogLevel.ERROR, "StatesList :: handleAddActivity", error);
-    }
+    navigate("/qr-management/add-qr");
   };
 
   useEffect(() => {
@@ -328,34 +348,81 @@ const StatesList = () => {
       <div className="">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-semibold text-[#374151]">
-            Activity Report
+            Activity Report & QR Code
           </h2>
           <div className="flex gap-4">
-            <button
+            {/* <button
               onClick={handleExport}
               disabled={isExporting}
               className="px-6 py-2 flex items-center border-[1px] border-[#003366] text-sm text-[#003366] font-[500] rounded-lg hover:bg-gray-100 transition"
             >
               Export
               <img src={UploadIcon} alt="upload-icon" className="ml-1" />
-            </button>
-            {/* <button
+            </button> */}
+            <button
               onClick={handleAddActivity}
               className="bg-[#003366] px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
             >
-              Add Activity +
-            </button> */}
+              Add QR Code +
+            </button>
+          </div>
+        </div>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm font-semibold text-[#6B7280] mb-2">
+                  Total Pledge
+                </p>
+                <p className="text-3xl font-semibold text-[#003366]">12060</p>
+              </div>
+              <img
+                src={PledgeContributionIcon}
+                alt="pledge-contribution-icon"
+              />
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm font-semibold text-[#6B7280] mb-2">
+                  Total Pledge Today
+                </p>
+                <p className="text-3xl font-semibold text-[#003366]">89</p>
+              </div>
+              <img
+                src={PledgeContributionIcon}
+                alt="pledge-contribution-icon"
+              />
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm font-semibold text-[#6B7280] mb-2">
+                  Total Pledge Contribution
+                </p>
+                <p className="text-3xl font-semibold text-[#003366]">3%</p>
+              </div>
+
+              <img
+                src={PledgeContributionIcon}
+                alt="pledge-contribution-icon"
+              />
+            </div>
           </div>
         </div>
 
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
-          <div className="grid grid-cols-12 gap-4 mb-6">
+          <div className="grid grid-cols-12 gap-5  mb-6">
             {/* Search Bar */}
-            <div className="col-span-12 sm:col-span-6 lg:col-span-6 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-white">
+            <div className="col-span-12 md:col-span-7 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
               <input
                 type="search"
-                className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] text-sm"
-                placeholder="Search for State, District or Activity"
+                className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] bg-[#F9FAFB] text-sm "
+                placeholder="Search by Organization"
                 onChange={(e) => debouncedHandleSearch(e.target.value)}
               />
               <img
@@ -365,7 +432,7 @@ const StatesList = () => {
               />
             </div>
 
-            <div className="relative col-span-12 sm:col-span-6 lg:col-span-2">
+            <div className="relative col-span-12 md:col-span-5 ">
               <select
                 value={filterActivity}
                 onChange={(e) => {
@@ -374,47 +441,11 @@ const StatesList = () => {
                 }}
                 className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
               >
-                <option>All Activity</option>
+                <option>All Organisations</option>
                 <option>Drawing Competition</option>
                 <option>Slogan Writing</option>
                 <option>Nukkad Natak</option>
                 <option>Marathon Run</option>
-              </select>
-            </div>
-
-            <div className="relative col-span-12 sm:col-span-6 lg:col-span-2">
-              <select
-                value={filterDistrict}
-                onChange={(e) => {
-                  setFilterDistrict(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
-              >
-                <option>All District</option>
-                <option>Amroha</option>
-                <option>Auraiya</option>
-                <option>Ayodhya</option>
-                <option>Azamgarh</option>
-                <option>Badaun</option>
-                <option>Baghpat</option>
-              </select>
-            </div>
-
-            <div className="relative col-span-12 sm:col-span-6 lg:col-span-2">
-              <select
-                value={filterState}
-                onChange={(e) => {
-                  setFilterState(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
-              >
-                <option>Uttar Pradesh</option>
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
-                <option>Tamil Nadu</option>
-                <option>West Bengal</option>
               </select>
             </div>
           </div>
@@ -424,41 +455,25 @@ const StatesList = () => {
               <thead style={{ backgroundColor: "#F9FAFB" }}>
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    State/UT Name
+                    Organisation
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    District Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Activity
+                    Assigned to
                   </th>
                   <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Total Activity
+                    Total Pledge
                   </th>
                   <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Completed Activity
-                  </th>
-
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Total Participants
+                    Pledge Today
                   </th>
                   <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Males/Females
+                    Total Contribution (%)
                   </th>
                   <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Date of Activity
+                    Rank
                   </th>
                   <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Total Educational Institutes
-                  </th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Department
-                  </th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Location
-                  </th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Media
+                    QR Code
                   </th>
                 </tr>
               </thead>
@@ -470,13 +485,10 @@ const StatesList = () => {
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {activity.state_name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151]">
                         {activity.district_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {activity.activity_name}
+                        Shubham Sharma
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
                         {activity.total_activity}
@@ -485,31 +497,20 @@ const StatesList = () => {
                         {activity.completed_activity}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {activity.total_participants}
+                        {activity.total_contribution}%
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {activity.males_females}
+                        {activity.rank}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {activity.date_of_activity}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {activity.total_educational_institutes}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {activity.department}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {activity.location}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        <Link
-                          to={activity.media}
-                          target="_blank"
-                          className="text-[#003366] hover:underline font-[500]"
-                        >
-                          View ↗
-                        </Link>
+                        <button className="px-3 py-2 border border-[#003366] text-[#003366] rounded-lg text-xs font-medium hover:bg-blue-50 transition flex items-center gap-2 mx-auto">
+                          <span>View QR</span>
+                          <img
+                            src={EyeIcon}
+                            alt="eye-icon"
+                            className=" flex-shrink-0"
+                          />
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -601,4 +602,4 @@ const StatesList = () => {
   );
 };
 
-export default StatesList;
+export default QrList;

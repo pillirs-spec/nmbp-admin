@@ -10,6 +10,7 @@ import { useToast } from "./hooks/useToast";
 import { useAuth, useLogger } from "./hooks";
 import { LogLevel } from "./enums";
 import LoadingFallback from "./components/common/LoadingFallback/LoadingFallback";
+import ViewEvent from "./components/ViewEvent/ViewEvent";
 
 const Header = lazy(() => import("./components/common/Header/Header"));
 const Login = lazy(() => import("./pages/Login/Login"));
@@ -21,10 +22,42 @@ const ResetPassword = lazy(
   () => import("./pages/Login/ResetPassword/ResetPassword"),
 );
 
-const Dashboard = lazy(() => import("./pages/Admin/Dashboard/Dashboard"));
+const DashboardManagement = lazy(
+  () => import("./pages/Admin/DashboardManagement/DashboardManagement"),
+);
+
+const AddEvent = lazy(() => import("./components/AddEvent/AddEvent"));
 
 const StatesManagement = lazy(
   () => import("./pages/Admin/StatesManagement/StatesManagement"),
+);
+
+const QrManagement = lazy(
+  () => import("./pages/Admin/QrManagement/QrManagement"),
+);
+
+const AddQr = lazy(() => import("./components/AddQr/AddQr"));
+
+const PledgeReportManagement = lazy(
+  () => import("./pages/Admin/PledgeReportManagement/PledgeReportManagement"),
+);
+
+const BareauManagement = lazy(
+  () => import("./pages/Admin/BureauStatusManagement/BureauStatusManagement"),
+);
+
+const DistrictActivitiesManagement = lazy(
+  () =>
+    import("./pages/Admin/DistrictActivityManagement/DistrictActivityManagement"),
+);
+
+const ImportantDocumentsManagement = lazy(
+  () =>
+    import("./pages/Admin/ImportantDocumentsManagement/ImportantDocumentsManagement"),
+);
+
+const NodalOiiicersManagement = lazy(
+  () => import("./pages/Admin/NodalOfficersManagement/NodalOfficersManagement"),
 );
 
 const UserManagement = lazy(
@@ -52,20 +85,30 @@ function App() {
 
   return (
     <Suspense fallback={<LoadingFallback />}>
-      {isAuthenticated && <Header />}
+      <div className={isAuthenticated ? "fixed top-0 left-0 right-0 z-50" : ""}>
+        {isAuthenticated && <Header />}
+      </div>
       <div
-        className={`flex flex-col md:flex-row w-full ${isAuthenticated ? "" : ""}`}
+        className="flex w-full"
+        style={
+          isAuthenticated
+            ? { marginTop: "128px", height: "calc(100vh - 128px)" }
+            : {}
+        }
       >
         {isAuthenticated && (
-          <aside className="w-full md:w-[20%] hidden md:block sticky top-32">
+          <aside
+            className="w-[20%] hidden md:block fixed left-0 overflow-y-auto border-r border-gray-300"
+            style={{ top: "135px", height: "calc(100vh - 128px)" }}
+          >
             <SideBarMenu />
           </aside>
         )}
         <main
-          className={`w-full ${isAuthenticated ? "" : ""} flex-1 ${
-            isAuthenticated ? "md:w-[80%]" : "w-full"
+          className={`w-full md:flex-1 overflow-y-auto ${
+            isAuthenticated ? "md:ml-[20%]" : "w-full"
           }`}
-          // style={isAuthenticated ? { height: "calc(100vh - 128px)" } : {}}
+          style={isAuthenticated ? { height: "calc(100vh - 128px)" } : {}}
         >
           <Routes>
             <Route
@@ -91,15 +134,65 @@ function App() {
             />
             <Route
               path="/dashboard"
-              element={<PrivateRoutes element={<Dashboard />} />}
+              element={<PrivateRoutes element={<DashboardManagement />} />}
+            />
+            <Route
+              path="/dashboard/add-event"
+              element={<PrivateRoutes element={<AddEvent />} />}
             />
             <Route
               path="/user-management"
               element={<PrivateRoutes element={<UserManagement />} />}
             />
             <Route
+              path="/qr-management"
+              element={<PrivateRoutes element={<QrManagement />} />}
+            />
+            <Route
+              path="/qr-management/add-qr"
+              element={<PrivateRoutes element={<AddQr />} />}
+            />
+            <Route
               path="/state-activities"
               element={<PrivateRoutes element={<StatesManagement />} />}
+            />
+            <Route
+              path="/pledge-reports"
+              element={<PrivateRoutes element={<PledgeReportManagement />} />}
+            />
+            <Route
+              path="/bureau-status-report"
+              element={<PrivateRoutes element={<BareauManagement />} />}
+            />
+            <Route
+              path="/district-activities"
+              element={
+                <PrivateRoutes element={<DistrictActivitiesManagement />} />
+              }
+            />
+
+            <Route
+              path="/important-documents"
+              element={
+                <PrivateRoutes element={<ImportantDocumentsManagement />} />
+              }
+            />
+
+            <Route
+              path="/nodal-officers-list"
+              element={<PrivateRoutes element={<NodalOiiicersManagement />} />}
+            />
+
+            <Route
+              path="/district-activities/view"
+              element={<PrivateRoutes element={<ViewEvent />} />}
+            />
+
+            <Route
+              path="/important-documents"
+              element={
+                <PrivateRoutes element={<ImportantDocumentsManagement />} />
+              }
             />
             <Route
               path="/role-management"
