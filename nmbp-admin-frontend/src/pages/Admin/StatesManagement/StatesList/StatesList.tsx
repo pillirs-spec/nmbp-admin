@@ -372,7 +372,7 @@ const StatesList = () => {
                   setFilterActivity(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
                 <option>All Activity</option>
                 <option>Drawing Competition</option>
@@ -389,7 +389,7 @@ const StatesList = () => {
                   setFilterDistrict(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
                 <option>All District</option>
                 <option>Amroha</option>
@@ -408,7 +408,7 @@ const StatesList = () => {
                   setFilterState(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
                 <option>Uttar Pradesh</option>
                 <option>Maharashtra</option>

@@ -439,7 +439,7 @@ const QrList = () => {
                   setFilterActivity(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
                 <option>All Organisations</option>
                 <option>Drawing Competition</option>

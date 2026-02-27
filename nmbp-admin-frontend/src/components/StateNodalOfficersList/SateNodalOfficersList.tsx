@@ -260,7 +260,7 @@ const StateNodalOfficersList = () => {
                   setFilterState(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm w-full md:w-48"
+                className="px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm w-full md:w-48"
               >
                 <option>Uttar Pradesh</option>
                 <option>Maharashtra</option>

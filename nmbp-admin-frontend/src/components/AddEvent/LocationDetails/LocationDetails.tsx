@@ -95,7 +95,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full px-4 py-2 border border-[#D1D5DB] rounded-md outline-none text-[#374151] text-sm appearance-none bg-[#F3F4F6] focus:border-[#003366] transition"
+                  className="w-full px-4 py-2 border border-[#D1D5DB] rounded-md outline-none text-[#374151] text-sm  bg-[#F3F4F6] focus:border-[#003366] transition"
                 >
                   <option>Harda</option>
                   <option>Amroha</option>

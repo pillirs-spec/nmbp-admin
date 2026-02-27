@@ -116,7 +116,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                 name="activityType"
                 value={formData.activityType}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-[#E5E7EB] rounded-md outline-none text-[#374151] text-sm appearance-none bg-white focus:border-[#003366] transition"
+                className="w-full px-4 py-2 border border-[#E5E7EB] rounded-md outline-none text-[#374151] text-sm  bg-white focus:border-[#003366] transition"
               >
                 <option value="">Select Activity</option>
                 {activities.map((activity) => (
