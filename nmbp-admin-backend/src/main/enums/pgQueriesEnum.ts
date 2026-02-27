@@ -32,6 +32,10 @@ export enum DistrictQueries {
   LIST_DISTRICTS_BY_STATE = `SELECT district_id, district_name FROM m_districts WHERE state_id = $1 ORDER BY district_name ASC`,
 }
 
+export enum ActivityQueries {
+  LIST_ACTIVITIES = `SELECT activity_id, activity_name FROM m_activities ORDER BY activity_name ASC`,
+}
+
 export enum PasswordPolicyQueries {
   ADD_PASSWORD_POLICY = `INSERT INTO password_policies(password_expiry, password_history, minimum_password_length, complexity, alphabetical, "numeric", special_characters, allowed_special_characters, maximum_invalid_attempts, date_created, date_updated)
                          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,

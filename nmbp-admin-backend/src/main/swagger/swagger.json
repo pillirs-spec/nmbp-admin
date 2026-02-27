@@ -1141,6 +1141,29 @@
         }
       }
     },
+    "/api/v1/admin/locations/activities": {
+      "get": {
+        "tags": [
+          "Activities"
+        ],
+        "summary": "List All Activities",
+        "description": "This API is used to fetch all the activities.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/admin/health": {
       "get": {
         "tags": [

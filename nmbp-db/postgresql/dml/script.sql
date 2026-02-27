@@ -284,7 +284,25 @@ VALUES
     (1, 99, 99, 8, 1, 1, 0, 0, '!@#$%^&*()', 99, NOW(), NOW());
 
 
-    INSERT INTO m_activities (activity_id, activity_name, activity_timestamp) VALUES (1, 'Slogan Writing Competition', NOW(), 2, 'Rangoli Making Competition', NOW(), 3, 'Drawing Competition', NOW(), 4, 'Marathon / Walkthon / yclothon', NOW());
+    INSERT INTO m_activities (activity_id, activity_name, activity_timestamp) VALUES 
+    (1, 'Slogan Writing Competition', NOW()),
+    (2, 'Rangoli Making Competition', NOW()),
+    (3, 'Drawing competition', NOW()),
+    (4, 'Marathon / Walkthon / Cyclothon', NOW()),
+    (5, 'Training and awareness generation activities with children, adolescents, youth and master volunteers', NOW()),
+    (6, 'Sports and physical activities', NOW()),
+    (7, 'Seminars, Webinars or Workshops for awareness generation', NOW()),
+    (8, 'Nukkad Natak, Skits and Play', NOW()),
+    (9, 'Flash mobs, drives and Rallies', NOW()),
+    (10, 'NMBA pledge (including e-pledge) in educational institutions, hotspots and public places', NOW()),
+    (11, 'Community mapping of nearby areas and identifying hotspots for qualitative analysis', NOW()),
+    (12, 'Wall Paintings/Graffiti and art competitions', NOW()),
+    (13, 'Video-making or short film making', NOW()),
+    (14, 'Activities with/NSS/NCC/ NYK volunteers and spiritual organizations', NOW()),
+    (15, 'Yoga and Meditation Activities', NOW()),
+    (16, 'Documentaries/Film Screenings on substance use and discussions', NOW()),
+    (17, 'Awareness generation through NMBA vehicles', NOW()),
+    (18, 'Sensitizing the general public about the different schemes and programs of the Ministry with regards to existing deaddiction facilities', NOW());
 
 -- Reset sequences to next available value
 SELECT setval('m_roles_role_id_seq', (SELECT MAX(role_id) FROM m_roles));

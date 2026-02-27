@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LockImage from "../../../assets/lock.svg";
+import dashboardListService from "../../../pages/Admin/DashboardManagement/DashboardList/dashboardListService";
 
 interface ActivityDetailsProps {
   formData: {
@@ -32,6 +33,22 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
   handleCancel,
   handleSaveAndContinue,
 }) => {
+  const [activities, setActivities] = React.useState<any[]>([]);
+  const getActivities = async () => {
+    try {
+      const response = await dashboardListService.activitiesList();
+      if (response.status === 200) {
+        setActivities(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
+
+  useEffect(() => {
+    getActivities();
+  }, []);
+
   return (
     <div className="p-5">
       {/* Step Indicator */}
@@ -101,10 +118,15 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border border-[#E5E7EB] rounded-md outline-none text-[#374151] text-sm appearance-none bg-white focus:border-[#003366] transition"
               >
-                <option>Drawing Competition</option>
-                <option>Slogan Writing</option>
-                <option>Nukkad Natak</option>
-                <option>Marathon Run</option>
+                <option value="">Select Activity</option>
+                {activities.map((activity) => (
+                  <option
+                    key={activity.activity_id}
+                    value={activity.activity_id}
+                  >
+                    {activity.activity_name}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
