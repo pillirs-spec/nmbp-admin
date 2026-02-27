@@ -16,6 +16,7 @@ import Constrast from "../../../assets/contrast.png";
 import Accessiblity from "../../../assets/accessibility_new.png";
 import ArrowDropDown from "../../../assets/arrow_drop_down.png";
 import GovernmentOfIndia from "../../../assets/govt-of-india.svg";
+import { IoMdLogOut } from "react-icons/io";
 
 const Header: React.FC = () => {
   const { sideMenuOpen, setSideMenuOpen } = useAuth();
@@ -183,19 +184,20 @@ const Header: React.FC = () => {
                   />
                 </CommonDrawer>
 
-                <HoverCard width={250} shadow="md">
+                <HoverCard shadow="lg">
                   <HoverCard.Target>
-                    <div className="flex items-center  gap-4 cursor-pointer hover:opacity-80 transition">
+                    <div className="flex items-center gap-4 cursor-pointer hover:opacity-80 transition">
                       <div className="order-2">
-                        <div className="font-semibold text-[#374151]">
+                        <div className="font-bold text-[#374151] text-lg">
                           {userDetails?.display_name
                             ? userDetails?.display_name
                             : userData?.display_name}
                         </div>
-                        <div className="text-xs text-[#6B7280]">
+                        <div className="text-sm font-medium text-[#6B7280]">
                           {userDetails?.role_name
-                            ? userDetails?.role_name
-                            : userData?.role_name || "District Nodal Officer"}
+                            ? `(${userDetails?.role_name})`
+                            : `(${userData?.role_name})` ||
+                              "(District Nodal Officer)"}
                         </div>
                       </div>
                       <div className="order-1 flex items-center justify-center w-12 h-12 rounded-lg bg-[#C8DBF0] text-[#001933] font-bold text-lg">
@@ -217,16 +219,18 @@ const Header: React.FC = () => {
                   </HoverCard.Target>
                   <HoverCard.Dropdown>
                     <div
-                      className="cursor-pointer text-sm pb-2 hover:text-blue-600 transition"
+                      className="cursor-pointer pb-2 font-medium text-[#003366] hover:text-[#1573d1] transition"
                       onClick={() => setOpenedProfile(true)}
                     >
+                      <i className="fa-regular fa-circle-user text-[#003366] mr-2"></i>
                       Profile Settings
                     </div>
                     <div className="border-t border-gray-300 my-2"></div>
                     <div
-                      className="cursor-pointer text-sm pt-2 hover:text-blue-600 transition"
+                      className="cursor-pointer pt-2 font-medium text-red-600 hover:text-red-400 transition"
                       onClick={handleLogout}
                     >
+                      <i className="fa-solid fa-arrow-right-from-bracket text-red-600 mr-2"></i>
                       Logout
                     </div>
                   </HoverCard.Dropdown>
