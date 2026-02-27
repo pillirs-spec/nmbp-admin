@@ -65,7 +65,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="grid  grid-cols-12 ">
-      <div className="hidden md:flex col-span-7 bg-[#E5EFF9] rounded-tr-3xl rounded-br-3xl relative">
+      <div className="hidden shadow-md shadow-[#003366] md:flex col-span-7 bg-[#E5EFF9] rounded-tr-[40px] rounded-br-[40px] relative">
         <div className="w-full relative ">
           <img
             src={GovtLogo}
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
         <div className="flex flex-col items-center">
           <img src={NationalEmblem} alt="national-emblem" className=" mb-4" />
           <h1 className="text-[#374151] font-semibold text-xl sm:text-4xl mt-2 !text-left">
-            Admin Login
+            Log In
           </h1>
         </div>
 
@@ -189,7 +189,7 @@ const Login: React.FC = () => {
               </button>
             </div>
 
-            <div className="w-full sm:w-3/4 flex items-center font-[600] text-[#A6A6A6] text-sm">
+            {/* <div className="w-full sm:w-3/4 flex items-center font-[600] text-[#A6A6A6] text-sm">
               <hr className="flex-grow border-[#A6A6A6]" />
               <span className="mx-4 text-gray-500">OR</span>
               <hr className="flex-grow border-[#A6A6A6]" />
@@ -201,7 +201,7 @@ const Login: React.FC = () => {
               >
                 Login Using OTP
               </button>
-            </div>
+            </div> */}
           </div>
         </form>
       </div>
