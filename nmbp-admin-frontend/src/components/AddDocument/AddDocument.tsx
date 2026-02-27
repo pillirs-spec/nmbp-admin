@@ -134,7 +134,7 @@ const AddDocument = () => {
             {/* Submit Button */}
             <div className="flex justify-center gap-6">
               <button
-                type="submit"
+                type="button"
                 className="px-12 py-2 border border-[#003366] text-[#003366] font-[500] rounded-lg text-sm"
                 onClick={() => navigate("/important-documents")}
               >

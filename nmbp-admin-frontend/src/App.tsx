@@ -38,6 +38,10 @@ const QrManagement = lazy(
 
 const AddQr = lazy(() => import("./components/AddQr/AddQr"));
 
+const AddWebexFacebook = lazy(
+  () => import("./components/AddWebexFacebook/AddWebexFacebook"),
+);
+
 const AddDocument = lazy(() => import("./components/AddDocument/AddDocument"));
 
 const PledgeReportManagement = lazy(
@@ -64,6 +68,20 @@ const NodalOiiicersManagement = lazy(
 
 const FeedbackManagement = lazy(
   () => import("./pages/Admin/FeebackManagement/FeebackManagement"),
+);
+
+const WebexFacebookManagement = lazy(
+  () => import("./pages/Admin/WebexFeedbackManagement/WebexFeedbackManagement"),
+);
+
+const ForumQuestionsManagement = lazy(
+  () =>
+    import("./pages/Admin/ForumQuestionsManagement/ForumQuestionsManagement"),
+);
+
+const MinistriesDashboardManagement = lazy(
+  () =>
+    import("./pages/Admin/MinistriesDashboardManagement/MinistriesDashboardManagement"),
 );
 
 const UserManagement = lazy(
@@ -189,6 +207,15 @@ function App() {
             />
 
             <Route
+              path="/webex-facebook"
+              element={<PrivateRoutes element={<WebexFacebookManagement />} />}
+            />
+            <Route
+              path="/webex-facebook/add"
+              element={<PrivateRoutes element={<AddWebexFacebook />} />}
+            />
+
+            <Route
               path="/important-documents/add"
               element={<PrivateRoutes element={<AddDocument />} />}
             />
@@ -209,9 +236,21 @@ function App() {
             />
 
             <Route
+              path="/forum-questions"
+              element={<PrivateRoutes element={<ForumQuestionsManagement />} />}
+            />
+
+            <Route
               path="/important-documents"
               element={
                 <PrivateRoutes element={<ImportantDocumentsManagement />} />
+              }
+            />
+
+            <Route
+              path="/ministries-dashboard"
+              element={
+                <PrivateRoutes element={<MinistriesDashboardManagement />} />
               }
             />
             <Route
