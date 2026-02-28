@@ -62,6 +62,25 @@ const adminRepository = {
       throw new Error(error.message);
     }
   },
+
+  totalPledgeTodayCount: async () => {
+    const logPrefix = `adminRepository :: totalPledgeTodayCount`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.TOTAL_PLEDGE_TODAY_COUNT,
+        values: [],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminRepository;

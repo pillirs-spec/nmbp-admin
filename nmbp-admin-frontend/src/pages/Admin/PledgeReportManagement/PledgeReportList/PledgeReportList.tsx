@@ -24,6 +24,9 @@ const PledgeReportList = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [totalPledgeCount, setTotalPledgeCount] = useState<number>(0);
+  const [totalPledgeTodayCount, setTotalPledgeTodayCount] = useState<number>(0);
+  // const [totalRecoveredPledgeCount, setTotalRecoveredPledgeCount] =
+  //   useState<number>(0);
   const [filterDistrict, setFilterDistrict] = useState<string>("All District");
   const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
@@ -57,8 +60,28 @@ const PledgeReportList = () => {
       log(LogLevel.INFO, "PledgeReportList :: getPledgesList", response.data);
       if (response.status === 200) {
         setPledges(response.data.data.pledgesList);
-        setTotalCount(Number(response.data.data.pledgesCount));
-        setTotalPledgeCount(Number(response.data.data.totalPledgeCount));
+        setTotalCount(
+          Number(
+            response.data.data.pledgesCount.replace(/,/g, "").replace(/"/g, ""),
+          ),
+        );
+        setTotalPledgeCount(
+          Number(
+            response.data.data.totalPledgeCount
+              .replace(/,/g, "")
+              .replace(/"/g, ""),
+          ),
+        );
+        setTotalPledgeTodayCount(
+          Number(
+            response.data.data.totalPledgeTodayCount
+              .replace(/,/g, "")
+              .replace(/"/g, "") || 0,
+          ),
+        );
+        // setTotalRecoveredPledgeCount(
+        //   Number(response.data.data.totalRecoveredPledgeCount || 0),
+        // );
       }
     } catch (error) {
       log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
@@ -96,27 +119,15 @@ const PledgeReportList = () => {
               />
             </div>
           </div>
-          {/* <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-semibold text-[#6B7280] mb-2">
-                  Total e-Pledge
-                </p>
-                <p className="text-3xl font-semibold text-[#003366]">500</p>
-              </div>
-              <img
-                src={PledgeContributionIcon}
-                alt="pledge-contribution-icon"
-              />
-            </div>
-          </div> */}
           <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
-                  Total Recovered Pledge
+                  Total Pledge Today
                 </p>
-                <p className="text-3xl font-semibold text-[#003366]">500</p>
+                <p className="text-3xl font-semibold text-[#003366]">
+                  {totalPledgeTodayCount}
+                </p>
               </div>
               <img
                 src={PledgeContributionIcon}
@@ -124,6 +135,22 @@ const PledgeReportList = () => {
               />
             </div>
           </div>
+          {/* <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-sm font-semibold text-[#6B7280] mb-2">
+                  Total Recovered Pledge
+                </p>
+                <p className="text-3xl font-semibold text-[#003366]">
+                  {totalRecoveredPledgeCount}
+                </p>
+              </div>
+              <img
+                src={PledgeContributionIcon}
+                alt="pledge-contribution-icon"
+              />
+            </div>
+          </div> */}
         </div>
 
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">

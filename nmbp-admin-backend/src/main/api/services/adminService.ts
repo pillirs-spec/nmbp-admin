@@ -70,7 +70,23 @@ const adminService = {
       logger.debug(
         `${logPrefix} :: Parameters :: searchFilter :: ${searchFilter}`,
       );
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.PLEDGES_COUNT,
+        { searchFilter },
+      );
+
+      const cachedCount = await redis.GetKeyRedis(key);
+      if (cachedCount) {
+        logger.info(
+          `${logPrefix} :: cached count of pledges :: ${cachedCount}`,
+        );
+        return cachedCount;
+      }
+
       const count = await adminRepository.pledgeCount(searchFilter);
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
       return count;
     } catch (error) {
       logger.error(
@@ -84,11 +100,55 @@ const adminService = {
     const logPrefix = `adminService :: totalPledgeCount`;
     try {
       logger.info(`${logPrefix} :: Counting total pledges in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.PLEDGES_TOTAL_COUNT,
+        {},
+      );
+
+      const cachedTotalCount = await redis.GetKeyRedis(key);
+      if (cachedTotalCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of pledges :: ${cachedTotalCount}`,
+        );
+        return cachedTotalCount;
+      }
       const count = await adminRepository.totalPledgeCount();
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
       return count;
     } catch (error) {
       logger.error(
         `${logPrefix} :: Error counting total pledges :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  totalPledgeTodayCount: async () => {
+    const logPrefix = `adminService :: totalPledgeTodayCount`;
+    try {
+      logger.info(`${logPrefix} :: Counting today's pledges in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.PLEDGES_TODAY_TOTAL_COUNT,
+        {},
+      );
+
+      const cachedTodayCount = await redis.GetKeyRedis(key);
+      if (cachedTodayCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of today's pledges :: ${cachedTodayCount}`,
+        );
+        return cachedTodayCount;
+      }
+      const count = await adminRepository.totalPledgeTodayCount();
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting today's pledges :: ${error.message} :: ${error}`,
       );
       throw error;
     }

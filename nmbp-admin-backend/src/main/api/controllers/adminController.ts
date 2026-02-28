@@ -58,9 +58,15 @@ const adminController = {
       );
       const pledgesCount = await adminService.pledgeCount(searchFilter);
       const totalPledgeCount = await adminService.totalPledgeCount();
+      const totalPledgeTodayCount = await adminService.totalPledgeTodayCount();
 
       return res.status(STATUS.OK).send({
-        data: { pledgesList, pledgesCount, totalPledgeCount },
+        data: {
+          pledgesList,
+          pledgesCount,
+          totalPledgeCount,
+          totalPledgeTodayCount,
+        },
         message: "Pledges fetched successfully",
       });
     } catch (error) {

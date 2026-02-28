@@ -128,4 +128,8 @@ export enum AdminQueries {
   TOTAL_PLEDGE_COUNT = `
     SELECT COUNT(*) as count FROM t_pledge_users
    `,
+
+  TOTAL_PLEDGE_TODAY_COUNT = `
+    SELECT COUNT(*) as count FROM t_pledge_users WHERE date_updated >= CURRENT_DATE
+   `,
 }
