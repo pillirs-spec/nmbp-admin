@@ -65,7 +65,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="grid  grid-cols-12 ">
-      <div className="hidden shadow-md shadow-[#003366] md:flex col-span-7 bg-[#E5EFF9] rounded-tr-[40px] rounded-br-[40px] relative">
+      <div className="hidden md:flex col-span-7 bg-[#E5EFF9] rounded-tr-[40px] rounded-br-[40px] relative">
         <div className="w-full relative ">
           <img
             src={GovtLogo}
@@ -79,7 +79,7 @@ const Login: React.FC = () => {
           />
         </div>
       </div>
-      <div className="col-span-12 md:col-span-5 h-screen px-5 md:px-8 py-4 overflow-y-auto flex flex-col justify-center">
+      <div className="bg-[#E5EFF9] md:bg-transparent col-span-12 md:col-span-5 h-screen px-5 md:px-8 py-4 overflow-y-auto flex flex-col justify-center">
         <div className="flex flex-col items-center">
           <img src={NationalEmblem} alt="national-emblem" className=" mb-4" />
           <h1 className="text-[#374151] font-semibold text-xl sm:text-4xl mt-2 !text-left">
