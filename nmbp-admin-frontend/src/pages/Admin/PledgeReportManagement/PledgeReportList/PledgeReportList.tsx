@@ -4,17 +4,18 @@ import searchIcon from "../../../../assets/search-icon.svg";
 import { useLogger } from "../../../../hooks";
 import { LogLevel } from "../../../../enums";
 import PledgeContributionIcon from "../../../../assets/total_pledge.svg";
+import { pledgeReportService } from "./pledgeReportService";
 
 interface Pledge {
   id: number;
   pledge_type: string;
-  name: string;
+  full_name: string;
   age: number;
-  mobile: string;
-  email: string;
-  state: string;
-  district: string;
-  pledge_date: string;
+  mobile_number: string;
+  email_id: string;
+  state_name: string;
+  district_name: string;
+  date_updated: string;
 }
 
 const PledgeReportList = () => {
@@ -22,6 +23,7 @@ const PledgeReportList = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [totalPledgeCount, setTotalPledgeCount] = useState<number>(0);
   const [filterDistrict, setFilterDistrict] = useState<string>("All District");
   const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
@@ -30,162 +32,13 @@ const PledgeReportList = () => {
   });
   const { log } = useLogger();
 
-  const pageSize = 200;
-
-  const mockPledges: Pledge[] = [
-    {
-      id: 1,
-      pledge_type: "e-Pledge",
-      name: "Shubham Sharma",
-      age: 44,
-      mobile: "9721947314",
-      email: "Shubham@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-01-15",
-    },
-    {
-      id: 2,
-      pledge_type: "e-Pledge",
-      name: "Ayush Yadav",
-      age: 34,
-      mobile: "9723171929",
-      email: "Ayush@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-02-20",
-    },
-    {
-      id: 3,
-      pledge_type: "e-Pledge",
-      name: "Ruchi Singh",
-      age: 54,
-      mobile: "9631618713",
-      email: "Ruchi@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-03-10",
-    },
-    {
-      id: 4,
-      pledge_type: "e-Pledge",
-      name: "Deepika Sharma",
-      age: 42,
-      mobile: "9971747134",
-      email: "Deepika@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-04-05",
-    },
-    {
-      id: 5,
-      pledge_type: "e-Pledge",
-      name: "Amarjit Sarkar",
-      age: 45,
-      mobile: "8891737145",
-      email: "Amarjit@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-05-12",
-    },
-    {
-      id: 6,
-      pledge_type: "e-Pledge",
-      name: "Govid Puri",
-      age: 37,
-      mobile: "8831983914",
-      email: "Govind@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-06-18",
-    },
-    {
-      id: 7,
-      pledge_type: "e-Pledge",
-      name: "Priya Verma",
-      age: 28,
-      mobile: "9876543210",
-      email: "Priya@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-07-22",
-    },
-    {
-      id: 8,
-      pledge_type: "e-Pledge",
-      name: "Rajesh Kumar",
-      age: 52,
-      mobile: "9111223344",
-      email: "Rajesh@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-08-30",
-    },
-    {
-      id: 9,
-      pledge_type: "e-Pledge",
-      name: "Neha Singh",
-      age: 35,
-      mobile: "8822334455",
-      email: "Neha@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-09-14",
-    },
-    {
-      id: 10,
-      pledge_type: "e-Pledge",
-      name: "Vikas Patel",
-      age: 48,
-      mobile: "9933445566",
-      email: "Vikas@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-10-01",
-    },
-  ];
-
-  const handleListPledges = () => {
-    try {
-      let filtered = mockPledges;
-
-      if (searchQuery) {
-        filtered = filtered.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.mobile.includes(searchQuery),
-        );
-      }
-
-      setTotalCount(filtered.length);
-      setPledges(filtered);
-
-      log(LogLevel.INFO, "PledgeReportList :: handleListPledges", filtered);
-    } catch (error) {
-      log(LogLevel.ERROR, "PledgeReportList :: handleListPledges", error);
-    }
-  };
-
-  useEffect(() => {
-    handleListPledges();
-  }, [currentPage, searchQuery, filterDistrict, filterState]);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const handleSearch = (value: string) => {
-    if (value.length > 0) {
+    if (value.length >= 3) {
       setSearchQuery(value);
       setCurrentPage(1);
-    } else {
+    } else if (value.length === 0) {
       setSearchQuery("");
       setCurrentPage(1);
     }
@@ -193,9 +46,28 @@ const PledgeReportList = () => {
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, pledges.length);
-  const paginatedPledges = pledges.slice(startIndex, endIndex);
+  const getPledgesList = async () => {
+    try {
+      const payload = {
+        pageSize,
+        currentPage,
+        searchFilter: searchQuery,
+      };
+      const response = await pledgeReportService.getAllPledgesList(payload);
+      log(LogLevel.INFO, "PledgeReportList :: getPledgesList", response.data);
+      if (response.status === 200) {
+        setPledges(response.data.data.pledgesList);
+        setTotalCount(Number(response.data.data.pledgesCount));
+        setTotalPledgeCount(Number(response.data.data.totalPledgeCount));
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
+    }
+  };
+
+  useEffect(() => {
+    getPledgesList();
+  }, [pageSize, currentPage, searchQuery]);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -214,7 +86,9 @@ const PledgeReportList = () => {
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
                   Total Pledge
                 </p>
-                <p className="text-3xl font-semibold text-[#003366]">1000</p>
+                <p className="text-3xl font-semibold text-[#003366]">
+                  {totalPledgeCount}
+                </p>
               </div>
               <img
                 src={PledgeContributionIcon}
@@ -222,7 +96,7 @@ const PledgeReportList = () => {
               />
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
+          {/* <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
@@ -235,7 +109,7 @@ const PledgeReportList = () => {
                 alt="pledge-contribution-icon"
               />
             </div>
-          </div>
+          </div> */}
           <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex justify-between items-start">
               <div>
@@ -343,35 +217,39 @@ const PledgeReportList = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedPledges.length > 0 ? (
-                  paginatedPledges.map((pledge, index) => (
+                {pledges && pledges.length > 0 ? (
+                  pledges.map((pledge, index) => (
                     <tr
                       key={index}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.pledge_type}
+                        {pledge.pledge_type ? pledge.pledge_type : "e-pledge"}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.name}
+                        {pledge.full_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
                         {pledge.age}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {pledge.mobile}
+                        {pledge.mobile_number}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.email}
+                        {pledge.email_id}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.state}
+                        {pledge.state_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.district}
+                        {pledge.district_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.pledge_date}
+                        {pledge.date_updated
+                          .split("T")[0]
+                          .split("-")
+                          .reverse()
+                          .join("-")}
                       </td>
                     </tr>
                   ))
@@ -449,10 +327,18 @@ const PledgeReportList = () => {
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>200</option>
-                <option>50</option>
-                <option>100</option>
+              <select
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
               of{" "}
               <span className="font-medium text-[#374151]">{totalCount}</span>{" "}

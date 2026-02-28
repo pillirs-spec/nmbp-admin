@@ -4,6 +4,7 @@ import passwordPoliciesService from "./passwordPoliciesService";
 import rolesService from "./rolesService";
 import emailService from "./emailService";
 import masterService from "./masterService";
+import adminService from "./adminService";
 
 export {
   menusServices,
@@ -12,4 +13,5 @@ export {
   usersService,
   emailService,
   masterService,
+  adminService,
 };

@@ -1177,6 +1177,51 @@
           }
         }
       }
+    },
+    "/api/v1/admin/pledges": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Pledges (Paginated)",
+        "description": "Retrieve a paginated list of pledges with optional filtering by active status and search term. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "Admin"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
     }
   }
 }

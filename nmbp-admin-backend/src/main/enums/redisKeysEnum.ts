@@ -12,6 +12,7 @@ export enum RedisKeys {
   PASSWORD_POLICIES = "password_policies",
   PASSWORD_POLICY_BY_ID = "password_policy:${passwordPolicyId}",
   ROLES = "roles",
+  PLEDGES_LIST = "pledges",
   ROLE_BY_ID = "role:${roleId}",
   ACTIVE_ROLES = "roles|active",
   ROLES_COUNT = "roles|count",

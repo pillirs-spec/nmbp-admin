@@ -89,3 +89,43 @@ export enum RoleQueries {
             m.date_created ASC;
     `,
 }
+
+export enum AdminQueries {
+  LIST_PLEDGES = `
+    SELECT 
+      u.pledge_id,
+      u.full_name,
+      u.mobile_number,
+      u.age,
+      u.email_id,
+      s.state_name,
+      d.district_name,
+      u.date_updated
+    FROM t_pledge_users u
+    LEFT JOIN m_states s ON u.state_id = s.state_id
+    LEFT JOIN m_districts d ON u.district_id = d.district_id
+    WHERE (
+      u.full_name ILIKE '%' || $3 || '%'
+      OR s.state_name ILIKE '%' || $3 || '%'
+      OR d.district_name ILIKE '%' || $3 || '%'
+    )
+    ORDER BY u.date_updated DESC
+    LIMIT $1 OFFSET $2
+  `,
+
+  PLEDGE_COUNT = `
+    SELECT COUNT(*) as count
+    FROM t_pledge_users u
+    LEFT JOIN m_states s ON u.state_id = s.state_id
+    LEFT JOIN m_districts d ON u.district_id = d.district_id
+    WHERE (
+      u.full_name ILIKE '%' || $1 || '%'
+      OR s.state_name ILIKE '%' || $1 || '%'
+      OR d.district_name ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_PLEDGE_COUNT = `
+    SELECT COUNT(*) as count FROM t_pledge_users
+   `,
+}
