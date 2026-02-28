@@ -63,7 +63,7 @@ const setupInterceptors = (
       if (config.url?.startsWith("/api/v1/auth")) {
         config.baseURL = environment.authApiBaseUrl;
         console.log(config.baseURL);
-      } else if (config.url?.startsWith("/api/v1/user")) {
+      } else if (config.url?.startsWith("/api/v1/admin-profile")) {
         config.baseURL = environment.userApiBaseUrl;
       } else if (config.url?.startsWith("/api/v1/admin")) {
         config.baseURL = environment.adminApiBaseUrl;

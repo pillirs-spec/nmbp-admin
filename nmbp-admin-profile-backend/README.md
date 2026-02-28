@@ -25,7 +25,7 @@ Key Features
 • API Endpoints: Handles user registration, authentication, profile management, and other user-related operations.
 • Configuration: Centralized config for environment variables, authentication, and error handling.
 • Helpers: Utility functions for encryption, validation, and other common tasks.
-• Swagger Integration: API documentation available via Swagger UI (http://localhost:7002/api/v1/user/docs).
+• Swagger Integration: API documentation available via Swagger UI (http://localhost:7002/api/v1/admin-profile/docs).
 • Testing: Includes test files to ensure reliability.
 
 How To Run

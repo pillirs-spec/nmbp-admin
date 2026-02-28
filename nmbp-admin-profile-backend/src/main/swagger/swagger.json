@@ -35,7 +35,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/user/admin/updateProfilePic": {
+    "/api/v1/admin-profile/admin/updateProfilePic": {
       "post": {
         "tags": [
           "Admin"
@@ -65,7 +65,7 @@
         }
       }
     },
-    "/api/v1/user/admin/updateProfile": {
+    "/api/v1/admin-profile/admin/updateProfile": {
       "post": {
         "tags": [
           "Admin"
@@ -114,7 +114,7 @@
         }
       }
     },
-    "/api/v1/user/admin/loggedUserInfo": {
+    "/api/v1/admin-profile/admin/loggedUserInfo": {
       "get": {
         "tags": [
           "Admin"
@@ -137,7 +137,7 @@
         }
       }
     },
-    "/api/v1/user/health": {
+    "/api/v1/admin-profile/health": {
       "get": {
         "tags": [
           "Users"
