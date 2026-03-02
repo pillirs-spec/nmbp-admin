@@ -225,18 +225,18 @@ const Header: React.FC = () => {
                     }}
                   >
                     <div
-                      className="cursor-pointer pb-2 font-medium text-[#003366] hover:text-[#1573d1] transition"
+                      className="cursor-pointer pb-2 font-medium text-[#003366] hover:text-[#1573d1] transition text-sm"
                       onClick={() => setOpenedProfile(true)}
                     >
                       <i className="fa-regular fa-circle-user text-[#003366] mr-2"></i>
                       Profile Settings
                     </div>
-                    <div className="border-t border-gray-300 my-2"></div>
+                    {/* <div className="border-t border-gray-300"></div> */}
                     <div
-                      className="cursor-pointer pt-2 font-medium text-red-600 hover:text-red-400 transition"
+                      className="cursor-pointer pt-1 font-medium text-red-500 hover:text-red-400 transition text-sm"
                       onClick={handleLogout}
                     >
-                      <i className="fa-solid fa-arrow-right-from-bracket text-red-600 mr-2"></i>
+                      <i className="fa-solid fa-arrow-right-from-bracket text-red-500 mr-2"></i>
                       Logout
                     </div>
                   </HoverCard.Dropdown>
