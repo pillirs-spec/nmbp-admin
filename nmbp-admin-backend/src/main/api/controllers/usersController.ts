@@ -35,7 +35,7 @@ const usersController = {
                     mobile_number: '8249834095',
                     dob: '1997-07-21',
                     gender: 1,
-                    role_id: 2
+                    role_id: 2,
                     state_id: 21,
                     district_id: 189
                 }

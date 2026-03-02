@@ -38,6 +38,12 @@ const QrManagement = lazy(
 
 const AddQr = lazy(() => import("./components/AddQr/AddQr"));
 
+const AddWebexFacebook = lazy(
+  () => import("./components/AddWebexFacebook/AddWebexFacebook"),
+);
+
+const AddDocument = lazy(() => import("./components/AddDocument/AddDocument"));
+
 const PledgeReportManagement = lazy(
   () => import("./pages/Admin/PledgeReportManagement/PledgeReportManagement"),
 );
@@ -58,6 +64,24 @@ const ImportantDocumentsManagement = lazy(
 
 const NodalOiiicersManagement = lazy(
   () => import("./pages/Admin/NodalOfficersManagement/NodalOfficersManagement"),
+);
+
+const FeedbackManagement = lazy(
+  () => import("./pages/Admin/FeebackManagement/FeebackManagement"),
+);
+
+const WebexFacebookManagement = lazy(
+  () => import("./pages/Admin/WebexFeedbackManagement/WebexFeedbackManagement"),
+);
+
+const ForumQuestionsManagement = lazy(
+  () =>
+    import("./pages/Admin/ForumQuestionsManagement/ForumQuestionsManagement"),
+);
+
+const MinistriesDashboardManagement = lazy(
+  () =>
+    import("./pages/Admin/MinistriesDashboardManagement/MinistriesDashboardManagement"),
 );
 
 const UserManagement = lazy(
@@ -141,6 +165,10 @@ function App() {
               element={<PrivateRoutes element={<AddEvent />} />}
             />
             <Route
+              path="/feedback"
+              element={<PrivateRoutes element={<FeedbackManagement />} />}
+            />
+            <Route
               path="/user-management"
               element={<PrivateRoutes element={<UserManagement />} />}
             />
@@ -179,7 +207,26 @@ function App() {
             />
 
             <Route
-              path="/nodal-officers-list"
+              path="/webex-facebook"
+              element={<PrivateRoutes element={<WebexFacebookManagement />} />}
+            />
+            <Route
+              path="/webex-facebook/add"
+              element={<PrivateRoutes element={<AddWebexFacebook />} />}
+            />
+
+            <Route
+              path="/important-documents/add"
+              element={<PrivateRoutes element={<AddDocument />} />}
+            />
+
+            <Route
+              path="/state-nodal-officers-list"
+              element={<PrivateRoutes element={<NodalOiiicersManagement />} />}
+            />
+
+            <Route
+              path="/district-nodal-officers-list"
               element={<PrivateRoutes element={<NodalOiiicersManagement />} />}
             />
 
@@ -189,9 +236,21 @@ function App() {
             />
 
             <Route
+              path="/forum-questions"
+              element={<PrivateRoutes element={<ForumQuestionsManagement />} />}
+            />
+
+            <Route
               path="/important-documents"
               element={
                 <PrivateRoutes element={<ImportantDocumentsManagement />} />
+              }
+            />
+
+            <Route
+              path="/ministries-dashboard"
+              element={
+                <PrivateRoutes element={<MinistriesDashboardManagement />} />
               }
             />
             <Route

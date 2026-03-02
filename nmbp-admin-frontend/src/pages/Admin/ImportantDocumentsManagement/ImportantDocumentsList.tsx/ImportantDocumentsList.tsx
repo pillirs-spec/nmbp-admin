@@ -91,6 +91,10 @@ const ImportantDocumentsList = () => {
     alert("View Document functionality to be implemented");
   };
 
+  const handleAddDocument = () => {
+    navigate("/important-documents/add");
+  };
+
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
       <div className="">
@@ -98,6 +102,12 @@ const ImportantDocumentsList = () => {
           <h2 className="text-2xl font-semibold text-[#374151]">
             Important Documents
           </h2>
+          <button
+            onClick={handleAddDocument}
+            className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
+          >
+            Add Document +
+          </button>
         </div>
 
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">

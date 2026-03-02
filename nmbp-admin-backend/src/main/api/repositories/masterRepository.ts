@@ -37,6 +37,23 @@ const masterRepository = {
       throw new Error(error.message);
     }
   },
+
+  getActivities: async () => {
+    const logPrefix = `masterRepository :: getActivities`;
+    try {
+      const _query = {
+        text: pgQueries.ActivityQueries.LIST_ACTIVITIES,
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default masterRepository;

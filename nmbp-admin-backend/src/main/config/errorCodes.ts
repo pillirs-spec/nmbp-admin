@@ -49,6 +49,17 @@ const users = {
   },
 };
 
+const activities = {
+  ACTIVITIES00000: {
+    errorCode: "ACTIVITIES00000",
+    errorMessage: "Internal Server Error",
+  },
+  ACTIVITIES00001: {
+    errorCode: "ACTIVITIES00001",
+    errorMessage: "No Activity Found!",
+  },
+};
+
 const states = {
   STATES00000: {
     errorCode: "STATES00000",
@@ -235,4 +246,5 @@ export {
   projects,
   formBuilder,
   states,
+  activities,
 };

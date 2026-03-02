@@ -388,12 +388,12 @@ cd nmbp-admin-frontend && npm start
 
 ### Check all services are running
 
-| Service        | URL                                     | Expected   |
-| -------------- | --------------------------------------- | ---------- |
-| Auth Backend   | http://localhost:7001/api/v1/auth/docs  | Swagger UI |
-| User Backend   | http://localhost:7002/api/v1/user/docs  | Swagger UI |
-| Admin Backend  | http://localhost:7003/api/v1/admin/docs | Swagger UI |
-| Admin Frontend | http://localhost:3001                   | Login page |
+| Service        | URL                                             | Expected   |
+| -------------- | ----------------------------------------------- | ---------- |
+| Auth Backend   | http://localhost:7001/api/v1/auth/docs          | Swagger UI |
+| User Backend   | http://localhost:7002/api/v1/admin-profile/docs | Swagger UI |
+| Admin Backend  | http://localhost:7003/api/v1/admin/docs         | Swagger UI |
+| Admin Frontend | http://localhost:3001                           | Login page |
 
 ### Test login
 
@@ -419,11 +419,11 @@ cd nmbp-admin-frontend && npm start
 
 Each backend service auto-generates Swagger documentation on startup.
 
-| Service | Swagger URL                             |
-| ------- | --------------------------------------- |
-| Auth    | http://localhost:7001/api/v1/auth/docs  |
-| User    | http://localhost:7002/api/v1/user/docs  |
-| Admin   | http://localhost:7003/api/v1/admin/docs |
+| Service | Swagger URL                                     |
+| ------- | ----------------------------------------------- |
+| Auth    | http://localhost:7001/api/v1/auth/docs          |
+| User    | http://localhost:7002/api/v1/admin-profile/docs |
+| Admin   | http://localhost:7003/api/v1/admin/docs         |
 
 ### Key API Endpoints
 
@@ -435,8 +435,8 @@ Each backend service auto-generates Swagger documentation on startup.
 
 **User Management (port 7002):**
 
-- `GET /api/v1/user/users/getLoggedInUserInfo` — Get current user info
-- `POST /api/v1/user/users/logout` — Logout
+- `GET /api/v1/admin-profile/users/getLoggedInUserInfo` — Get current user info
+- `POST /api/v1/admin-profile/users/logout` — Logout
 
 **Admin (port 7003):**
 

@@ -5,4 +5,10 @@ const adminRouter = express.Router();
 
 adminRouter.get("/health", adminController.health);
 
+adminRouter.post("/pledges", adminController.getPledges);
+
+adminRouter.post("/sno_list", adminController.getSnoList);
+
+adminRouter.post("/dno_list", adminController.getDnoList);
+
 export default adminRouter;

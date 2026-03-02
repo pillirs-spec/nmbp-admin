@@ -186,7 +186,7 @@ const DistrictActivityList = () => {
                   setFilterLocation(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-3 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className="w-full px-4 py-3 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
                 <option>All Location</option>
                 <option>Delhi Central District</option>
@@ -205,7 +205,7 @@ const DistrictActivityList = () => {
                   setFilterActivity(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 !py-3 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className="w-full px-4 !py-3 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
                 <option>All Activity</option>
                 <option>Drawing Competition</option>

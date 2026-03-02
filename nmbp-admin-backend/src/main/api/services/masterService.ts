@@ -71,6 +71,33 @@ const masterService = {
       throw new Error(error.message);
     }
   },
+
+  getActivities: async () => {
+    const logPrefix = `masterService :: getActivities`;
+    try {
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.ACTIVITIES,
+        {},
+      );
+      const cacheResult = await redis.GetKeyRedis(key);
+      if (cacheResult) {
+        logger.debug(
+          `${logPrefix} :: returned from cachedResult :: ${cacheResult}`,
+        );
+        return JSON.parse(cacheResult);
+      }
+
+      const activities = await masterRepository.getActivities();
+      logger.debug(`${logPrefix} :: returned from DB :: ${activities}`);
+      if (activities && activities.length > 0) {
+        redis.SetRedis(key, activities, CacheTTL.EXTRA_LONG);
+        return activities;
+      }
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default masterService;

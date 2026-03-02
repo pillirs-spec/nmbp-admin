@@ -2,13 +2,13 @@ import { ApiResponse, post, get } from "../../../api";
 
 export const profileService = {
   updateProfile: async (values: any): Promise<ApiResponse<any>> => {
-    return await post("/api/v1/user/admin/updateProfile", values);
+    return await post("/api/v1/admin-profile/admin/updateProfile", values);
   },
 
   getLoggedInUserInfo: async (): Promise<ApiResponse<any>> => {
-    return await get("/api/v1/user/admin/loggedUserInfo");
+    return await get("/api/v1/admin-profile/admin/loggedUserInfo");
   },
   updateProfilePic: async (formData: FormData): Promise<ApiResponse<any>> => {
-    return await post("/api/v1/user/admin/updateProfilePic", formData);
+    return await post("/api/v1/admin-profile/admin/updateProfilePic", formData);
   },
 };

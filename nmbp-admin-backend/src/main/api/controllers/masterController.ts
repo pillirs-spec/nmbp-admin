@@ -71,6 +71,34 @@ const masterController = {
         .send(errorCodes.states.STATES00000);
     }
   },
+
+  getActivities: async (req: Request, res: Response) => {
+    const logPrefix = `masterController :: getActivities`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*  
+            #swagger.tags = ['Activities']
+            #swagger.summary = 'List All Activities'
+            #swagger.description = 'This API is used to fetch all the activities.'
+            #swagger.parameters['Authorization'] = {
+                in: 'header',
+                required: true,
+                type: 'string',
+                description: 'JWT token for authentication'
+            }
+        */
+      const activities = await masterService.getActivities();
+      return res.status(STATUS.OK).send({
+        data: activities,
+        message: "Activities fetched Successfully!",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res
+        .status(STATUS.INTERNAL_SERVER_ERROR)
+        .send(errorCodes.activities.ACTIVITIES00000);
+    }
+  },
 };
 
 export default masterController;

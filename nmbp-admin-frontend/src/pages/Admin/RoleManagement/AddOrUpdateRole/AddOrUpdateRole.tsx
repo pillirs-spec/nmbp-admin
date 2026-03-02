@@ -283,7 +283,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
         </div> */}
         <div className="mt-14">
           <div className="mb-6 relative border rounded-xl p-5 border-gray-300">
-            <div className="absolute -top-3.5 left-32 bg-white px-2 ">
+            <div className="absolute left-1/2 top-[-15px] text-red-600 italic font-semibold text-xl transform -translate-x-1/2  bg-white px-2 ">
               Role Permissions
             </div>
             <div className="mb-6">
@@ -324,7 +324,7 @@ const AddOrUpdateRole: React.FC<AddOrUpdateRoleProps> = ({ roleId, close }) => {
           </div>
         </div>
       </div>
-      <div className="fixed bottom-5 w-[25.5rem] justify-center">
+      <div className="fixed bottom-1 w-5/6 left-1/2 transform -translate-x-1/2">
         <MantineProvider
           theme={{
             colors: {

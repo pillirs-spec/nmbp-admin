@@ -3,6 +3,7 @@ import passwordPoliciesRepository from "./passwordPoliciesRepository";
 import rolesRepository from "./rolesRepository";
 import usersRepository from "./usersRepository";
 import masterRepository from "./masterRepository";
+import adminRepository from "./adminRepository";
 
 export {
   menusRepository,
@@ -10,4 +11,5 @@ export {
   usersRepository,
   rolesRepository,
   masterRepository,
+  adminRepository,
 };

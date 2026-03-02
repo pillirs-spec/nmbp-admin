@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { debounce } from "lodash";
 import searchIcon from "../../../../assets/search-icon.svg";
-import { useLogger } from "../../../../hooks";
-import { LogLevel } from "../../../../enums";
+import { useLogger, useToast } from "../../../../hooks";
+import { LogLevel, ToastType } from "../../../../enums";
 import PledgeContributionIcon from "../../../../assets/total_pledge.svg";
+import { pledgeReportService } from "./pledgeReportService";
+import usersListService from "../../UserManagement/UserList/usersListService";
+
+import { DatePickerInput } from "@mantine/dates";
+import "@mantine/dates/styles.css";
+import dayjs from "dayjs";
+import { IconFilterOff } from "@tabler/icons-react";
 
 interface Pledge {
   id: number;
   pledge_type: string;
-  name: string;
+  full_name: string;
   age: number;
-  mobile: string;
-  email: string;
-  state: string;
-  district: string;
-  pledge_date: string;
+  mobile_number: string;
+  email_id: string;
+  state_name: string;
+  district_name: string;
+  date_updated: string;
 }
 
 const PledgeReportList = () => {
@@ -22,170 +29,34 @@ const PledgeReportList = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [filterDistrict, setFilterDistrict] = useState<string>("All District");
-  const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
-  const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
-    start: "",
-    end: "",
-  });
+  const [totalPledgeCount, setTotalPledgeCount] = useState<number>(0);
+  const [totalPledgeTodayCount, setTotalPledgeTodayCount] = useState<number>(0);
+  // const [totalRecoveredPledgeCount, setTotalRecoveredPledgeCount] =
+  //   useState<number>(0);
+  // const [filterDistrict, setFilterDistrict] = useState<string>("All District");
+  // const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
+  const [states, setStates] = useState<{ label: string; value: string }[]>([]);
+  const [districts, setDistricts] = useState<
+    { label: string; value: string }[]
+  >([{ label: "Select District", value: "" }]);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const { log } = useLogger();
+  const { showToast } = useToast();
 
-  const pageSize = 200;
-
-  const mockPledges: Pledge[] = [
-    {
-      id: 1,
-      pledge_type: "e-Pledge",
-      name: "Shubham Sharma",
-      age: 44,
-      mobile: "9721947314",
-      email: "Shubham@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-01-15",
-    },
-    {
-      id: 2,
-      pledge_type: "e-Pledge",
-      name: "Ayush Yadav",
-      age: 34,
-      mobile: "9723171929",
-      email: "Ayush@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-02-20",
-    },
-    {
-      id: 3,
-      pledge_type: "e-Pledge",
-      name: "Ruchi Singh",
-      age: 54,
-      mobile: "9631618713",
-      email: "Ruchi@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-03-10",
-    },
-    {
-      id: 4,
-      pledge_type: "e-Pledge",
-      name: "Deepika Sharma",
-      age: 42,
-      mobile: "9971747134",
-      email: "Deepika@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-04-05",
-    },
-    {
-      id: 5,
-      pledge_type: "e-Pledge",
-      name: "Amarjit Sarkar",
-      age: 45,
-      mobile: "8891737145",
-      email: "Amarjit@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-05-12",
-    },
-    {
-      id: 6,
-      pledge_type: "e-Pledge",
-      name: "Govid Puri",
-      age: 37,
-      mobile: "8831983914",
-      email: "Govind@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-06-18",
-    },
-    {
-      id: 7,
-      pledge_type: "e-Pledge",
-      name: "Priya Verma",
-      age: 28,
-      mobile: "9876543210",
-      email: "Priya@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-07-22",
-    },
-    {
-      id: 8,
-      pledge_type: "e-Pledge",
-      name: "Rajesh Kumar",
-      age: 52,
-      mobile: "9111223344",
-      email: "Rajesh@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-08-30",
-    },
-    {
-      id: 9,
-      pledge_type: "e-Pledge",
-      name: "Neha Singh",
-      age: 35,
-      mobile: "8822334455",
-      email: "Neha@example.com",
-      state: "Uttar Pradesh",
-      district: "Lucknow",
-
-      pledge_date: "2024-09-14",
-    },
-    {
-      id: 10,
-      pledge_type: "e-Pledge",
-      name: "Vikas Patel",
-      age: 48,
-      mobile: "9933445566",
-      email: "Vikas@example.com",
-      state: "Uttar Pradesh",
-      district: "Kanpur",
-
-      pledge_date: "2024-10-01",
-    },
-  ];
-
-  const handleListPledges = () => {
-    try {
-      let filtered = mockPledges;
-
-      if (searchQuery) {
-        filtered = filtered.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.mobile.includes(searchQuery),
-        );
-      }
-
-      setTotalCount(filtered.length);
-      setPledges(filtered);
-
-      log(LogLevel.INFO, "PledgeReportList :: handleListPledges", filtered);
-    } catch (error) {
-      log(LogLevel.ERROR, "PledgeReportList :: handleListPledges", error);
-    }
-  };
-
-  useEffect(() => {
-    handleListPledges();
-  }, [currentPage, searchQuery, filterDistrict, filterState]);
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const handleSearch = (value: string) => {
-    if (value.length > 0) {
+    if (value.length >= 3) {
       setSearchQuery(value);
       setCurrentPage(1);
-    } else {
+    } else if (value.length === 0) {
       setSearchQuery("");
       setCurrentPage(1);
     }
@@ -193,9 +64,95 @@ const PledgeReportList = () => {
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, pledges.length);
-  const paginatedPledges = pledges.slice(startIndex, endIndex);
+  const getPledgesList = async () => {
+    try {
+      const payload = {
+        pageSize,
+        currentPage,
+        searchFilter: searchQuery,
+        selectedState,
+        selectedDistrict,
+        dateRange: startDate && endDate ? `${startDate},${endDate}` : "",
+      };
+      const response = await pledgeReportService.getAllPledgesList(payload);
+      log(LogLevel.INFO, "PledgeReportList :: getPledgesList", response.data);
+      if (response.status === 200) {
+        setPledges(response.data.data.pledgesList);
+        setTotalCount(Number(response.data.data.pledgesCount));
+        setTotalPledgeCount(Number(response.data.data.totalPledgeCount));
+        setTotalPledgeTodayCount(
+          Number(response.data.data.totalPledgeTodayCount),
+        );
+        // setTotalRecoveredPledgeCount(
+        //   Number(response.data.data.totalRecoveredPledgeCount || 0),
+        // );
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
+    }
+  };
+
+  const listStates = async () => {
+    try {
+      const response = await usersListService.listStates();
+      log(LogLevel.INFO, "States :: listStates", response);
+      if (response.data && response.data.data) {
+        setStates(response.data.data);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "Roles :: listRoles", error);
+      showToast(
+        "Failed to load roles. Please try again later.",
+        "Error",
+        ToastType.ERROR,
+      );
+    }
+  };
+
+  const listDistrictsByStateId = async (stateId: string) => {
+    try {
+      const response = await usersListService.listDistrictsByStateId(stateId);
+      log(LogLevel.INFO, "Districts :: listDistrictsByStateId", response);
+      if (response.data && response.data.data) {
+        setDistricts(response.data.data);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "Districts :: listDistrictsByStateId", error);
+      showToast(
+        "Failed to load districts. Please try again later.",
+        "Error",
+        ToastType.ERROR,
+      );
+    }
+  };
+
+  useEffect(() => {
+    getPledgesList();
+  }, [pageSize, currentPage, searchQuery, selectedState, selectedDistrict]);
+
+  useEffect(() => {
+    if ((startDate && endDate) || (!startDate && !endDate)) {
+      getPledgesList();
+    }
+  }, [startDate, endDate]);
+
+  useEffect(() => {
+    listStates();
+  }, []);
+
+  useEffect(() => {
+    if (selectedState) {
+      listDistrictsByStateId(selectedState);
+    }
+  }, [selectedState]);
+
+  const handleDateChange = (date: [Date | null, Date | null]) => {
+    setDateRange(date);
+    const fromDate = date[0] ? dayjs(date[0]).format("YYYY-MM-DD") : "";
+    const toDate = date[1] ? dayjs(date[1]).format("YYYY-MM-DD") : "";
+    setStartDate(fromDate);
+    setEndDate(toDate);
+  };
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -214,7 +171,9 @@ const PledgeReportList = () => {
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
                   Total Pledge
                 </p>
-                <p className="text-3xl font-semibold text-[#003366]">1000</p>
+                <p className="text-3xl font-semibold text-[#003366]">
+                  {totalPledgeCount}
+                </p>
               </div>
               <img
                 src={PledgeContributionIcon}
@@ -226,9 +185,11 @@ const PledgeReportList = () => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
-                  Total e-Pledge
+                  Total Pledge Today
                 </p>
-                <p className="text-3xl font-semibold text-[#003366]">500</p>
+                <p className="text-3xl font-semibold text-[#003366]">
+                  {totalPledgeTodayCount}
+                </p>
               </div>
               <img
                 src={PledgeContributionIcon}
@@ -236,26 +197,28 @@ const PledgeReportList = () => {
               />
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
+          {/* <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
                   Total Recovered Pledge
                 </p>
-                <p className="text-3xl font-semibold text-[#003366]">500</p>
+                <p className="text-3xl font-semibold text-[#003366]">
+                  {totalRecoveredPledgeCount}
+                </p>
               </div>
               <img
                 src={PledgeContributionIcon}
                 alt="pledge-contribution-icon"
               />
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
-          <div className="grid grid-cols-12 gap-6 mb-6">
+          <div className="grid grid-cols-12 gap-6 mb-6 items-center">
             {/* Search Bar */}
-            <div className="col-span-12 md:col-span-6 lg:col-span-6 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
+            <div className="col-span-12 md:col-span-6 lg:col-span-5 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] bg-[#F9FAFB] text-sm"
@@ -271,43 +234,65 @@ const PledgeReportList = () => {
 
             <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <select
-                value={filterDistrict}
+                value={selectedState}
                 onChange={(e) => {
-                  setFilterDistrict(e.target.value);
+                  setSelectedState(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
-                <option>All District</option>
-                <option>Amroha</option>
-                <option>Auraiya</option>
-                <option>Ayodhya</option>
+                <option value="">Select State</option>
+                {states.map((state: any) => (
+                  <option key={state.state_id} value={state.state_id}>
+                    {state.state_name}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <select
-                value={filterState}
+                value={selectedDistrict}
+                disabled={!selectedState}
                 onChange={(e) => {
-                  setFilterState(e.target.value);
+                  setSelectedDistrict(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md appearance-none bg-white text-[#6B7280] cursor-pointer text-sm"
+                className={`w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm ${!selectedState ? "bg-gray-100 !cursor-not-allowed" : "bg-white cursor-pointer"}`}
               >
-                <option>Uttar Pradesh</option>
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
+                <option value="">Select District</option>
+                {districts.map((district: any) => (
+                  <option
+                    key={district.district_id}
+                    value={district.district_id}
+                  >
+                    {district.district_name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
-              <input
-                type="date"
-                value={dateRange.start}
-                onChange={(e) =>
-                  setDateRange({ ...dateRange, start: e.target.value })
-                }
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md bg-white text-[#6B7280] cursor-pointer text-sm focus:border-[#003366] transition"
-                placeholder="Start Date"
+              <DatePickerInput
+                type="range"
+                value={dateRange}
+                onChange={(e) => handleDateChange(e)}
+                placeholder="Select date range"
+                className="w-full"
+                clearable
+                maxDate={new Date()}
+              />
+            </div>
+            <div className="relative col-span-12 md:col-span-6 lg:col-span-1 border border-red-500 rounded-md flex items-center justify-center py-2 cursor-pointer">
+              <IconFilterOff
+                size={20}
+                color="red"
+                onClick={() => {
+                  setSelectedState("");
+                  setSelectedDistrict("");
+                  setDateRange([null, null]);
+                  setStartDate("");
+                  setEndDate("");
+                }}
               />
             </div>
           </div>
@@ -343,45 +328,49 @@ const PledgeReportList = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedPledges.length > 0 ? (
-                  paginatedPledges.map((pledge, index) => (
+                {pledges && pledges.length > 0 ? (
+                  pledges.map((pledge, index) => (
                     <tr
                       key={index}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.pledge_type}
+                        {pledge.pledge_type ? pledge.pledge_type : "e-pledge"}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.name}
+                        {pledge.full_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
                         {pledge.age}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        {pledge.mobile}
+                        {pledge.mobile_number}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.email}
+                        {pledge.email_id}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.state}
+                        {pledge.state_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.district}
+                        {pledge.district_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {pledge.pledge_date}
+                        {pledge.date_updated
+                          .split("T")[0]
+                          .split("-")
+                          .reverse()
+                          .join("-")}
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan={5}
-                      className="px-6 py-8 text-center text-[#374151] font-semibold"
+                      colSpan={12}
+                      className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                     >
-                      No Data Found
+                      No data found
                     </td>
                   </tr>
                 )}
@@ -449,12 +438,23 @@ const PledgeReportList = () => {
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>200</option>
-                <option>50</option>
-                <option>100</option>
+              <select
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
-              of <span className="font-semibold">{totalCount}</span> items
+              of{" "}
+              <span className="font-medium text-[#374151]">
+                {pledges?.length}
+              </span>{" "}
+              items
             </div>
           </div>
         </div>

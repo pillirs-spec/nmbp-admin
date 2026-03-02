@@ -75,7 +75,7 @@ const AddQr = () => {
                   name="url"
                   value={formData.url}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-md outline-none text-[#374151] text-sm appearance-none bg-white focus:border-[#003366] transition"
+                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-md outline-none text-[#374151] text-sm  bg-white focus:border-[#003366] transition"
                 >
                   <option>Drawing Competition</option>
                   <option>Slogan Writing</option>

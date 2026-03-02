@@ -56,6 +56,46 @@ const usersService = {
 
       await usersService.clearRedisCache(userId, user.mobile_number);
 
+      const snoRedisKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.SNO_LIST,
+        {},
+      );
+
+      const snoCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.SNO_COUNT,
+        {},
+      );
+
+      const totalSnoCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.SNO_TOTAL_COUNT,
+        {},
+      );
+
+      const dnoRedisKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DNO_LIST,
+        {},
+      );
+
+      const dnoCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DNO_COUNT,
+        {},
+      );
+
+      const totalDnoCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DNO_TOTAL_COUNT,
+        {},
+      );
+
+      if (user.role_id === 12) {
+        await redis.deleteRedisKeyWithPattern(`${snoRedisKey}*`);
+        await redis.deleteRedis(snoCountKey);
+        await redis.deleteRedis(totalSnoCountKey);
+      } else {
+        await redis.deleteRedisKeyWithPattern(`${dnoRedisKey}*`);
+        await redis.deleteRedis(dnoCountKey);
+        await redis.deleteRedis(totalDnoCountKey);
+      }
+
       usersService
         .sharePasswordToUser({
           emailId: user.email_id,

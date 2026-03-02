@@ -61,6 +61,52 @@
             "required": true,
             "type": "string",
             "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "example": "Rajesh"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "Nayak"
+                },
+                "email_id": {
+                  "type": "string",
+                  "example": "rajeshnayak899@gmail.com"
+                },
+                "mobile_number": {
+                  "type": "string",
+                  "example": "8249834095"
+                },
+                "dob": {
+                  "type": "string",
+                  "example": "1997-07-21"
+                },
+                "gender": {
+                  "type": "number",
+                  "example": 1
+                },
+                "role_id": {
+                  "type": "number",
+                  "example": 2
+                },
+                "state_id": {
+                  "type": "number",
+                  "example": 21
+                },
+                "district_id": {
+                  "type": "number",
+                  "example": 189
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -1141,6 +1187,29 @@
         }
       }
     },
+    "/api/v1/admin/locations/activities": {
+      "get": {
+        "tags": [
+          "Activities"
+        ],
+        "summary": "List All Activities",
+        "description": "This API is used to fetch all the activities.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/admin/health": {
       "get": {
         "tags": [
@@ -1148,6 +1217,161 @@
         ],
         "summary": "Health Check",
         "description": "Verify that the Admin Backend service is running and responsive",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/pledges": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Pledges (Paginated)",
+        "description": "Retrieve a paginated list of pledges with optional filtering by active status and search term. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "Kiran Kumar"
+                },
+                "selectedState": {
+                  "type": "number",
+                  "example": 1
+                },
+                "selectedDistrict": {
+                  "type": "number",
+                  "example": 1
+                },
+                "dateRange": {
+                  "type": "string",
+                  "example": "2024-01-01"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/sno_list": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get SNO List",
+        "description": "Retrieve a list of SNOs. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "Admin"
+                },
+                "selectedState": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dno_list": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get DNO List",
+        "description": "Retrieve a list of DNOs. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "Venkatesh"
+                },
+                "selectedState": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": ""
