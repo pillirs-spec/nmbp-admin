@@ -61,6 +61,52 @@
             "required": true,
             "type": "string",
             "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "example": "Rajesh"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "Nayak"
+                },
+                "email_id": {
+                  "type": "string",
+                  "example": "rajeshnayak899@gmail.com"
+                },
+                "mobile_number": {
+                  "type": "string",
+                  "example": "8249834095"
+                },
+                "dob": {
+                  "type": "string",
+                  "example": "1997-07-21"
+                },
+                "gender": {
+                  "type": "number",
+                  "example": 1
+                },
+                "role_id": {
+                  "type": "number",
+                  "example": 2
+                },
+                "state_id": {
+                  "type": "number",
+                  "example": 21
+                },
+                "district_id": {
+                  "type": "number",
+                  "example": 189
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -1253,20 +1299,25 @@
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "pageSize": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 10
                 },
                 "currentPage": {
-                  "example": "any"
-                },
-                "selectedState": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 1
                 },
                 "searchFilter": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Admin"
+                },
+                "selectedState": {
+                  "type": "number",
+                  "example": 1
                 }
               }
             }
@@ -1297,20 +1348,25 @@
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "pageSize": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 10
                 },
                 "currentPage": {
-                  "example": "any"
-                },
-                "selectedState": {
-                  "example": "any"
+                  "type": "number",
+                  "example": 1
                 },
                 "searchFilter": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "Venkatesh"
+                },
+                "selectedState": {
+                  "type": "number",
+                  "example": 1
                 }
               }
             }

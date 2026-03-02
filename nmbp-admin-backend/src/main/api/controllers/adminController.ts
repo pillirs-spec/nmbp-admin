@@ -105,7 +105,7 @@ const adminController = {
                     schema: {
                         pageSize: 10,
                         currentPage: 1,
-                        searchFilter: "Admin"
+                        searchFilter: "Venkatesh",
                         selectedState: 1
                     }
                 }  
@@ -161,7 +161,7 @@ const adminController = {
                     schema: {
                         pageSize: 10,
                         currentPage: 1,
-                        searchFilter: "Venkatesh"
+                        searchFilter: "Venkatesh",
                         selectedState: 1
                     }
                 }  

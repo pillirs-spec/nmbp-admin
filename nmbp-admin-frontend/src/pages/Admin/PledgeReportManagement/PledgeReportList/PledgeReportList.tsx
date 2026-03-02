@@ -6,10 +6,11 @@ import { LogLevel, ToastType } from "../../../../enums";
 import PledgeContributionIcon from "../../../../assets/total_pledge.svg";
 import { pledgeReportService } from "./pledgeReportService";
 import usersListService from "../../UserManagement/UserList/usersListService";
-import { IconFilter } from "@tabler/icons-react";
+
 import { DatePickerInput } from "@mantine/dates";
 import "@mantine/dates/styles.css";
 import dayjs from "dayjs";
+import { IconFilterOff } from "@tabler/icons-react";
 
 interface Pledge {
   id: number;
@@ -282,7 +283,7 @@ const PledgeReportList = () => {
               />
             </div>
             <div className="relative col-span-12 md:col-span-6 lg:col-span-1 border border-red-500 rounded-md flex items-center justify-center py-2 cursor-pointer">
-              <IconFilter
+              <IconFilterOff
                 size={20}
                 color="red"
                 onClick={() => {
