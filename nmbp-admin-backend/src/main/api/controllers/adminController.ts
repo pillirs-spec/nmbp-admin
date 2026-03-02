@@ -37,7 +37,10 @@ const adminController = {
                     schema: {
                         pageSize: 10,
                         currentPage: 1,
-                        searchFilter: "Admin"
+                        searchFilter: "Kiran Kumar",
+                        selectedState: 1,
+                        selectedDistrict: 1,
+                        dateRange: "2024-01-01"
                     }
                 }    
             */
@@ -45,7 +48,10 @@ const adminController = {
       const pageSize = req.body.pageSize || 11;
       const currentPage = req.body.currentPage
         ? (req.body.currentPage - 1) * pageSize
-        : 11;
+        : 10;
+      const selectedState = Number(req.body.selectedState) || 0;
+      const selectedDistrict = Number(req.body.selectedDistrict) || 0;
+      const dateRange = req.body.dateRange || "";
       const searchFilter = req.body.searchFilter || "";
       logger.debug(
         `${logPrefix} :: Parsed parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
@@ -55,6 +61,9 @@ const adminController = {
         pageSize,
         currentPage,
         searchFilter,
+        selectedState,
+        selectedDistrict,
+        dateRange,
       );
       const pledgesCount = await adminService.pledgeCount(searchFilter);
       const totalPledgeCount = await adminService.totalPledgeCount();

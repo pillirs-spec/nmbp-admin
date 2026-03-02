@@ -6,12 +6,22 @@ const adminRepository = {
     pageSize: number,
     currentPage: number,
     searchFilter: string,
+    selectedState: number,
+    selectedDistrict: number,
+    dateRange: string,
   ) => {
-    const logPrefix = `adminRepository :: listPledges :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`;
+    const logPrefix = `adminRepository :: listPledges :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState} :: selectedDistrict :: ${selectedDistrict} :: dateRange :: ${dateRange}`;
     try {
       const _query = {
         text: pgQueries.AdminQueries.LIST_PLEDGES,
-        values: [pageSize, currentPage, searchFilter],
+        values: [
+          pageSize,
+          currentPage,
+          searchFilter,
+          selectedState,
+          selectedDistrict,
+          dateRange,
+        ],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
 

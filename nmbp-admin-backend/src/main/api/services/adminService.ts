@@ -8,12 +8,15 @@ const adminService = {
     pageSize: number,
     currentPage: number,
     searchFilter: string,
+    selectedState: number,
+    selectedDistrict: number,
+    dateRange: string,
   ) => {
     const logPrefix = `adminService :: listPledges`;
     try {
       logger.info(`${logPrefix} :: Fetching pledges from database`);
       logger.debug(
-        `${logPrefix} :: Parameters:: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
+        `${logPrefix} :: Parameters:: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState} :: selectedDistrict :: ${selectedDistrict} :: dateRange :: ${dateRange}`,
       );
 
       let key = redisKeysFormatter.getFormattedRedisKey(
@@ -36,6 +39,18 @@ const adminService = {
         key += `|offset:${currentPage}`;
         whereQuery += ` OFFSET ${currentPage}`;
       }
+      if (selectedState) {
+        key += `|state:${selectedState}`;
+        whereQuery += ` AND state_id = '${selectedState}'`;
+      }
+      if (selectedDistrict) {
+        key += `|district:${selectedDistrict}`;
+        whereQuery += ` AND district_id = '${selectedDistrict}'`;
+      }
+      if (dateRange) {
+        key += `|dateRange:${dateRange}`;
+        whereQuery += ` AND pledge_date >= '${dateRange}'`;
+      }
 
       const cachedResult = await redis.GetKeyRedis(key);
       if (cachedResult) {
@@ -49,6 +64,9 @@ const adminService = {
         pageSize,
         currentPage,
         searchFilter,
+        selectedState,
+        selectedDistrict,
+        dateRange,
       );
 
       if (pledgesList && pledgesList.length > 0)

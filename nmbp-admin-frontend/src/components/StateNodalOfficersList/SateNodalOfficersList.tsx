@@ -8,6 +8,7 @@ import PDFIcon from "../../assets/pdf.svg";
 import nodalOfficersService from "../../pages/Admin/NodalOfficersManagement/NodalOfficersList/nodalOfficersService";
 import { LogLevel } from "../../enums";
 import { useLogger } from "../../hooks";
+import { IconFilter } from "@tabler/icons-react";
 
 interface Officer {
   id: string;

@@ -108,7 +108,7 @@ export enum AdminQueries {
       u.full_name ILIKE '%' || $3 || '%'
       OR s.state_name ILIKE '%' || $3 || '%'
       OR d.district_name ILIKE '%' || $3 || '%'
-    )
+    ) AND ($4 = 0 OR u.state_id = $4 ) AND ($5 = 0 OR u.district_id = $5) AND ($6 = '' OR u.date_updated >= $6::date)
     ORDER BY u.date_updated DESC
     LIMIT $1 OFFSET $2
   `,

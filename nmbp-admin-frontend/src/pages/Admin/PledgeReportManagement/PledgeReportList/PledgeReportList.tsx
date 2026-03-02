@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { debounce } from "lodash";
 import searchIcon from "../../../../assets/search-icon.svg";
-import { useLogger } from "../../../../hooks";
-import { LogLevel } from "../../../../enums";
+import { useLogger, useToast } from "../../../../hooks";
+import { LogLevel, ToastType } from "../../../../enums";
 import PledgeContributionIcon from "../../../../assets/total_pledge.svg";
 import { pledgeReportService } from "./pledgeReportService";
+import usersListService from "../../UserManagement/UserList/usersListService";
+import { IconFilter } from "@tabler/icons-react";
 
 interface Pledge {
   id: number;
@@ -27,13 +29,17 @@ const PledgeReportList = () => {
   const [totalPledgeTodayCount, setTotalPledgeTodayCount] = useState<number>(0);
   // const [totalRecoveredPledgeCount, setTotalRecoveredPledgeCount] =
   //   useState<number>(0);
-  const [filterDistrict, setFilterDistrict] = useState<string>("All District");
-  const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
-  const [dateRange, setDateRange] = useState<{ start: string; end: string }>({
-    start: "",
-    end: "",
-  });
+  // const [filterDistrict, setFilterDistrict] = useState<string>("All District");
+  // const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
+  const [states, setStates] = useState<{ label: string; value: string }[]>([]);
+  const [districts, setDistricts] = useState<
+    { label: string; value: string }[]
+  >([{ label: "Select District", value: "" }]);
+  const [dateRange, setDateRange] = useState("");
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const { log } = useLogger();
+  const { showToast } = useToast();
 
   const [pageSize, setPageSize] = useState<number>(10);
 
@@ -55,6 +61,9 @@ const PledgeReportList = () => {
         pageSize,
         currentPage,
         searchFilter: searchQuery,
+        selectedState,
+        selectedDistrict,
+        dateRange: dateRange,
       };
       const response = await pledgeReportService.getAllPledgesList(payload);
       log(LogLevel.INFO, "PledgeReportList :: getPledgesList", response.data);
@@ -74,9 +83,60 @@ const PledgeReportList = () => {
     }
   };
 
+  const listStates = async () => {
+    try {
+      const response = await usersListService.listStates();
+      log(LogLevel.INFO, "States :: listStates", response);
+      if (response.data && response.data.data) {
+        setStates(response.data.data);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "Roles :: listRoles", error);
+      showToast(
+        "Failed to load roles. Please try again later.",
+        "Error",
+        ToastType.ERROR,
+      );
+    }
+  };
+
+  const listDistrictsByStateId = async (stateId: string) => {
+    try {
+      const response = await usersListService.listDistrictsByStateId(stateId);
+      log(LogLevel.INFO, "Districts :: listDistrictsByStateId", response);
+      if (response.data && response.data.data) {
+        setDistricts(response.data.data);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "Districts :: listDistrictsByStateId", error);
+      showToast(
+        "Failed to load districts. Please try again later.",
+        "Error",
+        ToastType.ERROR,
+      );
+    }
+  };
+
   useEffect(() => {
     getPledgesList();
-  }, [pageSize, currentPage, searchQuery]);
+  }, [
+    pageSize,
+    currentPage,
+    searchQuery,
+    selectedState,
+    selectedDistrict,
+    dateRange,
+  ]);
+
+  useEffect(() => {
+    listStates();
+  }, []);
+
+  useEffect(() => {
+    if (selectedState) {
+      listDistrictsByStateId(selectedState);
+    }
+  }, [selectedState]);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -140,9 +200,9 @@ const PledgeReportList = () => {
         </div>
 
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
-          <div className="grid grid-cols-12 gap-6 mb-6">
+          <div className="grid grid-cols-12 gap-6 mb-6 items-center">
             {/* Search Bar */}
-            <div className="col-span-12 md:col-span-6 lg:col-span-6 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
+            <div className="col-span-12 md:col-span-6 lg:col-span-5 border border-[#E5E7EB] rounded-md px-4 py-2 flex items-center bg-[#F9FAFB]">
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] bg-[#F9FAFB] text-sm"
@@ -158,43 +218,61 @@ const PledgeReportList = () => {
 
             <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <select
-                value={filterDistrict}
+                value={selectedState}
                 onChange={(e) => {
-                  setFilterDistrict(e.target.value);
+                  setSelectedState(e.target.value);
                   setCurrentPage(1);
                 }}
                 className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
-                <option>All District</option>
-                <option>Amroha</option>
-                <option>Auraiya</option>
-                <option>Ayodhya</option>
+                <option value="">Select State</option>
+                {states.map((state: any) => (
+                  <option key={state.state_id} value={state.state_id}>
+                    {state.state_name}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <select
-                value={filterState}
+                value={selectedDistrict}
+                disabled={!selectedState}
                 onChange={(e) => {
-                  setFilterState(e.target.value);
+                  setSelectedDistrict(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
+                className={`w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm ${!selectedState ? "bg-gray-100 !cursor-not-allowed" : "bg-white cursor-pointer"}`}
               >
-                <option>Uttar Pradesh</option>
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
+                <option value="">Select District</option>
+                {districts.map((district: any) => (
+                  <option
+                    key={district.district_id}
+                    value={district.district_id}
+                  >
+                    {district.district_name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
               <input
                 type="date"
-                value={dateRange.start}
-                onChange={(e) =>
-                  setDateRange({ ...dateRange, start: e.target.value })
-                }
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value)}
                 className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md bg-white text-[#6B7280] cursor-pointer text-sm focus:border-[#003366] transition"
                 placeholder="Start Date"
+              />
+            </div>
+            <div className="relative col-span-12 md:col-span-6 lg:col-span-1 border border-red-500 rounded-md flex items-center justify-center py-2 cursor-pointer">
+              <IconFilter
+                size={20}
+                color="red"
+                onClick={() => {
+                  setSelectedState("");
+                  setSelectedDistrict("");
+                  setDateRange("");
+                }}
               />
             </div>
           </div>
@@ -269,10 +347,10 @@ const PledgeReportList = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan={5}
-                      className="px-6 py-8 text-center text-[#374151] font-semibold"
+                      colSpan={12}
+                      className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                     >
-                      No Data Found
+                      No data found
                     </td>
                   </tr>
                 )}
