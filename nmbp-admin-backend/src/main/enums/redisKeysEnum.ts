@@ -16,6 +16,7 @@ export enum RedisKeys {
   PLEDGES_COUNT = "pledges|count",
   PLEDGES_TOTAL_COUNT = "pledges|total_count",
   PLEDGES_TODAY_TOTAL_COUNT = "pledges|today_total_count",
+  SNO_LIST = "sno_list",
   ROLE_BY_ID = "role:${roleId}",
   ACTIVE_ROLES = "roles|active",
   ROLES_COUNT = "roles|count",

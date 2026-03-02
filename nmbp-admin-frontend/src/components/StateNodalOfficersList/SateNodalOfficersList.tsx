@@ -5,113 +5,52 @@ import ExcelIcon from "../../assets/excel.svg";
 import PrintIcon from "../../assets/print.svg";
 import CopyIcon from "../../assets/copy.svg";
 import PDFIcon from "../../assets/pdf.svg";
+import nodalOfficersService from "../../pages/Admin/NodalOfficersManagement/NodalOfficersList/nodalOfficersService";
+import { LogLevel } from "../../enums";
+import { useLogger } from "../../hooks";
 
 interface Officer {
   id: string;
-  stateName: string;
-  districtName: string;
-  officerName: string;
-  designation: string;
-  email: string;
-  mobileNo: string;
-  contactEmail: string;
+  state_name: string;
+  district_name: string;
+  display_name: string;
+  role_name: string;
+  email_id: string;
+  mobile_number: string;
 }
 
 const StateNodalOfficersList = () => {
   const [officers, setOfficers] = useState<Officer[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedState, setSelectedState] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
+  const [searchFilter, setSearchFilter] = useState<string>("");
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
 
-  const pageSize = 200;
+  const pageSize = 10;
+  const { log } = useLogger();
 
-  // Mock data - Replace with actual API call
-  const mockOfficers: Officer[] = [
-    {
-      id: "1",
-      stateName: "Uttar Pradesh",
-      districtName: "Amroha",
-      officerName: "Smt. Pankhuri Jain",
-      designation: "N/A",
-      email: "dswjpnagar@dirsamajkalyan.in",
-      mobileNo: "9151935247",
-      contactEmail: "dsawazamgarh@dirsamajkalyan.in",
-    },
-    {
-      id: "2",
-      stateName: "Uttar Pradesh",
-      districtName: "Auraiya",
-      officerName: "Ms. Indra Singh",
-      designation: "N/A",
-      email: "dswauraiya@dirsamajkalyan.in",
-      mobileNo: "9151935183",
-      contactEmail: "dswauraiya@dirsamajkalyan.in",
-    },
-    {
-      id: "3",
-      stateName: "Uttar Pradesh",
-      districtName: "Ayodhya",
-      officerName: "Shri Ramvijay Singh",
-      designation: "N/A",
-      email: "dswazamgarh@dirsama jkalyan.in",
-      mobileNo: "9151935227",
-      contactEmail: "dswazamgarh@dirsamajkalyan.in",
-    },
-    {
-      id: "4",
-      stateName: "Uttar Pradesh",
-      districtName: "Azamgarh",
-      officerName: "Shri Moti Lal",
-      designation: "N/A",
-      email: "dswazamgarh@dirsamajkalyan.in",
-      mobileNo: "9151935167",
-      contactEmail: "dswazamgarh@dirsamajkalyan.in",
-    },
-    {
-      id: "5",
-      stateName: "Uttar Pradesh",
-      districtName: "Badaun",
-      officerName: "Ms. Minakshi Verma",
-      designation: "N/A",
-      email: "dswbadaun@dirsamajkalyan.in",
-      mobileNo: "9151935235",
-      contactEmail: "dswbadaun@dirsamajkalyan.in",
-    },
-    {
-      id: "6",
-      stateName: "Uttar Pradesh",
-      districtName: "Baghpat",
-      officerName: "Smt. Rashmi Yadav",
-      designation: "N/A",
-      email: "dswbaghpat@dirsamajkalyan.in",
-      mobileNo: "9151935263",
-      contactEmail: "dswbaghpat@dirsamajkalyan.in",
-    },
-  ];
-
-  useEffect(() => {
-    try {
-      // Simulate API call - Replace with actual API
-      setOfficers(mockOfficers);
-      setTotalCount(1500); // Mock total count
-      if (mockOfficers.length > 0) {
-        setSelectedOfficer(mockOfficers[3]); // Set Azamgarh as default
-      }
-    } catch (error) {
-      console.error("Error loading officers:", error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery, filterState]);
+  // useEffect(() => {
+  //   try {
+  //     // Simulate API call - Replace with actual API
+  //     setOfficers(mockOfficers ? mockOfficers : []);
+  //     setTotalCount(1500); // Mock total count
+  //     if (mockOfficers.length > 0) {
+  //       setSelectedOfficer(mockOfficers[3]); // Set Azamgarh as default
+  //     }
+  //   } catch (error) {
+  //     console.error("Error loading officers:", error);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [currentPage, searchQuery, filterState]);
 
   const handleSearch = (value: string) => {
     if (value.length > 0) {
-      setSearchQuery(value);
+      setSearchFilter(value);
       setCurrentPage(1);
     } else {
-      setSearchQuery("");
+      setSearchFilter("");
       setCurrentPage(1);
     }
   };
@@ -149,6 +88,41 @@ const StateNodalOfficersList = () => {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, officers.length);
   const paginatedOfficers = officers.slice(startIndex, endIndex);
+
+  const getSnoList = async () => {
+    // Simulate API call - Replace with actual API
+    //  setOfficers(mockOfficers);
+    //  setTotalCount(1500); // Mock total count
+    //  if (mockOfficers.length > 0) {
+    //    setSelectedOfficer(mockOfficers[3]); // Set Azamgarh as default
+    //  }
+
+    try {
+      const payload = {
+        pageSize,
+        currentPage,
+        searchFilter,
+      };
+      const response =
+        await nodalOfficersService.getStateNodalOfficersList(payload);
+      log(LogLevel.INFO, "StateNodalOfficersList :: getSnoList", response.data);
+      if (response.status === 200) {
+        setOfficers(response.data.data.snoList);
+      }
+    } catch (error) {
+      log(
+        LogLevel.ERROR,
+        "StateNodalOfficersList :: getSnoList :: Error fetching sno list",
+        error,
+      );
+    }
+  };
+
+  useEffect(() => {
+    getSnoList();
+  }, [currentPage, searchFilter, pageSize, selectedState]);
+
+  console.log("Officers:", officers);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -189,7 +163,7 @@ const StateNodalOfficersList = () => {
         </div>
 
         {/* Selected Officer Info Card */}
-        {selectedOfficer && (
+        {/* {selectedOfficer && (
           <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
@@ -197,7 +171,7 @@ const StateNodalOfficersList = () => {
                   State Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.stateName}
+                  {selectedOfficer.state_name}
                 </p>
               </div>
               <div>
@@ -205,7 +179,7 @@ const StateNodalOfficersList = () => {
                   District Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.districtName}
+                  {selectedOfficer.district_name}
                 </p>
               </div>
               <div>
@@ -213,13 +187,13 @@ const StateNodalOfficersList = () => {
                   Officer Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.officerName}
+                  {selectedOfficer.display_name}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">Email</p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.contactEmail}
+                  {selectedOfficer.email_id}
                 </p>
               </div>
               <div>
@@ -227,12 +201,12 @@ const StateNodalOfficersList = () => {
                   Contact Number
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.mobileNo}
+                  {selectedOfficer.mobile_number}
                 </p>
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Table Container */}
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
@@ -255,14 +229,14 @@ const StateNodalOfficersList = () => {
             {/* State Filter */}
             <div className="relative col-span-12 sm:col-span-6 lg:col-span-6 flex justify-end">
               <select
-                value={filterState}
+                value={selectedState}
                 onChange={(e) => {
-                  setFilterState(e.target.value);
+                  setSelectedState(e.target.value);
                   setCurrentPage(1);
                 }}
                 className="px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm w-full md:w-48"
               >
-                <option>Uttar Pradesh</option>
+                <option value={1}>Andhra Pradesh</option>
                 <option>Maharashtra</option>
                 <option>Karnataka</option>
                 <option>Tamil Nadu</option>
@@ -277,12 +251,6 @@ const StateNodalOfficersList = () => {
               <thead style={{ backgroundColor: "#F9FAFB" }}>
                 <tr>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    State Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    District Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Nodal Officer Name
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
@@ -294,33 +262,39 @@ const StateNodalOfficersList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Mobile No
                   </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                    State Name
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                    District Name
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedOfficers.length > 0 ? (
-                  paginatedOfficers.map((officer, index) => (
+                {officers.length > 0 ? (
+                  officers.map((officer, index) => (
                     <tr
                       key={index}
                       onClick={() => setSelectedOfficer(officer)}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0 cursor-pointer"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.stateName}
+                        {officer.display_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.districtName}
+                        {officer.role_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.officerName}
+                        {officer.email_id}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.designation}
+                        {officer.mobile_number}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.email}
+                        {officer.state_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.mobileNo}
+                        {officer.district_name}
                       </td>
                     </tr>
                   ))

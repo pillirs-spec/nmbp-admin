@@ -76,6 +76,54 @@ const adminController = {
         .send(errorCodes.roles.ROLE00000);
     }
   },
+
+  getSnoList: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: getSnoList`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*                #swagger.tags = ['Admin']
+                #swagger.summary = 'Get SNO List'
+                #swagger.description = 'Retrieve a list of SNOs. Requires authentication.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    required: true,
+                    schema: {
+                        pageSize: 10,
+                        currentPage: 1,
+                        searchFilter: "Admin"
+                    }
+                }  
+            */
+
+      const pageSize = req.body.pageSize || 11;
+      const currentPage = req.body.currentPage
+        ? (req.body.currentPage - 1) * pageSize
+        : 11;
+      const searchFilter = req.body.searchFilter || "";
+      const snoList = await adminService.getSnoList(
+        pageSize,
+        currentPage,
+        searchFilter,
+      );
+      return res.status(STATUS.OK).send({
+        data: {
+          snoList,
+        },
+        message: "SNO List fetched successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res
+        .status(STATUS.INTERNAL_SERVER_ERROR)
+        .send(errorCodes.roles.ROLE00000);
+    }
+  },
 };
 
 export default adminController;

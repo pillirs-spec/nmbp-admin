@@ -80,7 +80,7 @@ const adminService = {
         logger.info(
           `${logPrefix} :: cached count of pledges :: ${cachedCount}`,
         );
-        return cachedCount;
+        return JSON.parse(cachedCount);
       }
 
       const count = await adminRepository.pledgeCount(searchFilter);
@@ -110,7 +110,7 @@ const adminService = {
         logger.info(
           `${logPrefix} :: cached total count of pledges :: ${cachedTotalCount}`,
         );
-        return cachedTotalCount;
+        return JSON.parse(cachedTotalCount);
       }
       const count = await adminRepository.totalPledgeCount();
       if (count !== null && count !== undefined) {
@@ -139,7 +139,7 @@ const adminService = {
         logger.info(
           `${logPrefix} :: cached total count of today's pledges :: ${cachedTodayCount}`,
         );
-        return cachedTodayCount;
+        return JSON.parse(cachedTodayCount);
       }
       const count = await adminRepository.totalPledgeTodayCount();
       if (count !== null && count !== undefined) {
@@ -149,6 +149,56 @@ const adminService = {
     } catch (error) {
       logger.error(
         `${logPrefix} :: Error counting today's pledges :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  getSnoList: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+  ) => {
+    const logPrefix = `adminService :: getSnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`;
+    try {
+      logger.info(`${logPrefix} :: Fetching SNO list from database`);
+      let key = redisKeysFormatter.getFormattedRedisKey(RedisKeys.SNO_LIST, {});
+      let whereQuery = `WHERE`;
+
+      if (searchFilter) {
+        if (searchFilter) key += `|search:${searchFilter}`;
+        whereQuery += ` AND role_name ILIKE '%${searchFilter}%'`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+        whereQuery += ` LIMIT ${pageSize}`;
+      }
+
+      if (currentPage) {
+        key += `|offset:${currentPage}`;
+        whereQuery += ` OFFSET ${currentPage}`;
+      }
+
+      const cachedSnoList = await redis.GetKeyRedis(key);
+      if (cachedSnoList) {
+        logger.info(
+          `${logPrefix} :: cached result of all pledges :: ${cachedSnoList}`,
+        );
+        return JSON.parse(cachedSnoList);
+      }
+      const snoList = await adminRepository.getSnoList(
+        pageSize,
+        currentPage,
+        searchFilter,
+      );
+      if (snoList && snoList.length > 0)
+        redis.SetRedis(key, snoList, CacheTTL.LONG);
+
+      return snoList;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error fetching SNO list :: ${error.message} :: ${error}`,
       );
       throw error;
     }

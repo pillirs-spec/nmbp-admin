@@ -18,7 +18,7 @@ const adminRepository = {
       const result = await pg.executeQueryPromise(_query);
       logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
 
-      return result.length ? result : null;
+      return result.length ? result : [];
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
       throw new Error(error.message);
@@ -76,6 +76,29 @@ const adminRepository = {
       logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
 
       return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getSnoList: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+  ) => {
+    const logPrefix = `adminRepository :: getSnoList`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.GET_SNO_LIST,
+        values: [pageSize, currentPage, searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result : [];
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
       throw new Error(error.message);

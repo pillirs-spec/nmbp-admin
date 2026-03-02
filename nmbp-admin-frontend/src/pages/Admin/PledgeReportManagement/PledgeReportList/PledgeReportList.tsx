@@ -60,24 +60,10 @@ const PledgeReportList = () => {
       log(LogLevel.INFO, "PledgeReportList :: getPledgesList", response.data);
       if (response.status === 200) {
         setPledges(response.data.data.pledgesList);
-        setTotalCount(
-          Number(
-            response.data.data.pledgesCount.replace(/,/g, "").replace(/"/g, ""),
-          ),
-        );
-        setTotalPledgeCount(
-          Number(
-            response.data.data.totalPledgeCount
-              .replace(/,/g, "")
-              .replace(/"/g, ""),
-          ),
-        );
+        setTotalCount(Number(response.data.data.pledgesCount));
+        setTotalPledgeCount(Number(response.data.data.totalPledgeCount));
         setTotalPledgeTodayCount(
-          Number(
-            response.data.data.totalPledgeTodayCount
-              .replace(/,/g, "")
-              .replace(/"/g, "") || 0,
-          ),
+          Number(response.data.data.totalPledgeTodayCount),
         );
         // setTotalRecoveredPledgeCount(
         //   Number(response.data.data.totalRecoveredPledgeCount || 0),

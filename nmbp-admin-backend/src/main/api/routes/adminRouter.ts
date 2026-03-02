@@ -7,4 +7,6 @@ adminRouter.get("/health", adminController.health);
 
 adminRouter.post("/pledges", adminController.getPledges);
 
+adminRouter.post("/sno_list", adminController.getSnoList);
+
 export default adminRouter;
