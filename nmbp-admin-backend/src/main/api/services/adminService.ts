@@ -158,8 +158,9 @@ const adminService = {
     pageSize: number,
     currentPage: number,
     searchFilter: string,
+    selectedState: number,
   ) => {
-    const logPrefix = `adminService :: getSnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`;
+    const logPrefix = `adminService :: getSnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState}`;
     try {
       logger.info(`${logPrefix} :: Fetching SNO list from database`);
       let key = redisKeysFormatter.getFormattedRedisKey(RedisKeys.SNO_LIST, {});
@@ -179,6 +180,10 @@ const adminService = {
         key += `|offset:${currentPage}`;
         whereQuery += ` OFFSET ${currentPage}`;
       }
+      if (selectedState) {
+        key += `|state:${selectedState}`;
+        whereQuery += ` AND state_id = '${selectedState}'`;
+      }
 
       const cachedSnoList = await redis.GetKeyRedis(key);
       if (cachedSnoList) {
@@ -191,6 +196,7 @@ const adminService = {
         pageSize,
         currentPage,
         searchFilter,
+        selectedState,
       );
       if (snoList && snoList.length > 0)
         redis.SetRedis(key, snoList, CacheTTL.LONG);
@@ -199,6 +205,174 @@ const adminService = {
     } catch (error) {
       logger.error(
         `${logPrefix} :: Error fetching SNO list :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  snoCount: async (searchFilter: string) => {
+    const logPrefix = `adminService :: snoCount :: Parameters :: searchFilter :: ${searchFilter}`;
+    try {
+      logger.info(`${logPrefix} :: Counting SNOs in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(RedisKeys.SNO_COUNT, {
+        searchFilter,
+      });
+
+      const cachedCount = await redis.GetKeyRedis(key);
+      if (cachedCount) {
+        logger.info(`${logPrefix} :: cached count of SNOs :: ${cachedCount}`);
+        return JSON.parse(cachedCount);
+      }
+
+      const count = await adminRepository.snoCount(searchFilter);
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting SNOs :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  totalSnoCount: async () => {
+    const logPrefix = `adminService :: totalSnoCount`;
+    try {
+      logger.info(`${logPrefix} :: Counting total SNOs in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.SNO_TOTAL_COUNT,
+        {},
+      );
+
+      const cachedTotalCount = await redis.GetKeyRedis(key);
+      if (cachedTotalCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of SNO's:: ${cachedTotalCount}`,
+        );
+        return JSON.parse(cachedTotalCount);
+      }
+      const count = await adminRepository.totalSnoCount();
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting total pledges :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  getDnoList: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+    selectedState: number,
+  ) => {
+    const logPrefix = `adminService :: getDnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState}`;
+    try {
+      logger.info(`${logPrefix} :: Fetching DNO list from database`);
+      let key = redisKeysFormatter.getFormattedRedisKey(RedisKeys.DNO_LIST, {});
+      let whereQuery = `WHERE`;
+
+      if (searchFilter) {
+        if (searchFilter) key += `|search:${searchFilter}`;
+        whereQuery += ` AND role_name ILIKE '%${searchFilter}%'`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+        whereQuery += ` LIMIT ${pageSize}`;
+      }
+
+      if (currentPage) {
+        key += `|offset:${currentPage}`;
+        whereQuery += ` OFFSET ${currentPage}`;
+      }
+      if (selectedState) {
+        key += `|state:${selectedState}`;
+        whereQuery += ` AND state_id = '${selectedState}'`;
+      }
+
+      const cachedSnoList = await redis.GetKeyRedis(key);
+      if (cachedSnoList) {
+        logger.info(
+          `${logPrefix} :: cached result of all pledges :: ${cachedSnoList}`,
+        );
+        return JSON.parse(cachedSnoList);
+      }
+      const snoList = await adminRepository.getDnoList(
+        pageSize,
+        currentPage,
+        searchFilter,
+        selectedState,
+      );
+      if (snoList && snoList.length > 0)
+        redis.SetRedis(key, snoList, CacheTTL.LONG);
+
+      return snoList;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error fetching SNO list :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  dnoCount: async (searchFilter: string) => {
+    const logPrefix = `adminService :: dnoCount :: Parameters :: searchFilter :: ${searchFilter}`;
+    try {
+      logger.info(`${logPrefix} :: Counting DNOs in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(RedisKeys.DNO_COUNT, {
+        searchFilter,
+      });
+
+      const cachedCount = await redis.GetKeyRedis(key);
+      if (cachedCount) {
+        logger.info(`${logPrefix} :: cached count of DNOs :: ${cachedCount}`);
+        return JSON.parse(cachedCount);
+      }
+
+      const count = await adminRepository.dnoCount(searchFilter);
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting DNOs :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  totalDnoCount: async () => {
+    const logPrefix = `adminService :: totalDnoCount`;
+    try {
+      logger.info(`${logPrefix} :: Counting total DNOs in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DNO_TOTAL_COUNT,
+        {},
+      );
+
+      const cachedTotalCount = await redis.GetKeyRedis(key);
+      if (cachedTotalCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of DNO's:: ${cachedTotalCount}`,
+        );
+        return JSON.parse(cachedTotalCount);
+      }
+      const count = await adminRepository.totalDnoCount();
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting total DNOs :: ${error.message} :: ${error}`,
       );
       throw error;
     }

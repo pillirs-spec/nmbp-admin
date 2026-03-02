@@ -5,6 +5,9 @@ import ExcelIcon from "../../assets/excel.svg";
 import PrintIcon from "../../assets/print.svg";
 import CopyIcon from "../../assets/copy.svg";
 import PDFIcon from "../../assets/pdf.svg";
+import { useLogger } from "../../hooks";
+import { LogLevel } from "../../enums";
+import nodalOfficersService from "../../pages/Admin/NodalOfficersManagement/NodalOfficersList/nodalOfficersService";
 
 interface Officer {
   id: string;
@@ -19,99 +22,36 @@ interface Officer {
 
 const DistrictNodalOfficersList = () => {
   const [officers, setOfficers] = useState<Officer[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchFilter, setSearchFilter] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [filterState, setFilterState] = useState<string>("Uttar Pradesh");
+  const [selectedState, setSelectedState] = useState<string>("");
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
+  const [stateList, setStateList] = useState<any[]>([]);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const { log } = useLogger();
 
-  const pageSize = 200;
-
-  // Mock data - Replace with actual API call
-  const mockOfficers: Officer[] = [
-    {
-      id: "1",
-      stateName: "Uttar Pradesh",
-      districtName: "Amroha",
-      officerName: "Smt. Pankhuri Jain",
-      designation: "N/A",
-      email: "dswjpnagar@dirsamajkalyan.in",
-      mobileNo: "9151935247",
-      contactEmail: "dsawazamgarh@dirsamajkalyan.in",
-    },
-    {
-      id: "2",
-      stateName: "Uttar Pradesh",
-      districtName: "Auraiya",
-      officerName: "Ms. Indra Singh",
-      designation: "N/A",
-      email: "dswauraiya@dirsamajkalyan.in",
-      mobileNo: "9151935183",
-      contactEmail: "dswauraiya@dirsamajkalyan.in",
-    },
-    {
-      id: "3",
-      stateName: "Uttar Pradesh",
-      districtName: "Ayodhya",
-      officerName: "Shri Ramvijay Singh",
-      designation: "N/A",
-      email: "dswazamgarh@dirsama jkalyan.in",
-      mobileNo: "9151935227",
-      contactEmail: "dswazamgarh@dirsamajkalyan.in",
-    },
-    {
-      id: "4",
-      stateName: "Uttar Pradesh",
-      districtName: "Azamgarh",
-      officerName: "Shri Moti Lal",
-      designation: "N/A",
-      email: "dswazamgarh@dirsamajkalyan.in",
-      mobileNo: "9151935167",
-      contactEmail: "dswazamgarh@dirsamajkalyan.in",
-    },
-    {
-      id: "5",
-      stateName: "Uttar Pradesh",
-      districtName: "Badaun",
-      officerName: "Ms. Minakshi Verma",
-      designation: "N/A",
-      email: "dswbadaun@dirsamajkalyan.in",
-      mobileNo: "9151935235",
-      contactEmail: "dswbadaun@dirsamajkalyan.in",
-    },
-    {
-      id: "6",
-      stateName: "Uttar Pradesh",
-      districtName: "Baghpat",
-      officerName: "Smt. Rashmi Yadav",
-      designation: "N/A",
-      email: "dswbaghpat@dirsamajkalyan.in",
-      mobileNo: "9151935263",
-      contactEmail: "dswbaghpat@dirsamajkalyan.in",
-    },
-  ];
-
-  useEffect(() => {
-    try {
-      // Simulate API call - Replace with actual API
-      setOfficers(mockOfficers);
-      setTotalCount(1500); // Mock total count
-      if (mockOfficers.length > 0) {
-        setSelectedOfficer(mockOfficers[3]); // Set Azamgarh as default
-      }
-    } catch (error) {
-      console.error("Error loading officers:", error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery, filterState]);
+  // useEffect(() => {
+  //   try {
+  //     // Simulate API call - Replace with actual API
+  //     setOfficers(mockOfficers);
+  //     setTotalCount(1500); // Mock total count
+  //     if (mockOfficers.length > 0) {
+  //       setSelectedOfficer(mockOfficers[3]); // Set Azamgarh as default
+  //     }
+  //   } catch (error) {
+  //     console.error("Error loading officers:", error);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [currentPage, searchQuery, filterState]);
 
   const handleSearch = (value: string) => {
-    if (value.length > 0) {
-      setSearchQuery(value);
+    if (value.length >= 3) {
+      setSearchFilter(value);
       setCurrentPage(1);
     } else {
-      setSearchQuery("");
+      setSearchFilter("");
       setCurrentPage(1);
     }
   };
@@ -146,9 +86,72 @@ const DistrictNodalOfficersList = () => {
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, officers.length);
-  const paginatedOfficers = officers.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * pageSize;
+  // const endIndex = Math.min(startIndex + pageSize, officers.length);
+  // const paginatedOfficers = officers.slice(startIndex, endIndex);
+
+  const getStatesList = async () => {
+    try {
+      const response = await nodalOfficersService.getStatesList();
+      log(
+        LogLevel.INFO,
+        "StateNodalOfficersList :: getStatesList",
+        response.data,
+      );
+      if (response.status === 200) {
+        setStateList(response.data.data);
+      }
+    } catch (error) {
+      log(
+        LogLevel.ERROR,
+        "StateNodalOfficersList :: getStatesList :: Error fetching states list",
+        error,
+      );
+    }
+  };
+
+  const getDnoList = async () => {
+    // Simulate API call - Replace with actual API
+    //  setOfficers(mockOfficers);
+    //  setTotalCount(1500); // Mock total count
+    //  if (mockOfficers.length > 0) {
+    //    setSelectedOfficer(mockOfficers[3]); // Set Azamgarh as default
+    //  }
+
+    try {
+      const payload = {
+        pageSize,
+        currentPage,
+        selectedState,
+        searchFilter,
+      };
+      const response =
+        await nodalOfficersService.getDistrictNodalOfficersList(payload);
+      log(
+        LogLevel.INFO,
+        "DistrictNodalOfficersList :: getDnoList",
+        response.data,
+      );
+      if (response.status === 200) {
+        setOfficers(response.data.data.dnoList);
+        setTotalCount(response.data.data.dnoCount);
+      }
+    } catch (error) {
+      log(
+        LogLevel.ERROR,
+        "DistrictNodalOfficersList :: getDnoList :: Error fetching dno list",
+        error,
+      );
+    }
+  };
+
+  useEffect(() => {
+    getDnoList();
+  }, [currentPage, searchFilter, pageSize, selectedState]);
+
+  useEffect(() => {
+    getStatesList();
+  }, []);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -242,7 +245,7 @@ const DistrictNodalOfficersList = () => {
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] text-sm"
-                placeholder="Search for DNO / District"
+                placeholder="Search for DNO by name or state or district"
                 onChange={(e) => debouncedHandleSearch(e.target.value)}
               />
               <img
@@ -255,18 +258,23 @@ const DistrictNodalOfficersList = () => {
             {/* State Filter */}
             <div className="relative col-span-12 sm:col-span-6 lg:col-span-6 flex justify-end">
               <select
-                value={filterState}
+                value={selectedState}
                 onChange={(e) => {
-                  setFilterState(e.target.value);
+                  setSelectedState(e.target.value);
                   setCurrentPage(1);
                 }}
                 className="px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm w-full md:w-48"
               >
-                <option>Uttar Pradesh</option>
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
-                <option>Tamil Nadu</option>
-                <option>West Bengal</option>
+                {stateList && stateList.length > 0 && (
+                  <>
+                    <option value="">All States</option>
+                    {stateList.map((state: any, index) => (
+                      <option key={index} value={state.state_id}>
+                        {state.state_name}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
             </div>
           </div>
@@ -276,9 +284,6 @@ const DistrictNodalOfficersList = () => {
             <table className="w-full min-w-max border-collapse">
               <thead style={{ backgroundColor: "#F9FAFB" }}>
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    District Name
-                  </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Nodal Officer Name
                   </th>
@@ -291,30 +296,39 @@ const DistrictNodalOfficersList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Mobile No
                   </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                    State Name
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                    District Name
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedOfficers.length > 0 ? (
-                  paginatedOfficers.map((officer, index) => (
+                {officers.length > 0 ? (
+                  officers.map((officer: any, index) => (
                     <tr
                       key={index}
                       onClick={() => setSelectedOfficer(officer)}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0 cursor-pointer"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.districtName}
+                        {officer.display_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.officerName}
+                        {officer.role_name}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.designation}
+                        {officer.email_id}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.email}
+                        {officer.mobile_number}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {officer.mobileNo}
+                        {officer.state_name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        {officer.district_name}
                       </td>
                     </tr>
                   ))
@@ -388,12 +402,16 @@ const DistrictNodalOfficersList = () => {
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>200</option>
-                <option>50</option>
-                <option>100</option>
+              <select
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+              >
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
-              of <span className="font-semibold">{totalCount}</span> items
+              of <span className="font-semibold">{officers?.length}</span> items
             </div>
           </div>
         </div>

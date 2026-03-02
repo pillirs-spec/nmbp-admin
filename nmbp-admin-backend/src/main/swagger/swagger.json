@@ -1241,21 +1241,64 @@
           {
             "name": "body",
             "in": "body",
-            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "pageSize": {
-                  "type": "number",
-                  "example": 10
+                  "example": "any"
                 },
                 "currentPage": {
-                  "type": "number",
-                  "example": 1
+                  "example": "any"
+                },
+                "selectedState": {
+                  "example": "any"
                 },
                 "searchFilter": {
-                  "type": "string",
-                  "example": "Admin"
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dno_list": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get DNO List",
+        "description": "Retrieve a list of DNOs. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "example": "any"
+                },
+                "currentPage": {
+                  "example": "any"
+                },
+                "selectedState": {
+                  "example": "any"
+                },
+                "searchFilter": {
+                  "example": "any"
                 }
               }
             }

@@ -19,6 +19,11 @@ interface Officer {
   mobile_number: string;
 }
 
+interface IStates {
+  state_id: string;
+  state_name: string;
+}
+
 const StateNodalOfficersList = () => {
   const [officers, setOfficers] = useState<Officer[]>([]);
   const [selectedState, setSelectedState] = useState<string>("");
@@ -27,8 +32,8 @@ const StateNodalOfficersList = () => {
   const [searchFilter, setSearchFilter] = useState<string>("");
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
-
-  const pageSize = 10;
+  const [stateList, setStateList] = useState<string[]>([]);
+  const [pageSize, setPageSize] = useState<number>(10);
   const { log } = useLogger();
 
   // useEffect(() => {
@@ -101,6 +106,7 @@ const StateNodalOfficersList = () => {
       const payload = {
         pageSize,
         currentPage,
+        selectedState,
         searchFilter,
       };
       const response =
@@ -108,6 +114,7 @@ const StateNodalOfficersList = () => {
       log(LogLevel.INFO, "StateNodalOfficersList :: getSnoList", response.data);
       if (response.status === 200) {
         setOfficers(response.data.data.snoList);
+        setTotalCount(response.data.data.snoCount);
       }
     } catch (error) {
       log(
@@ -118,11 +125,33 @@ const StateNodalOfficersList = () => {
     }
   };
 
+  const getStatesList = async () => {
+    try {
+      const response = await nodalOfficersService.getStatesList();
+      log(
+        LogLevel.INFO,
+        "StateNodalOfficersList :: getStatesList",
+        response.data,
+      );
+      if (response.status === 200) {
+        setStateList(response.data.data);
+      }
+    } catch (error) {
+      log(
+        LogLevel.ERROR,
+        "StateNodalOfficersList :: getStatesList :: Error fetching states list",
+        error,
+      );
+    }
+  };
+
   useEffect(() => {
     getSnoList();
   }, [currentPage, searchFilter, pageSize, selectedState]);
 
-  console.log("Officers:", officers);
+  useEffect(() => {
+    getStatesList();
+  }, []);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -216,7 +245,7 @@ const StateNodalOfficersList = () => {
               <input
                 type="search"
                 className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] text-sm"
-                placeholder="Search for SNO / District"
+                placeholder="Search for SNO by name or state or district"
                 onChange={(e) => debouncedHandleSearch(e.target.value)}
               />
               <img
@@ -236,11 +265,16 @@ const StateNodalOfficersList = () => {
                 }}
                 className="px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm w-full md:w-48"
               >
-                <option value={1}>Andhra Pradesh</option>
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
-                <option>Tamil Nadu</option>
-                <option>West Bengal</option>
+                {stateList && stateList.length > 0 && (
+                  <>
+                    <option value="">All States</option>
+                    {stateList.map((state: any, index) => (
+                      <option key={index} value={state.state_id}>
+                        {state.state_name}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
             </div>
           </div>
@@ -368,12 +402,16 @@ const StateNodalOfficersList = () => {
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>200</option>
+              <select
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+              >
+                <option>10</option>
                 <option>50</option>
                 <option>100</option>
               </select>
-              of <span className="font-semibold">{totalCount}</span> items
+              of <span className="font-semibold">{officers?.length}</span> items
             </div>
           </div>
         </div>

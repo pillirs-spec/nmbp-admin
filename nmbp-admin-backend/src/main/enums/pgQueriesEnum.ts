@@ -151,7 +151,7 @@ export enum AdminQueries {
       SELECT role_id 
       FROM m_roles 
       WHERE role_name = 'State Nodal Officer'
-  )
+  ) 
   AND (
       u.display_name ILIKE '%' || $3 || '%'
       OR s.state_name ILIKE '%' || $3 || '%'
@@ -160,4 +160,72 @@ export enum AdminQueries {
   ORDER BY u.date_updated DESC
   LIMIT $1 OFFSET $2
 `,
+
+  SNO_COUNT = `
+    SELECT COUNT(*) as count
+    FROM m_users u
+    LEFT JOIN m_states s ON u.state_id = s.state_id
+    LEFT JOIN m_districts d ON u.district_id = d.district_id
+    LEFT JOIN m_roles r ON u.role_id = r.role_id
+    WHERE r.role_name = 'State Nodal Officer'
+    AND (
+      u.display_name ILIKE '%' || $1 || '%'
+      OR s.state_name ILIKE '%' || $1 || '%'
+      OR d.district_name ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_SNO_COUNT = `
+    SELECT COUNT(*) as count FROM m_users u
+    LEFT JOIN m_roles r ON u.role_id = r.role_id
+    WHERE r.role_name = 'State Nodal Officer'
+   `,
+
+  GET_DNO_LIST = `
+  SELECT 
+    u.user_id,
+    u.display_name,
+    u.mobile_number,
+    u.email_id,
+    s.state_name,
+    d.district_name,
+    r.role_name,
+    u.date_updated
+  FROM m_users u
+  INNER JOIN m_roles r ON u.role_id = r.role_id
+  LEFT JOIN m_states s ON u.state_id = s.state_id
+  LEFT JOIN m_districts d ON u.district_id = d.district_id
+  WHERE u.role_id = (
+      SELECT role_id 
+      FROM m_roles 
+      WHERE role_name = 'District Nodal Officer'
+  ) 
+  AND (
+      u.display_name ILIKE '%' || $3 || '%'
+      OR s.state_name ILIKE '%' || $3 || '%'
+      OR d.district_name ILIKE '%' || $3 || '%'
+  )
+  ORDER BY u.date_updated DESC
+  LIMIT $1 OFFSET $2
+`,
+
+  DNO_COUNT = `
+    SELECT COUNT(*) as count
+    FROM m_users u
+    LEFT JOIN m_states s ON u.state_id = s.state_id
+    LEFT JOIN m_districts d ON u.district_id = d.district_id
+    LEFT JOIN m_roles r ON u.role_id = r.role_id
+    WHERE r.role_name = 'District Nodal Officer'
+    AND (
+      u.display_name ILIKE '%' || $1 || '%'
+      OR s.state_name ILIKE '%' || $1 || '%'
+      OR d.district_name ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_DNO_COUNT = `
+    SELECT COUNT(*) as count FROM m_users u
+    LEFT JOIN m_roles r ON u.role_id = r.role_id
+    WHERE r.role_name = 'District Nodal Officer'
+   `,
 }

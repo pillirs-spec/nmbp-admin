@@ -86,8 +86,9 @@ const adminRepository = {
     pageSize: number,
     currentPage: number,
     searchFilter: string,
+    selectedState: number,
   ) => {
-    const logPrefix = `adminRepository :: getSnoList`;
+    const logPrefix = `adminRepository :: getSnoList :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState}`;
     try {
       const _query = {
         text: pgQueries.AdminQueries.GET_SNO_LIST,
@@ -99,6 +100,105 @@ const adminRepository = {
       logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
 
       return result.length ? result : [];
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  snoCount: async (searchFilter: string) => {
+    const logPrefix = `adminRepository :: snoCount :: searchFilter :: ${searchFilter}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.SNO_COUNT,
+        values: [searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  totalSnoCount: async () => {
+    const logPrefix = `adminRepository :: totalSnoCount`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.TOTAL_SNO_COUNT,
+        values: [],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getDnoList: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+    selectedState: number,
+  ) => {
+    const logPrefix = `adminRepository :: getDnoList :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.GET_DNO_LIST,
+        values: [pageSize, currentPage, searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result : [];
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+  dnoCount: async (searchFilter: string) => {
+    const logPrefix = `adminRepository :: dnoCount :: searchFilter :: ${searchFilter}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.DNO_COUNT,
+        values: [searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  totalDnoCount: async () => {
+    const logPrefix = `adminRepository :: totalDnoCount`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.TOTAL_DNO_COUNT,
+        values: [],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
       throw new Error(error.message);

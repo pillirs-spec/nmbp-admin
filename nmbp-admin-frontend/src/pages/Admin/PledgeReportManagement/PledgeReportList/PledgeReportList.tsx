@@ -349,12 +349,13 @@ const PledgeReportList = () => {
                 }}
               >
                 <option value={10}>10</option>
-                <option value={20}>20</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
               </select>
               of{" "}
-              <span className="font-medium text-[#374151]">{totalCount}</span>{" "}
+              <span className="font-medium text-[#374151]">
+                {pledges?.length}
+              </span>{" "}
               items
             </div>
           </div>
