@@ -217,7 +217,13 @@ const Header: React.FC = () => {
                       </div>
                     </div>
                   </HoverCard.Target>
-                  <HoverCard.Dropdown>
+                  <HoverCard.Dropdown
+                    mt={15}
+                    style={{
+                      border: "1px solid #c5c6d4",
+                      borderRadius: "8px",
+                    }}
+                  >
                     <div
                       className="cursor-pointer pb-2 font-medium text-[#003366] hover:text-[#1573d1] transition"
                       onClick={() => setOpenedProfile(true)}
