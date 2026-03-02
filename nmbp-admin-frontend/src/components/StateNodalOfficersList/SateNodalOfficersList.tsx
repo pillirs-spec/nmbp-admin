@@ -267,7 +267,7 @@ const StateNodalOfficersList = () => {
               >
                 {stateList && stateList.length > 0 && (
                   <>
-                    <option value="">All States</option>
+                    <option value="0">All States</option>
                     {stateList.map((state: any, index) => (
                       <option key={index} value={state.state_id}>
                         {state.state_name}
@@ -335,10 +335,10 @@ const StateNodalOfficersList = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan={5}
-                      className="px-6 py-8 text-center text-[#374151] font-semibold"
+                      colSpan={12}
+                      className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                     >
-                      No Data Found
+                      No data found
                     </td>
                   </tr>
                 )}

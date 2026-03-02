@@ -92,7 +92,7 @@ const adminRepository = {
     try {
       const _query = {
         text: pgQueries.AdminQueries.GET_SNO_LIST,
-        values: [pageSize, currentPage, searchFilter],
+        values: [pageSize, currentPage, searchFilter, selectedState],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
 
@@ -154,7 +154,7 @@ const adminRepository = {
     try {
       const _query = {
         text: pgQueries.AdminQueries.GET_DNO_LIST,
-        values: [pageSize, currentPage, searchFilter],
+        values: [pageSize, currentPage, searchFilter, selectedState],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
 

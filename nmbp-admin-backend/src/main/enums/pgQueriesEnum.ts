@@ -152,6 +152,7 @@ export enum AdminQueries {
       FROM m_roles 
       WHERE role_name = 'State Nodal Officer'
   ) 
+  AND ($4 = 0 OR u.state_id = $4)
   AND (
       u.display_name ILIKE '%' || $3 || '%'
       OR s.state_name ILIKE '%' || $3 || '%'
@@ -199,7 +200,7 @@ export enum AdminQueries {
       SELECT role_id 
       FROM m_roles 
       WHERE role_name = 'District Nodal Officer'
-  ) 
+  ) AND ($4 = 0 OR u.state_id = $4)
   AND (
       u.display_name ILIKE '%' || $3 || '%'
       OR s.state_name ILIKE '%' || $3 || '%'
