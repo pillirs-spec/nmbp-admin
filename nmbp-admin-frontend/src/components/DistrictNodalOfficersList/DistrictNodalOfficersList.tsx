@@ -5,18 +5,21 @@ import ExcelIcon from "../../assets/excel.svg";
 import PrintIcon from "../../assets/print.svg";
 import CopyIcon from "../../assets/copy.svg";
 import PDFIcon from "../../assets/pdf.svg";
-import { useLogger } from "../../hooks";
-import { LogLevel } from "../../enums";
+import { useLogger, useToast } from "../../hooks";
+import { LogLevel, ToastType } from "../../enums";
 import nodalOfficersService from "../../pages/Admin/NodalOfficersManagement/NodalOfficersList/nodalOfficersService";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Officer {
   id: string;
-  stateName: string;
-  districtName: string;
-  officerName: string;
+  state_name: string;
+  district_name: string;
+  display_name: string;
   designation: string;
-  email: string;
-  mobileNo: string;
+  email_id: string;
+  mobile_number: string;
   contactEmail: string;
 }
 
@@ -31,6 +34,7 @@ const DistrictNodalOfficersList = () => {
   const [stateList, setStateList] = useState<any[]>([]);
   const [pageSize, setPageSize] = useState<number>(10);
   const { log } = useLogger();
+  const { showToast } = useToast();
 
   // useEffect(() => {
   //   try {
@@ -65,30 +69,229 @@ const DistrictNodalOfficersList = () => {
   };
 
   const handleExportCopy = () => {
-    console.log("Copy data");
+    handleCopy();
     setShowExportModal(false);
   };
 
   const handleExportPDF = () => {
-    console.log("Export to PDF");
+    handleExportToPDF();
     setShowExportModal(false);
   };
 
   const handleExportPrint = () => {
-    console.log("Print data");
+    handlePrint();
     setShowExportModal(false);
   };
 
   const handleExportExcel = () => {
-    console.log("Export to Excel");
+    handleExportCSV();
     setShowExportModal(false);
   };
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  // const startIndex = (currentPage - 1) * pageSize;
-  // const endIndex = Math.min(startIndex + pageSize, officers.length);
-  // const paginatedOfficers = officers.slice(startIndex, endIndex);
+  const handleExportToPDF = () => {
+    if (!officers || officers.length === 0) {
+      showToast("No data available to export", "Error", ToastType.ERROR);
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(14);
+    doc.text("District Nodal Officer List", 14, 15);
+
+    // Table Columns
+    const tableColumn = [
+      "Name",
+      "Mobile Number",
+      "Email ID",
+      "State",
+      "District",
+    ];
+
+    // Table Rows
+    const tableRows = officers.map((dno: any) => [
+      dno.display_name,
+      dno.mobile_number,
+      dno.email_id,
+      dno.state_name,
+      dno.district_name,
+    ]);
+
+    // Generate Table
+    autoTable(doc, {
+      startY: 20,
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    // Download
+    doc.save("dno_list.pdf");
+  };
+
+  const handleExportCSV = () => {
+    if (!officers || officers.length === 0) {
+      showToast("No data available to export", "Error", ToastType.ERROR);
+      return;
+    }
+
+    // Define CSV headers
+    const headers = ["Name", "Mobile Number", "Email ID", "State", "District"];
+
+    // Convert data to CSV rows
+    const rows = officers.map((dno) => [
+      dno.display_name,
+      dno.mobile_number,
+      dno.email_id,
+      dno.state_name,
+      dno.district_name,
+    ]);
+
+    // Combine headers + rows
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    // Create Blob
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    // Download file
+    saveAs(blob, "DNO_List.csv");
+  };
+
+  const handlePrint = () => {
+    if (!officers || officers.length === 0) {
+      showToast("No data available to print", "Error", ToastType.ERROR);
+      return;
+    }
+
+    const tableRows = officers
+      .map(
+        (dno) => `
+      <tr>
+        <td>${dno.display_name}</td>
+        <td>${dno.mobile_number}</td>
+        <td>${dno.email_id}</td>
+        <td>${dno.state_name}</td>
+        <td>${dno.district_name}</td>
+       
+      </tr>
+    `,
+      )
+      .join("");
+
+    const printWindow = window.open("", "", "width=1000,height=700");
+
+    if (!printWindow) {
+      showToast("Unable to open print window", "Error", ToastType.ERROR);
+      return;
+    }
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>District Nodal Officer List</title>
+        <style>
+          body { font-family: Arial; padding: 20px; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+          th { background-color: #003366; color: white; }
+        </style>
+      </head>
+      <body>
+        <h2>District Nodal Officer List</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Email</th>
+              <th>State</th>
+              <th>District</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `);
+
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const handleCopy = async () => {
+    if (!officers || officers.length === 0) {
+      showToast("No data available to copy", "Error", ToastType.ERROR);
+      return;
+    }
+
+    try {
+      const headers = ["Name", "Mobile", "Email", "State", "District"];
+      const plainTextData = [
+        headers.join("\t"),
+        ...officers.map((dno) =>
+          [
+            dno.display_name,
+            dno.mobile_number,
+            dno.email_id,
+            dno.state_name,
+            dno.district_name,
+          ].join("\t"),
+        ),
+      ].join("\n");
+
+      const tableRows = officers
+        .map(
+          (dno) => `
+      <tr>
+        <td>${dno.display_name}</td>
+        <td>${dno.mobile_number}</td>
+        <td>${dno.email_id}</td>
+        <td>${dno.state_name}</td>
+        <td>${dno.district_name}</td>
+       
+      </tr>
+    `,
+        )
+        .join("");
+
+      const htmlTable = `
+    <table border="1" style="border-collapse: collapse; font-family: Arial;">
+      <thead>
+        <tr style="background-color:#003366; color:white;">
+          <th>Name</th>
+          <th>Mobile</th>
+          <th>Email</th>
+          <th>State</th>
+          <th>District</th>
+        
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+  `;
+
+      // Copy both formats
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([htmlTable], { type: "text/html" }),
+          "text/plain": new Blob([plainTextData], { type: "text/plain" }),
+        }),
+      ]);
+
+      showToast("Table copied successfully!", "Success", ToastType.SUCCESS);
+    } catch (error) {
+      log(LogLevel.ERROR, "Error copying to clipboard", error);
+      showToast("Failed to copy data", "Error", ToastType.ERROR);
+    }
+  };
 
   const getStatesList = async () => {
     try {
@@ -192,7 +395,7 @@ const DistrictNodalOfficersList = () => {
         </div>
 
         {/* Selected Officer Info Card */}
-        {selectedOfficer && (
+        {/* {selectedOfficer && (
           <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
@@ -200,7 +403,7 @@ const DistrictNodalOfficersList = () => {
                   State Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.stateName}
+                  {selectedOfficer.state_name}
                 </p>
               </div>
               <div>
@@ -208,7 +411,7 @@ const DistrictNodalOfficersList = () => {
                   District Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.districtName}
+                  {selectedOfficer.district_name}
                 </p>
               </div>
               <div>
@@ -216,7 +419,7 @@ const DistrictNodalOfficersList = () => {
                   Officer Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.officerName}
+                  {selectedOfficer.display_name}
                 </p>
               </div>
               <div>
@@ -230,12 +433,12 @@ const DistrictNodalOfficersList = () => {
                   Contact Number
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.mobileNo}
+                  {selectedOfficer.mobile_number}
                 </p>
               </div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Table Container */}
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
