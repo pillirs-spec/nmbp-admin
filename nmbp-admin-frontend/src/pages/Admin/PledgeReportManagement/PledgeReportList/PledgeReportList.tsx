@@ -7,6 +7,9 @@ import PledgeContributionIcon from "../../../../assets/total_pledge.svg";
 import { pledgeReportService } from "./pledgeReportService";
 import usersListService from "../../UserManagement/UserList/usersListService";
 import { IconFilter } from "@tabler/icons-react";
+import { DatePickerInput } from "@mantine/dates";
+import "@mantine/dates/styles.css";
+import dayjs from "dayjs";
 
 interface Pledge {
   id: number;
@@ -35,9 +38,14 @@ const PledgeReportList = () => {
   const [districts, setDistricts] = useState<
     { label: string; value: string }[]
   >([{ label: "Select District", value: "" }]);
-  const [dateRange, setDateRange] = useState("");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
   const [selectedState, setSelectedState] = useState<string>("");
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const { log } = useLogger();
   const { showToast } = useToast();
 
@@ -63,7 +71,7 @@ const PledgeReportList = () => {
         searchFilter: searchQuery,
         selectedState,
         selectedDistrict,
-        dateRange: dateRange,
+        dateRange: startDate && endDate ? `${startDate},${endDate}` : "",
       };
       const response = await pledgeReportService.getAllPledgesList(payload);
       log(LogLevel.INFO, "PledgeReportList :: getPledgesList", response.data);
@@ -119,14 +127,13 @@ const PledgeReportList = () => {
 
   useEffect(() => {
     getPledgesList();
-  }, [
-    pageSize,
-    currentPage,
-    searchQuery,
-    selectedState,
-    selectedDistrict,
-    dateRange,
-  ]);
+  }, [pageSize, currentPage, searchQuery, selectedState, selectedDistrict]);
+
+  useEffect(() => {
+    if ((startDate && endDate) || (!startDate && !endDate)) {
+      getPledgesList();
+    }
+  }, [startDate, endDate]);
 
   useEffect(() => {
     listStates();
@@ -137,6 +144,14 @@ const PledgeReportList = () => {
       listDistrictsByStateId(selectedState);
     }
   }, [selectedState]);
+
+  const handleDateChange = (date: [Date | null, Date | null]) => {
+    setDateRange(date);
+    const fromDate = date[0] ? dayjs(date[0]).format("YYYY-MM-DD") : "";
+    const toDate = date[1] ? dayjs(date[1]).format("YYYY-MM-DD") : "";
+    setStartDate(fromDate);
+    setEndDate(toDate);
+  };
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -256,12 +271,14 @@ const PledgeReportList = () => {
               </select>
             </div>
             <div className="relative col-span-12 md:col-span-6 lg:col-span-2">
-              <input
-                type="date"
+              <DatePickerInput
+                type="range"
                 value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
-                className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md bg-white text-[#6B7280] cursor-pointer text-sm focus:border-[#003366] transition"
-                placeholder="Start Date"
+                onChange={(e) => handleDateChange(e)}
+                placeholder="Select date range"
+                className="w-full"
+                clearable
+                maxDate={new Date()}
               />
             </div>
             <div className="relative col-span-12 md:col-span-6 lg:col-span-1 border border-red-500 rounded-md flex items-center justify-center py-2 cursor-pointer">
@@ -271,7 +288,9 @@ const PledgeReportList = () => {
                 onClick={() => {
                   setSelectedState("");
                   setSelectedDistrict("");
-                  setDateRange("");
+                  setDateRange([null, null]);
+                  setStartDate("");
+                  setEndDate("");
                 }}
               />
             </div>

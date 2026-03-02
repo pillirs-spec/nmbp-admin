@@ -1210,7 +1210,19 @@
                 },
                 "searchFilter": {
                   "type": "string",
-                  "example": "Admin"
+                  "example": "Kiran Kumar"
+                },
+                "selectedState": {
+                  "type": "number",
+                  "example": 1
+                },
+                "selectedDistrict": {
+                  "type": "number",
+                  "example": 1
+                },
+                "dateRange": {
+                  "type": "string",
+                  "example": "2024-01-01"
                 }
               }
             }

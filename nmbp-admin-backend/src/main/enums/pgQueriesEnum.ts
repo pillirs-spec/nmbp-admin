@@ -108,10 +108,20 @@ export enum AdminQueries {
       u.full_name ILIKE '%' || $3 || '%'
       OR s.state_name ILIKE '%' || $3 || '%'
       OR d.district_name ILIKE '%' || $3 || '%'
-    ) AND ($4 = 0 OR u.state_id = $4 ) AND ($5 = 0 OR u.district_id = $5) AND ($6 = '' OR u.date_updated >= $6::date)
+    )
+    AND ($4 = 0 OR u.state_id = $4 )
+    AND ($5 = 0 OR u.district_id = $5)
+    AND (
+      $6 = '' 
+      OR (
+          u.date_updated >= split_part($6, ',', 1)::date
+          AND
+          u.date_updated < (split_part($6, ',', 2)::date + INTERVAL '1 day')
+      )
+    )
     ORDER BY u.date_updated DESC
     LIMIT $1 OFFSET $2
-  `,
+`,
 
   PLEDGE_COUNT = `
     SELECT COUNT(*) as count
