@@ -11,4 +11,6 @@ adminRouter.post("/sno_list", adminController.getSnoList);
 
 adminRouter.post("/dno_list", adminController.getDnoList);
 
+adminRouter.post("/add_documents", adminController.addDocuments);
+
 export default adminRouter;

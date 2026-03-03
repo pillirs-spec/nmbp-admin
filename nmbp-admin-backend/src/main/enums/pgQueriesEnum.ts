@@ -239,4 +239,24 @@ export enum AdminQueries {
     LEFT JOIN m_roles r ON u.role_id = r.role_id
     WHERE r.role_name = 'District Nodal Officer'
    `,
+
+  CREATE_DOCUMENTS_TABLE = `
+    CREATE TABLE IF NOT EXISTS t_documents (
+      document_id VARCHAR(255) PRIMARY KEY,
+      document_name VARCHAR(255) NOT NULL,
+      file_url TEXT NOT NULL,
+      file_type VARCHAR(100),
+      file_size INTEGER,
+      created_by INTEGER NOT NULL,
+      updated_by INTEGER,
+      date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `,
+
+  ADD_DOCUMENT = `
+    INSERT INTO t_documents(document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated) 
+    VALUES ($1, $2, $3, $4, $4, $5, $6, NOW(), NOW())
+    RETURNING document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated
+  `,
 }

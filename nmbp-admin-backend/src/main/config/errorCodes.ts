@@ -49,6 +49,25 @@ const users = {
   },
 };
 
+const documents = {
+  DOCUMENTS00000: {
+    errorCode: "DOCUMENTS00000",
+    errorMessage: "Internal Server Error",
+  },
+  DOCUMENTS00001: {
+    errorCode: "DOCUMENTS00001",
+    errorMessage: "Document name is required!",
+  },
+  DOCUMENTS00002: {
+    errorCode: "DOCUMENTS00002",
+    errorMessage: "File is required!",
+  },
+  DOCUMENTS00003: {
+    errorCode: "DOCUMENTS00003",
+    errorMessage: "File size should not exceed 10MB!",
+  },
+};
+
 const activities = {
   ACTIVITIES00000: {
     errorCode: "ACTIVITIES00000",
@@ -247,4 +266,5 @@ export {
   formBuilder,
   states,
   activities,
+  documents,
 };

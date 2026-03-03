@@ -1313,7 +1313,7 @@
                 },
                 "searchFilter": {
                   "type": "string",
-                  "example": "Admin"
+                  "example": "Venkatesh"
                 },
                 "selectedState": {
                   "type": "number",
@@ -1367,6 +1367,58 @@
                 "selectedState": {
                   "type": "number",
                   "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/add_documents": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Add Documents",
+        "description": "Upload documents to the system. Supports PDF, CSV, Excel (xlsx, xls), and JPEG files with maximum 10 MB file size. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "document_name",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Name of the document (3-255 characters)"
+          },
+          {
+            "name": "file",
+            "in": "formData",
+            "type": "file",
+            "required": true,
+            "description": "Document file (PDF, CSV, Excel, JPEG - max 10 MB)"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "document_name": {
+                  "example": "any"
                 }
               }
             }

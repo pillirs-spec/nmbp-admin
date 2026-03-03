@@ -3,6 +3,8 @@ import { Request } from "../../types/express";
 import { STATUS, logger } from "ts-commons";
 import { errorCodes } from "../../config";
 import { adminService } from "../services";
+import { adminValidations } from "../validations";
+import { v4 as uuidv4 } from "uuid";
 
 const adminController = {
   health: (req: Request, res: Response): Response => {
@@ -195,6 +197,88 @@ const adminController = {
       return res
         .status(STATUS.INTERNAL_SERVER_ERROR)
         .send(errorCodes.roles.ROLE00000);
+    }
+  },
+
+  addDocuments: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: addDocuments`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Add Documents'
+                #swagger.description = 'Upload documents to the system. Supports PDF, CSV, Excel (xlsx, xls), and JPEG files with maximum 10 MB file size. Requires authentication.'
+                #swagger.consumes = ['multipart/form-data']
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['document_name'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: true,
+                    description: 'Name of the document (3-255 characters)'
+                }
+                #swagger.parameters['file'] = {
+                    in: 'formData',
+                    type: 'file',
+                    required: true,
+                    description: 'Document file (PDF, CSV, Excel, JPEG - max 10 MB)'
+                }
+            */
+      const userId = req.plainToken.user_id;
+      const document_id = uuidv4();
+      const { document_name } = req.body;
+      const file = req.files?.file as any;
+      const file_type = file?.mimetype || "";
+      const file_size = file?.size || 0;
+      const documents = {
+        document_id,
+        document_name,
+        file,
+      };
+
+      const { error } = adminValidations.validateDocument(documents);
+      if (error) {
+        if (error.details != null)
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.documents.DOCUMENTS00001.errorCode,
+            errorMessage: error.details[0].message,
+          });
+        else
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.documents.DOCUMENTS00001.errorCode,
+            errorMessage: error.message,
+          });
+      }
+
+      if (!document_name || !file) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          data: null,
+          message:
+            "Missing required fields: documentType, documentUrl, associatedPledgeId",
+        });
+      }
+
+      await adminService.addDocuments(
+        document_id,
+        document_name,
+        file,
+        userId,
+        file_type,
+        file_size,
+      );
+
+      return res.status(STATUS.OK).send({
+        data: null,
+        message: "Document added successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res
+        .status(STATUS.INTERNAL_SERVER_ERROR)
+        .send(errorCodes.documents.DOCUMENTS00000);
     }
   },
 };

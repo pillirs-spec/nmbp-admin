@@ -214,6 +214,48 @@ const adminRepository = {
       throw new Error(error.message);
     }
   },
+
+  addDocument: async (
+    document_id: string,
+    document_name: string,
+    file: string,
+    userId: number,
+    file_type: string,
+    file_size: number,
+  ) => {
+    const logPrefix = `adminRepository :: addDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file :: ${file} :: file_type :: ${file_type} :: file_size :: ${file_size} :: userId :: ${userId}`;
+    try {
+      // First, ensure the table exists
+      const createTableQuery = {
+        text: pgQueries.AdminQueries.CREATE_DOCUMENTS_TABLE,
+        values: [],
+      };
+      await pg.executeQueryPromise(createTableQuery);
+      logger.debug(`${logPrefix} :: Table created/verified`);
+
+      // Then insert the document
+      const _query = {
+        text: pgQueries.AdminQueries.ADD_DOCUMENT,
+        values: [
+          document_id,
+          document_name,
+          file,
+          userId,
+          file_type,
+          file_size,
+        ],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0] : null;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminRepository;

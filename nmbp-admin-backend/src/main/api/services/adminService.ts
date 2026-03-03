@@ -2,6 +2,8 @@ import { STATUS, logger, redis } from "ts-commons";
 import { adminRepository } from "../repositories";
 import { redisKeysFormatter } from "../../helpers";
 import { CacheTTL, pgQueries, RedisKeys } from "../../enums";
+import { IDocument } from "../../types/custom";
+import { uploadToS3 } from "../../config/uploadToS3";
 
 const adminService = {
   getPledges: async (
@@ -391,6 +393,35 @@ const adminService = {
     } catch (error) {
       logger.error(
         `${logPrefix} :: Error counting total DNOs :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  addDocuments: async (
+    document_id: string,
+    document_name: string,
+    file: string,
+    userId: number,
+    file_type: string,
+    file_size: number,
+  ) => {
+    const logPrefix = `adminService :: addDocuments :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file_type :: ${file_type} :: file_size :: ${file_size} :: userId :: ${userId}`;
+    try {
+      logger.info(`${logPrefix} :: Adding document to database`);
+      const addedDocument = await uploadToS3(file, userId, document_name);
+      await adminRepository.addDocument(
+        document_id,
+        document_name,
+        addedDocument,
+        userId,
+        file_type,
+        file_size,
+      );
+      return addedDocument;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error adding document :: ${error.message} :: ${error}`,
       );
       throw error;
     }
