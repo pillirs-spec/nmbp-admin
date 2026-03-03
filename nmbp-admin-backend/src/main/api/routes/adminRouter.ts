@@ -13,4 +13,13 @@ adminRouter.post("/dno_list", adminController.getDnoList);
 
 adminRouter.post("/add_documents", adminController.addDocuments);
 
+adminRouter.post("/documents/list", adminController.listDocuments);
+
+adminRouter.get("/documents/:document_id", adminController.getDocumentById);
+
+adminRouter.get(
+  "/documents/:document_id/download",
+  adminController.downloadDocument,
+);
+
 export default adminRouter;

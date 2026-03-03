@@ -3,7 +3,7 @@ import { adminRepository } from "../repositories";
 import { redisKeysFormatter } from "../../helpers";
 import { CacheTTL, pgQueries, RedisKeys } from "../../enums";
 import { IDocument } from "../../types/custom";
-import { uploadToS3 } from "../../config/uploadToS3";
+import { uploadToS3, getSignedS3Url } from "../../config/uploadToS3";
 
 const adminService = {
   getPledges: async (
@@ -398,6 +398,66 @@ const adminService = {
     }
   },
 
+  listDocuments: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+  ) => {
+    const logPrefix = `adminService :: listDocuments`;
+    try {
+      logger.info(`${logPrefix} :: Fetching documents from database`);
+      logger.debug(
+        `${logPrefix} :: Parameters:: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
+      );
+
+      const documentsList = await adminRepository.listDocuments(
+        pageSize,
+        currentPage,
+        searchFilter,
+      );
+
+      return documentsList;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error fetching documents :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  documentsCount: async (searchFilter: string) => {
+    const logPrefix = `adminService :: documentsCount`;
+    try {
+      logger.info(`${logPrefix} :: Counting documents in database`);
+      logger.debug(
+        `${logPrefix} :: Parameters :: searchFilter :: ${searchFilter}`,
+      );
+
+      const count = await adminRepository.documentsCount(searchFilter);
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting documents :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  totalDocumentsCount: async () => {
+    const logPrefix = `adminService :: totalDocumentsCount`;
+    try {
+      logger.info(`${logPrefix} :: Counting total documents in database`);
+
+      const count = await adminRepository.totalDocumentsCount();
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting total documents :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
   addDocuments: async (
     document_id: string,
     document_name: string,
@@ -422,6 +482,46 @@ const adminService = {
     } catch (error) {
       logger.error(
         `${logPrefix} :: Error adding document :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  getDocumentById: async (document_id: string) => {
+    const logPrefix = `adminService :: getDocumentById :: document_id :: ${document_id}`;
+    try {
+      logger.info(`${logPrefix} :: Fetching document details from database`);
+      const document = await adminRepository.getDocumentById(document_id);
+      return document;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error fetching document :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  getDocumentDownloadUrl: async (document_id: string) => {
+    const logPrefix = `adminService :: getDocumentDownloadUrl :: document_id :: ${document_id}`;
+    try {
+      logger.info(
+        `${logPrefix} :: Fetching document and generating download URL`,
+      );
+      const document = await adminRepository.getDocumentById(document_id);
+
+      if (!document) {
+        logger.warn(`${logPrefix} :: Document not found`);
+        return null;
+      }
+
+      const downloadUrl = await getSignedS3Url(document.file_url, 300); // 5 minutes validity
+      logger.info(
+        `${logPrefix} :: Download URL generated successfully for file: ${document.file_url}`,
+      );
+      return downloadUrl;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error generating download URL :: ${error.message} :: ${error}`,
       );
       throw error;
     }

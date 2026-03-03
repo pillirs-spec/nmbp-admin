@@ -259,4 +259,32 @@ export enum AdminQueries {
     VALUES ($1, $2, $3, $4, $4, $5, $6, NOW(), NOW())
     RETURNING document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated
   `,
+
+  GET_DOCUMENT_BY_ID = `
+    SELECT document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated
+    FROM t_documents
+    WHERE document_id = $1
+  `,
+
+  LIST_DOCUMENTS = `
+    SELECT document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated
+    FROM t_documents
+    WHERE (
+      document_name ILIKE '%' || $3 || '%'
+    )
+    ORDER BY date_created DESC
+    LIMIT $1 OFFSET $2
+  `,
+
+  DOCUMENTS_COUNT = `
+    SELECT COUNT(*) as count
+    FROM t_documents
+    WHERE (
+      document_name ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_DOCUMENTS_COUNT = `
+    SELECT COUNT(*) as count FROM t_documents
+  `,
 }

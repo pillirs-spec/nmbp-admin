@@ -215,6 +215,67 @@ const adminRepository = {
     }
   },
 
+  listDocuments: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+  ) => {
+    const logPrefix = `adminRepository :: listDocuments :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.LIST_DOCUMENTS,
+        values: [pageSize, currentPage, searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result : [];
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  documentsCount: async (searchFilter: string) => {
+    const logPrefix = `adminRepository :: documentsCount :: searchFilter :: ${searchFilter}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.DOCUMENTS_COUNT,
+        values: [searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  totalDocumentsCount: async () => {
+    const logPrefix = `adminRepository :: totalDocumentsCount`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.TOTAL_DOCUMENTS_COUNT,
+        values: [],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
   addDocument: async (
     document_id: string,
     document_name: string,
@@ -244,6 +305,25 @@ const adminRepository = {
           file_type,
           file_size,
         ],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0] : null;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getDocumentById: async (document_id: string) => {
+    const logPrefix = `adminRepository :: getDocumentById :: document_id :: ${document_id}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.GET_DOCUMENT_BY_ID,
+        values: [document_id],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
 

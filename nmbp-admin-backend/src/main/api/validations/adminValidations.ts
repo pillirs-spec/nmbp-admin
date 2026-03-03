@@ -31,6 +31,27 @@ const adminValidations = {
     });
     return documentSchema.validate(document);
   },
+
+  validateListDocuments: (params: any): Joi.ValidationResult => {
+    const listDocumentsSchema = Joi.object({
+      pageSize: Joi.number()
+        .positive()
+        .default(10)
+        .error(new Error("pageSize must be a positive number")),
+      currentPage: Joi.number()
+        .positive()
+        .default(1)
+        .error(new Error("currentPage must be a positive number")),
+      searchFilter: Joi.string()
+        .max(255)
+        .allow("")
+        .optional()
+        .error(
+          new Error("searchFilter must be a string with max 255 characters"),
+        ),
+    });
+    return listDocumentsSchema.validate(params);
+  },
 };
 
 export default adminValidations;

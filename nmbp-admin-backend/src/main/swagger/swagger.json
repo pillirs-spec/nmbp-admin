@@ -1430,6 +1430,111 @@
           }
         }
       }
+    },
+    "/api/v1/admin/documents/list": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Documents (Paginated)",
+        "description": "Retrieve a paginated list of documents with optional filtering by search term. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "document_name_or_user"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/documents/{document_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Document by ID",
+        "description": "Retrieve document details by document ID. Returns document metadata including file URL.",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/documents/{document_id}/download": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Download Document",
+        "description": "Get a signed download URL for a document. The URL is valid for 5 minutes.",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
     }
   }
 }

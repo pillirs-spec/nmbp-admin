@@ -200,6 +200,66 @@ const adminController = {
     }
   },
 
+  listDocuments: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: listDocuments`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'List Documents (Paginated)'
+                #swagger.description = 'Retrieve a paginated list of documents with optional filtering by search term. Requires authentication.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    required: true,
+                    schema: {
+                        pageSize: 10,
+                        currentPage: 1,
+                        searchFilter: "document_name_or_user"
+                    }
+                }    
+            */
+
+      const pageSize = req.body.pageSize || 10;
+      const currentPage = req.body.currentPage
+        ? (req.body.currentPage - 1) * pageSize
+        : 0;
+      const searchFilter = req.body.searchFilter || "";
+
+      logger.debug(
+        `${logPrefix} :: Parsed parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
+      );
+
+      const documentsList = await adminService.listDocuments(
+        pageSize,
+        currentPage,
+        searchFilter,
+      );
+      const documentsCount = await adminService.documentsCount(searchFilter);
+      const totalDocumentsCount = await adminService.totalDocumentsCount();
+
+      return res.status(STATUS.OK).send({
+        data: {
+          documentsList,
+          documentsCount,
+          totalDocumentsCount,
+          pageSize,
+          currentPage: Math.ceil(currentPage / pageSize) + 1,
+        },
+        message: "Documents fetched successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res
+        .status(STATUS.INTERNAL_SERVER_ERROR)
+        .send(errorCodes.roles.ROLE00000);
+    }
+  },
+
   addDocuments: async (req: Request, res: Response) => {
     const logPrefix = `adminController :: addDocuments`;
     try {
@@ -273,6 +333,110 @@ const adminController = {
       return res.status(STATUS.OK).send({
         data: null,
         message: "Document added successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res
+        .status(STATUS.INTERNAL_SERVER_ERROR)
+        .send(errorCodes.documents.DOCUMENTS00000);
+    }
+  },
+
+  getDocumentById: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: getDocumentById`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Get Document by ID'
+                #swagger.description = 'Retrieve document details by document ID. Returns document metadata including file URL.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['document_id'] = {
+                    in: 'path',
+                    type: 'string',
+                    required: true,
+                    description: 'Document ID'
+                }
+            */
+      const { document_id } = req.params;
+
+      if (!document_id) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          data: null,
+          message: "Missing required field: document_id",
+        });
+      }
+
+      const document = await adminService.getDocumentById(document_id);
+
+      if (!document) {
+        return res.status(STATUS.NOT_FOUND).send({
+          data: null,
+          message: "Document not found",
+        });
+      }
+
+      return res.status(STATUS.OK).send({
+        data: document,
+        message: "Document retrieved successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res
+        .status(STATUS.INTERNAL_SERVER_ERROR)
+        .send(errorCodes.documents.DOCUMENTS00000);
+    }
+  },
+
+  downloadDocument: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: downloadDocument`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Download Document'
+                #swagger.description = 'Get a signed download URL for a document. The URL is valid for 5 minutes.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['document_id'] = {
+                    in: 'path',
+                    type: 'string',
+                    required: true,
+                    description: 'Document ID'
+                }
+            */
+      const { document_id } = req.params;
+
+      if (!document_id) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          data: null,
+          message: "Missing required field: document_id",
+        });
+      }
+
+      const downloadUrl =
+        await adminService.getDocumentDownloadUrl(document_id);
+
+      if (!downloadUrl) {
+        return res.status(STATUS.NOT_FOUND).send({
+          data: null,
+          message: "Document not found or unable to generate download URL",
+        });
+      }
+
+      return res.status(STATUS.OK).send({
+        data: {
+          download_url: downloadUrl,
+          expires_in_seconds: 300,
+        },
+        message: "Download URL generated successfully. Valid for 5 minutes.",
       });
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
