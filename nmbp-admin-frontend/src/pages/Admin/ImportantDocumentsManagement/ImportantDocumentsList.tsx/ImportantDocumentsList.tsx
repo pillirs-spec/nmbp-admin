@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { debounce } from "lodash";
 import searchIcon from "../../../../assets/search-icon.svg";
 import { useNavigate } from "react-router-dom";
+import { importantDocumentService } from "./importantDocumentService";
 
 interface Document {
-  id: string;
-  documentName: string;
-  uploadedOn: string;
-  uploadedBy: string;
-  type: string;
+  document_id: string;
+  document_name: string;
+  date_updated: string;
+  updated_by: string;
 }
 
 const ImportantDocumentsList = () => {
@@ -17,59 +17,8 @@ const ImportantDocumentsList = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(10);
   const navigate = useNavigate();
-
-  const pageSize = 200;
-
-  // Mock data - Replace with actual API call
-  const mockDocuments: Document[] = [
-    {
-      id: "1",
-      documentName: "DO Letter to DNOs",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "letter",
-    },
-    {
-      id: "2",
-      documentName: "SOP for the MyGov Competitions",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "sop",
-    },
-    {
-      id: "3",
-      documentName: "DO Letter Regarding the Competitions on MyGov",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "letter",
-    },
-    {
-      id: "4",
-      documentName: "DO Letters to States and UTs",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "letter",
-    },
-    {
-      id: "5",
-      documentName: "PPT for SNOs and DNOs regarding Dashboard",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "presentation",
-    },
-  ];
-
-  useEffect(() => {
-    try {
-      // Simulate API call - Replace with actual API
-      setDocuments(mockDocuments);
-      setTotalCount(1500); // Mock total count
-    } catch (error) {
-      console.error("Error loading documents:", error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery]);
 
   const handleSearch = (value: string) => {
     if (value.length > 0) {
@@ -83,9 +32,9 @@ const ImportantDocumentsList = () => {
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, documents.length);
-  const paginatedDocuments = documents.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * pageSize;
+  // const endIndex = Math.min(startIndex + pageSize, documents.length);
+  // const paginatedDocuments = documents.slice(startIndex, endIndex);
 
   const handleViewDocument = () => {
     alert("View Document functionality to be implemented");
@@ -94,6 +43,26 @@ const ImportantDocumentsList = () => {
   const handleAddDocument = () => {
     navigate("/important-documents/add");
   };
+
+  const getAllDocumentsList = async () => {
+    try {
+      const payload = {
+        pageSize,
+        currentPage,
+        searchFilter: searchQuery,
+      };
+      const response =
+        await importantDocumentService.getAllDocumentsList(payload);
+      setDocuments(response.data.data.documentsList);
+      setTotalCount(response.data.data.totalDocumentsCount);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllDocumentsList();
+  }, []);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -147,23 +116,27 @@ const ImportantDocumentsList = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedDocuments.length > 0 ? (
-                  paginatedDocuments.map((document, index) => (
+                {documents.length > 0 ? (
+                  documents.map((document) => (
                     <tr
-                      key={index}
+                      key={document.document_id}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">📄</span>
-                          {document.documentName}
+                          {document.document_name}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {document.uploadedOn}
+                        {document.date_updated
+                          .split("T")[0]
+                          .split("-")
+                          .reverse()
+                          .join("-")}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {document.uploadedBy}
+                        {document.updated_by}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151] text-center">
                         <button
@@ -245,12 +218,17 @@ const ImportantDocumentsList = () => {
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>200</option>
+              <select
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+              >
+                <option>10</option>
                 <option>50</option>
                 <option>100</option>
               </select>
-              of <span className="font-semibold">{totalCount}</span> items
+              of <span className="font-semibold">{documents?.length}</span>{" "}
+              items
             </div>
           </div>
         </div>

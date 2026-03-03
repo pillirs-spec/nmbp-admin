@@ -247,8 +247,8 @@ export enum AdminQueries {
       file_url TEXT NOT NULL,
       file_type VARCHAR(100),
       file_size INTEGER,
-      created_by INTEGER NOT NULL,
-      updated_by INTEGER,
+      created_by INT REFERENCES m_users(user_id),
+      updated_by INT REFERENCES m_users(user_id),
       date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
@@ -261,20 +261,46 @@ export enum AdminQueries {
   `,
 
   GET_DOCUMENT_BY_ID = `
-    SELECT document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated
-    FROM t_documents
-    WHERE document_id = $1
-  `,
+  SELECT 
+    t.document_id, 
+    t.document_name, 
+    t.file_url, 
+    t.file_type, 
+    t.file_size, 
+    t.created_by,
+    creator.user_name AS created_by,
+    t.updated_by,
+    updater.user_name AS updated_by,
+    t.date_created, 
+    t.date_updated
+  FROM t_documents t
+  LEFT JOIN m_users creator ON t.created_by = creator.user_id
+  LEFT JOIN m_users updater ON t.updated_by = updater.user_id
+  WHERE t.document_id = $1
+`,
 
   LIST_DOCUMENTS = `
-    SELECT document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated
-    FROM t_documents
-    WHERE (
-      document_name ILIKE '%' || $3 || '%'
-    )
-    ORDER BY date_created DESC
-    LIMIT $1 OFFSET $2
-  `,
+  SELECT 
+    t.document_id, 
+    t.document_name, 
+    t.file_url, 
+    t.file_type, 
+    t.file_size, 
+    t.created_by,
+    creator.display_name AS created_by,
+    t.updated_by,
+    updater.display_name AS updated_by,
+    t.date_created, 
+    t.date_updated
+  FROM t_documents t
+  LEFT JOIN m_users creator ON t.created_by = creator.user_id
+  LEFT JOIN m_users updater ON t.updated_by = updater.user_id
+  WHERE (
+    t.document_name ILIKE '%' || $3 || '%'
+  )
+  ORDER BY t.date_created DESC
+  LIMIT $1 OFFSET $2
+`,
 
   DOCUMENTS_COUNT = `
     SELECT COUNT(*) as count
