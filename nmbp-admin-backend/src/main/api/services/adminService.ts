@@ -403,18 +403,41 @@ const adminService = {
     currentPage: number,
     searchFilter: string,
   ) => {
-    const logPrefix = `adminService :: listDocuments`;
+    const logPrefix = `adminService :: listDocuments :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`;
     try {
       logger.info(`${logPrefix} :: Fetching documents from database`);
-      logger.debug(
-        `${logPrefix} :: Parameters:: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
+      let key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_LIST,
+        {},
       );
+
+      if (searchFilter) {
+        key += `|search:${searchFilter}`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+      }
+
+      if (currentPage) {
+        key += `|offset:${currentPage}`;
+      }
+
+      const cachedDocumentsList = await redis.GetKeyRedis(key);
+      if (cachedDocumentsList) {
+        logger.info(
+          `${logPrefix} :: cached result of documents :: ${cachedDocumentsList}`,
+        );
+        return JSON.parse(cachedDocumentsList);
+      }
 
       const documentsList = await adminRepository.listDocuments(
         pageSize,
         currentPage,
         searchFilter,
       );
+      if (documentsList && documentsList.length > 0)
+        redis.SetRedis(key, documentsList, CacheTTL.LONG);
 
       return documentsList;
     } catch (error) {
@@ -426,14 +449,26 @@ const adminService = {
   },
 
   documentsCount: async (searchFilter: string) => {
-    const logPrefix = `adminService :: documentsCount`;
+    const logPrefix = `adminService :: documentsCount :: Parameters :: searchFilter :: ${searchFilter}`;
     try {
       logger.info(`${logPrefix} :: Counting documents in database`);
-      logger.debug(
-        `${logPrefix} :: Parameters :: searchFilter :: ${searchFilter}`,
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_COUNT,
+        { searchFilter },
       );
 
+      const cachedCount = await redis.GetKeyRedis(key);
+      if (cachedCount) {
+        logger.info(
+          `${logPrefix} :: cached count of documents :: ${cachedCount}`,
+        );
+        return JSON.parse(cachedCount);
+      }
+
       const count = await adminRepository.documentsCount(searchFilter);
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
       return count;
     } catch (error) {
       logger.error(
@@ -447,8 +482,23 @@ const adminService = {
     const logPrefix = `adminService :: totalDocumentsCount`;
     try {
       logger.info(`${logPrefix} :: Counting total documents in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_TOTAL_COUNT,
+        {},
+      );
+
+      const cachedTotalCount = await redis.GetKeyRedis(key);
+      if (cachedTotalCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of documents :: ${cachedTotalCount}`,
+        );
+        return JSON.parse(cachedTotalCount);
+      }
 
       const count = await adminRepository.totalDocumentsCount();
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
       return count;
     } catch (error) {
       logger.error(
@@ -480,6 +530,12 @@ const adminService = {
         file_size,
         is_published,
       );
+
+      await adminService.clearDocumentsRedisCache();
+      logger.info(
+        `${logPrefix} :: Document added and cache invalidated successfully`,
+      );
+
       return addedDocument;
     } catch (error) {
       logger.error(
@@ -535,10 +591,8 @@ const adminService = {
     file: any,
     userId: number,
     is_published: boolean,
-    file_type: string,
-    file_size: number,
   ) => {
-    const logPrefix = `adminService :: updateDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: userId :: ${userId} :: is_published :: ${is_published} :: file_type :: ${file_type} :: file_size :: ${file_size}`;
+    const logPrefix = `adminService :: updateDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: userId :: ${userId} :: is_published :: ${is_published}`;
     try {
       logger.info(`${logPrefix} :: Updating document in database`);
 
@@ -564,12 +618,44 @@ const adminService = {
         userId,
       );
 
+      await adminService.clearDocumentsRedisCache();
+      logger.info(
+        `${logPrefix} :: Document updated and cache invalidated successfully`,
+      );
+
       return updatedDocument;
     } catch (error) {
       logger.error(
         `${logPrefix} :: Error updating document :: ${error.message} :: ${error}`,
       );
       throw error;
+    }
+  },
+
+  clearDocumentsRedisCache: async () => {
+    const logPrefix = `adminService :: clearDocumentsRedisCache`;
+    try {
+      const documentsKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_LIST,
+        {},
+      );
+      const documentsCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_COUNT,
+        {},
+      );
+      const documentsTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${documentsKey}*`);
+      await redis.deleteRedis(documentsCountKey);
+      await redis.deleteRedis(documentsTotalCountKey);
+
+      logger.info(`${logPrefix} :: Documents cache cleared successfully`);
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
     }
   },
 };

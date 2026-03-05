@@ -498,8 +498,6 @@ const adminController = {
       const { document_id } = req.params;
       const { document_name, is_published } = req.body;
       const file = req.files?.file as any;
-      const file_type = file?.mimetype || "";
-      const file_size = file?.size || 0;
 
       const documents = {
         document_id,
@@ -522,11 +520,11 @@ const adminController = {
           });
       }
 
-      if (!document_id || !document_name || !is_published) {
+      if (!document_name || !file || !is_published || !document_id) {
         return res.status(STATUS.BAD_REQUEST).send({
           data: null,
           message:
-            "Missing required fields: document_id, document_name, is_published",
+            "Missing required fields: document_name, file, is_published, document_id",
         });
       }
 
@@ -545,8 +543,6 @@ const adminController = {
         file,
         userId,
         is_published,
-        file_type,
-        file_size,
       );
 
       return res.status(STATUS.OK).send({

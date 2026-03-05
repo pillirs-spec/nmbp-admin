@@ -1541,7 +1541,7 @@
                 "document_name": {
                   "example": "any"
                 },
-                "status": {
+                "is_published": {
                   "example": "any"
                 }
               }
