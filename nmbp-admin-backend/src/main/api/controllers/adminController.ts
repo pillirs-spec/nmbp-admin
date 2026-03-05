@@ -330,7 +330,7 @@ const adminController = {
         file_size,
       );
 
-      return res.status(STATUS.OK).send({
+      return res.status(STATUS.CREATED).send({
         data: null,
         message: "Document added successfully",
       });

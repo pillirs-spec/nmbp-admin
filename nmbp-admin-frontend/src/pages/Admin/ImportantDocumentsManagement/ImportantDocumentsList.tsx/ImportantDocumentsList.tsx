@@ -4,10 +4,19 @@ import { debounce } from "lodash";
 import searchIcon from "../../../../assets/search-icon.svg";
 import { useNavigate } from "react-router-dom";
 import { importantDocumentService } from "./importantDocumentService";
+import {
+  IconFileTypePdf,
+  IconFileTypeCsv,
+  IconFileExcel,
+  IconFileTypeJpg,
+  IconFileTypePng,
+  IconVideo,
+} from "@tabler/icons-react";
 
 interface Document {
   document_id: string;
   document_name: string;
+  file_type: string;
   date_updated: string;
   updated_by: string;
 }
@@ -124,7 +133,27 @@ const ImportantDocumentsList = () => {
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">📄</span>
+                          <span className="text-lg">
+                            {document.file_type.includes("pdf") ? (
+                              <IconFileTypePdf />
+                            ) : document.file_type.includes("csv") ? (
+                              <IconFileTypeCsv />
+                            ) : document.file_type.includes("excel") ||
+                              document.file_type.includes("spreadsheet") ? (
+                              <IconFileExcel />
+                            ) : document.file_type.includes("jpeg") ? (
+                              <IconFileTypeJpg />
+                            ) : document.file_type.includes("jpg") ? (
+                              <IconFileTypeJpg />
+                            ) : document.file_type.includes("png") ? (
+                              <IconFileTypePng />
+                            ) : document.file_type.includes("mp4") ||
+                              document.file_type.includes("video") ? (
+                              <IconVideo />
+                            ) : (
+                              <IconFileTypePdf />
+                            )}
+                          </span>
                           {document.document_name}
                         </div>
                       </td>

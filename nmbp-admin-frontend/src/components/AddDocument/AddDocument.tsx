@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { LogLevel, ToastType } from "../../enums";
+import { useLogger, useToast } from "../../hooks";
+import { importantDocumentService } from "../../pages/Admin/ImportantDocumentsManagement/ImportantDocumentsList.tsx/importantDocumentService";
 
 const AddDocument = () => {
   const navigate = useNavigate();
@@ -8,6 +11,8 @@ const AddDocument = () => {
     status: "Save and publish",
     documentFile: null as File | null,
   });
+  const { log } = useLogger();
+  const { showToast } = useToast();
 
   const [fileName, setFileName] = useState<string>("");
 
@@ -25,8 +30,8 @@ const AddDocument = () => {
     const file = e.target.files?.[0];
     if (file) {
       // Check file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size exceeds 5MB");
+      if (file.size > 10 * 1024 * 1024) {
+        showToast("File size exceeds 10MB", "error", ToastType.ERROR);
         return;
       }
 
@@ -37,9 +42,16 @@ const AddDocument = () => {
         "image/jpg",
         "image/png",
         "video/mp4",
+        "text/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       ];
       if (!allowedTypes.includes(file.type)) {
-        alert("Invalid file type. Allowed: PDF, JPG, JPEG, PNG, mp4");
+        showToast(
+          "Invalid file type. Allowed: PDF, JPG, JPEG, PNG, mp4",
+          "error",
+          ToastType.ERROR,
+        );
         return;
       }
 
@@ -51,10 +63,25 @@ const AddDocument = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    // Add API call here
+    try {
+      const payload = new FormData();
+      payload.append("document_name", formData.title);
+      if (formData.documentFile) {
+        payload.append("file", formData.documentFile);
+      }
+      const response = await importantDocumentService.addDocument(payload);
+      if (response.status === 201) {
+        showToast("Document added successfully", "success", ToastType.SUCCESS);
+        setTimeout(() => {
+          navigate("/important-documents");
+        }, 1500);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
+    }
     navigate(-1);
   };
 
@@ -109,7 +136,7 @@ const AddDocument = () => {
                   </div>
                 </div>
                 <span className="text-[#27682A] text-xs inline-block">
-                  (Allowed: PDF, JPG, JPEG, PNG, mp4 | Max Size: 5MB)
+                  (Allowed: PDF, JPG, JPEG, PNG, mp4 | Max Size: 10MB)
                 </span>
               </div>
 
