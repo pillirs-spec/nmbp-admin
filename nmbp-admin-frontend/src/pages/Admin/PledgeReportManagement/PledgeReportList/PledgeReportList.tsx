@@ -168,7 +168,7 @@ const PledgeReportList = () => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
-                  Total Pledge
+                  Total Pledges
                 </p>
                 <p className="text-3xl font-semibold text-[#003366]">
                   {totalPledgeCount}
@@ -184,7 +184,7 @@ const PledgeReportList = () => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
-                  Total Pledge Today
+                  Total Pledge Taken (Today)
                 </p>
                 <p className="text-3xl font-semibold text-[#003366]">
                   {totalPledgeTodayCount}
