@@ -37,7 +37,7 @@ const ImportantDocumentsList = () => {
   const { log } = useLogger();
 
   const handleSearch = (value: string) => {
-    if (value.length > 0) {
+    if (value.length >= 3) {
       setSearchQuery(value);
       setCurrentPage(1);
     } else {
@@ -89,7 +89,7 @@ const ImportantDocumentsList = () => {
 
   useEffect(() => {
     getAllDocumentsList();
-  }, []);
+  }, [pageSize, currentPage, searchQuery]);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">

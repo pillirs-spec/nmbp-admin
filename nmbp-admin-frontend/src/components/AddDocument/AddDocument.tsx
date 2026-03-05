@@ -194,7 +194,7 @@ const AddDocument = () => {
                   required
                 >
                   <option value="">Select</option>
-                  <option value="true">Save and publish</option>
+                  <option value="true">Publish</option>
                   <option value="false">Draft</option>
                 </select>
               </div>
