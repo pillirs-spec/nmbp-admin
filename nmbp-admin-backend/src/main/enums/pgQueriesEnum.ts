@@ -247,6 +247,7 @@ export enum AdminQueries {
       file_url TEXT NOT NULL,
       file_type VARCHAR(100),
       file_size INTEGER,
+      is_published BOOLEAN DEFAULT FALSE,
       created_by INT REFERENCES m_users(user_id),
       updated_by INT REFERENCES m_users(user_id),
       date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -255,9 +256,9 @@ export enum AdminQueries {
   `,
 
   ADD_DOCUMENT = `
-    INSERT INTO t_documents(document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated) 
-    VALUES ($1, $2, $3, $4, $4, $5, $6, NOW(), NOW())
-    RETURNING document_id, document_name, file_url, created_by, updated_by, file_type, file_size, date_created, date_updated
+    INSERT INTO t_documents(document_id, document_name, file_url, created_by, updated_by, file_type, file_size, is_published, date_created, date_updated) 
+    VALUES ($1, $2, $3, $4, $4, $5, $6, $7, NOW(), NOW())
+    RETURNING document_id, document_name, file_url, created_by, updated_by, file_type, file_size, is_published, date_created, date_updated
   `,
 
   GET_DOCUMENT_BY_ID = `
@@ -267,6 +268,7 @@ export enum AdminQueries {
     t.file_url, 
     t.file_type, 
     t.file_size, 
+    t.is_published,
     t.created_by,
     creator.user_name AS created_by,
     t.updated_by,
@@ -286,6 +288,7 @@ export enum AdminQueries {
     t.file_url, 
     t.file_type, 
     t.file_size, 
+    t.is_published,
     t.created_by,
     creator.display_name AS created_by,
     t.updated_by,
@@ -312,5 +315,19 @@ export enum AdminQueries {
 
   TOTAL_DOCUMENTS_COUNT = `
     SELECT COUNT(*) as count FROM t_documents
+  `,
+
+  UPDATE_DOCUMENT = `
+    UPDATE t_documents
+    SET 
+      document_name = $2,
+      file_url = COALESCE($3, file_url),
+      file_type = COALESCE($4, file_type),
+      file_size = COALESCE($5, file_size),
+      is_published = $6,
+      updated_by = $7,
+      date_updated = NOW()
+    WHERE document_id = $1
+    RETURNING document_id, document_name, file_url, file_type, file_size, is_published, created_by, updated_by, date_created, date_updated
   `,
 }

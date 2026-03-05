@@ -154,4 +154,5 @@ export interface IDocument {
   document_id: number;
   document_name: string;
   file: string;
+  is_published: boolean;
 }

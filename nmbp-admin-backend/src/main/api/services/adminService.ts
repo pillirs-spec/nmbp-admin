@@ -465,8 +465,9 @@ const adminService = {
     userId: number,
     file_type: string,
     file_size: number,
+    is_published: boolean,
   ) => {
-    const logPrefix = `adminService :: addDocuments :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file_type :: ${file_type} :: file_size :: ${file_size} :: userId :: ${userId}`;
+    const logPrefix = `adminService :: addDocuments :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file_type :: ${file_type} :: file_size :: ${file_size} :: userId :: ${userId} :: is_published :: ${is_published} :: `;
     try {
       logger.info(`${logPrefix} :: Adding document to database`);
       const addedDocument = await uploadToS3(file, userId, document_name);
@@ -477,6 +478,7 @@ const adminService = {
         userId,
         file_type,
         file_size,
+        is_published,
       );
       return addedDocument;
     } catch (error) {
@@ -522,6 +524,50 @@ const adminService = {
     } catch (error) {
       logger.error(
         `${logPrefix} :: Error generating download URL :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  updateDocument: async (
+    document_id: string,
+    document_name: string,
+    file: any,
+    userId: number,
+    is_published: boolean,
+    file_type: string,
+    file_size: number,
+  ) => {
+    const logPrefix = `adminService :: updateDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: userId :: ${userId} :: is_published :: ${is_published} :: file_type :: ${file_type} :: file_size :: ${file_size}`;
+    try {
+      logger.info(`${logPrefix} :: Updating document in database`);
+
+      let file_url = null;
+      let file_type = null;
+      let file_size = null;
+
+      // If a new file is provided, upload it to S3
+      if (file) {
+        file_url = await uploadToS3(file, userId, document_name);
+        file_type = file.mimetype;
+        file_size = file.size;
+        logger.info(`${logPrefix} :: New file uploaded to S3: ${file_url}`);
+      }
+
+      const updatedDocument = await adminRepository.updateDocument(
+        document_id,
+        document_name,
+        file_url,
+        file_type,
+        file_size,
+        is_published,
+        userId,
+      );
+
+      return updatedDocument;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error updating document :: ${error.message} :: ${error}`,
       );
       throw error;
     }

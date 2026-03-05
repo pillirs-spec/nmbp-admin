@@ -17,6 +17,8 @@ adminRouter.post("/documents/list", adminController.listDocuments);
 
 adminRouter.get("/documents/:document_id", adminController.getDocumentById);
 
+adminRouter.put("/documents/:document_id", adminController.updateDocument);
+
 adminRouter.get(
   "/documents/:document_id/download",
   adminController.downloadDocument,

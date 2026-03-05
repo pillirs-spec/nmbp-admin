@@ -11,7 +11,11 @@ import {
   IconFileTypeJpg,
   IconFileTypePng,
   IconVideo,
+  IconEdit,
+  IconEye,
 } from "@tabler/icons-react";
+import { useLogger, useToast } from "../../../../hooks";
+import { LogLevel, ToastType } from "../../../../enums";
 
 interface Document {
   document_id: string;
@@ -19,6 +23,7 @@ interface Document {
   file_type: string;
   date_updated: string;
   updated_by: string;
+  is_published: boolean;
 }
 
 const ImportantDocumentsList = () => {
@@ -28,6 +33,8 @@ const ImportantDocumentsList = () => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  const { log } = useLogger();
 
   const handleSearch = (value: string) => {
     if (value.length > 0) {
@@ -46,7 +53,15 @@ const ImportantDocumentsList = () => {
   // const paginatedDocuments = documents.slice(startIndex, endIndex);
 
   const handleViewDocument = () => {
-    alert("View Document functionality to be implemented");
+    showToast(
+      "View Document functionality to be implemented",
+      "info",
+      ToastType.INFO,
+    );
+  };
+
+  const handleEditDocument = (documentId: string) => {
+    navigate(`/important-documents/add`, { state: { documentId } });
   };
 
   const handleAddDocument = () => {
@@ -62,10 +77,13 @@ const ImportantDocumentsList = () => {
       };
       const response =
         await importantDocumentService.getAllDocumentsList(payload);
-      setDocuments(response.data.data.documentsList);
-      setTotalCount(response.data.data.totalDocumentsCount);
+      if (response.status === 200) {
+        // showToast(response.data.message, "success", ToastType.SUCCESS);
+        setDocuments(response.data.data.documentsList);
+        setTotalCount(response.data.data.totalDocumentsCount);
+      }
     } catch (error) {
-      console.error("Error fetching documents:", error);
+      log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
     }
   };
 
@@ -119,6 +137,10 @@ const ImportantDocumentsList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Uploaded By
                   </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                    Published
+                  </th>
+
                   <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Action
                   </th>
@@ -135,21 +157,21 @@ const ImportantDocumentsList = () => {
                         <div className="flex items-center gap-2">
                           <span className="text-lg">
                             {document.file_type.includes("pdf") ? (
-                              <IconFileTypePdf />
+                              <IconFileTypePdf color="red" />
                             ) : document.file_type.includes("csv") ? (
-                              <IconFileTypeCsv />
+                              <IconFileTypeCsv color="green" />
                             ) : document.file_type.includes("excel") ||
                               document.file_type.includes("spreadsheet") ? (
-                              <IconFileExcel />
+                              <IconFileExcel color="green" />
                             ) : document.file_type.includes("jpeg") ? (
-                              <IconFileTypeJpg />
+                              <IconFileTypeJpg color="blue" />
                             ) : document.file_type.includes("jpg") ? (
-                              <IconFileTypeJpg />
+                              <IconFileTypeJpg color="blue" />
                             ) : document.file_type.includes("png") ? (
-                              <IconFileTypePng />
+                              <IconFileTypePng color="blue" />
                             ) : document.file_type.includes("mp4") ||
                               document.file_type.includes("video") ? (
-                              <IconVideo />
+                              <IconVideo color="pink" />
                             ) : (
                               <IconFileTypePdf />
                             )}
@@ -167,12 +189,32 @@ const ImportantDocumentsList = () => {
                       <td className="px-6 py-4 text-sm text-[#374151]">
                         {document.updated_by}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#374151] text-center">
+
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        {document.is_published ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded">
+                            Published
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-yellow-100 text-red-600 text-xs font-semibold rounded">
+                            Draft
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
                         <button
                           className="text-[#003366] font-[500]"
                           onClick={handleViewDocument}
                         >
-                          View <span>↗</span>
+                          <IconEye size={20} color="red" />
+                        </button>
+                        <button
+                          className="text-[#003366] font-[500]"
+                          onClick={() =>
+                            handleEditDocument(document.document_id)
+                          }
+                        >
+                          <IconEdit size={20} />
                         </button>
                       </td>
                     </tr>
@@ -180,7 +222,7 @@ const ImportantDocumentsList = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={12}
                       className="px-6 py-8 text-center text-[#374151] font-semibold"
                     >
                       No Data Found

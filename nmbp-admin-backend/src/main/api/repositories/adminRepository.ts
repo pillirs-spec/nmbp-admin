@@ -283,8 +283,9 @@ const adminRepository = {
     userId: number,
     file_type: string,
     file_size: number,
+    is_published: boolean,
   ) => {
-    const logPrefix = `adminRepository :: addDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file :: ${file} :: file_type :: ${file_type} :: file_size :: ${file_size} :: userId :: ${userId}`;
+    const logPrefix = `adminRepository :: addDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file :: ${file} :: file_type :: ${file_type} :: file_size :: ${file_size} :: userId :: ${userId} :: is_published :: ${is_published}`;
     try {
       // First, ensure the table exists
       const createTableQuery = {
@@ -304,6 +305,7 @@ const adminRepository = {
           userId,
           file_type,
           file_size,
+          is_published,
         ],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
@@ -324,6 +326,41 @@ const adminRepository = {
       const _query = {
         text: pgQueries.AdminQueries.GET_DOCUMENT_BY_ID,
         values: [document_id],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0] : null;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  updateDocument: async (
+    document_id: string,
+    document_name: string,
+    file_url: string | null,
+    file_type: string | null,
+    file_size: number | null,
+    is_published: boolean,
+    userId: number,
+  ) => {
+    const logPrefix = `adminRepository :: updateDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file_url :: ${file_url} :: file_type :: ${file_type} :: file_size :: ${file_size} :: is_published :: ${is_published} :: userId :: ${userId}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.UPDATE_DOCUMENT,
+        values: [
+          document_id,
+          document_name,
+          file_url,
+          file_type,
+          file_size,
+          is_published,
+          userId,
+        ],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
 

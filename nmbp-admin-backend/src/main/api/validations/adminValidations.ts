@@ -7,6 +7,7 @@ const adminValidations = {
     const documentSchema = Joi.object({
       document_id: Joi.string().required(),
       document_name: Joi.string().min(3).max(255).required(),
+      is_published: Joi.boolean().required(),
       file: Joi.object({
         name: Joi.string().required(),
         mimetype: Joi.string()
@@ -16,6 +17,9 @@ const adminValidations = {
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             "application/vnd.ms-excel",
             "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "video/mp4",
           )
           .required(),
         data: Joi.binary().required(),
@@ -51,6 +55,41 @@ const adminValidations = {
         ),
     });
     return listDocumentsSchema.validate(params);
+  },
+
+  validateUpdateDocument: (
+    document: Partial<IDocument>,
+  ): Joi.ValidationResult => {
+    const updateDocumentSchema = Joi.object({
+      document_id: Joi.string().required(),
+      document_name: Joi.string().min(3).max(255).required(),
+      is_published: Joi.boolean().required(),
+      file: Joi.object({
+        name: Joi.string().required(),
+        mimetype: Joi.string()
+          .valid(
+            "application/pdf",
+            "text/csv",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.ms-excel",
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "video/mp4",
+          )
+          .required(),
+        data: Joi.binary().required(),
+        size: Joi.number()
+          .max(10 * 1024 * 1024)
+          .required()
+          .messages({
+            "number.max": "File size should not exceed 10MB",
+          }),
+      })
+        .unknown(true)
+        .optional(),
+    });
+    return updateDocumentSchema.validate(document);
   },
 };
 

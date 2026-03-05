@@ -263,10 +263,12 @@ const adminController = {
   addDocuments: async (req: Request, res: Response) => {
     const logPrefix = `adminController :: addDocuments`;
     try {
-      logger.info(`${logPrefix} :: Request received`);
+      logger.info(
+        `${logPrefix} :: Request received :: ${JSON.stringify(req.body)}`,
+      );
       /*        #swagger.tags = ['Admin']
                 #swagger.summary = 'Add Documents'
-                #swagger.description = 'Upload documents to the system. Supports PDF, CSV, Excel (xlsx, xls), and JPEG files with maximum 10 MB file size. Requires authentication.'
+                #swagger.description = 'Upload documents to the system. Supports PDF, CSV, Excel (xlsx, xls), PNG, JPEG and MP4 files with maximum 10 MB file size. Documents can be published immediately or saved as drafts. Requires authentication.'
                 #swagger.consumes = ['multipart/form-data']
                 #swagger.parameters['Authorization'] = {
                     in: 'header',
@@ -280,22 +282,29 @@ const adminController = {
                     required: true,
                     description: 'Name of the document (3-255 characters)'
                 }
+                #swagger.parameters['is_published'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: true,
+                    description: 'Document status: "Save and publish" (published and visible) or "Draft" (not published, admin only)'
+                }
                 #swagger.parameters['file'] = {
                     in: 'formData',
                     type: 'file',
                     required: true,
-                    description: 'Document file (PDF, CSV, Excel, JPEG - max 10 MB)'
+                    description: 'Document file (PDF, CSV, Excel, PNG, JPEG, MP4 - max 10 MB)'
                 }
             */
       const userId = req.plainToken.user_id;
       const document_id = uuidv4();
-      const { document_name } = req.body;
+      const { document_name, is_published } = req.body;
       const file = req.files?.file as any;
       const file_type = file?.mimetype || "";
       const file_size = file?.size || 0;
       const documents = {
         document_id,
         document_name,
+        is_published,
         file,
       };
 
@@ -313,11 +322,10 @@ const adminController = {
           });
       }
 
-      if (!document_name || !file) {
+      if (!document_name || !file || !is_published) {
         return res.status(STATUS.BAD_REQUEST).send({
           data: null,
-          message:
-            "Missing required fields: documentType, documentUrl, associatedPledgeId",
+          message: "Missing required fields: document_name, file, is_published",
         });
       }
 
@@ -328,6 +336,7 @@ const adminController = {
         userId,
         file_type,
         file_size,
+        is_published,
       );
 
       return res.status(STATUS.CREATED).send({
@@ -437,6 +446,112 @@ const adminController = {
           expires_in_seconds: 300,
         },
         message: "Download URL generated successfully. Valid for 5 minutes.",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res
+        .status(STATUS.INTERNAL_SERVER_ERROR)
+        .send(errorCodes.documents.DOCUMENTS00000);
+    }
+  },
+
+  updateDocument: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: updateDocument`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Update Document'
+                #swagger.description = 'Update an existing document. Can update document name, status, and optionally replace the file. Requires authentication.'
+                #swagger.consumes = ['multipart/form-data']
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['document_id'] = {
+                    in: 'path',
+                    type: 'string',
+                    required: true,
+                    description: 'Document ID'
+                }
+                #swagger.parameters['document_name'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: true,
+                    description: 'Name of the document (3-255 characters)'
+                }
+                #swagger.parameters['status'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: true,
+                    description: 'Document status: "Save and publish" or "Draft"'
+                }
+                #swagger.parameters['file'] = {
+                    in: 'formData',
+                    type: 'file',
+                    required: false,
+                    description: 'Document file (PDF, CSV, Excel, PNG, JPEG, MP4 - max 10 MB). Optional - if not provided, existing file is kept.'
+                }
+            */
+      const userId = req.plainToken.user_id;
+      const { document_id } = req.params;
+      const { document_name, is_published } = req.body;
+      const file = req.files?.file as any;
+      const file_type = file?.mimetype || "";
+      const file_size = file?.size || 0;
+
+      const documents = {
+        document_id,
+        document_name,
+        is_published,
+        file,
+      };
+
+      const { error } = adminValidations.validateUpdateDocument(documents);
+      if (error) {
+        if (error.details != null)
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.documents.DOCUMENTS00001.errorCode,
+            errorMessage: error.details[0].message,
+          });
+        else
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.documents.DOCUMENTS00001.errorCode,
+            errorMessage: error.message,
+          });
+      }
+
+      if (!document_id || !document_name || !is_published) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          data: null,
+          message:
+            "Missing required fields: document_id, document_name, is_published",
+        });
+      }
+
+      // Check if document exists
+      const existingDocument = await adminService.getDocumentById(document_id);
+      if (!existingDocument) {
+        return res.status(STATUS.NOT_FOUND).send({
+          data: null,
+          message: "Document not found",
+        });
+      }
+
+      const updatedDocument = await adminService.updateDocument(
+        document_id,
+        document_name,
+        file,
+        userId,
+        is_published,
+        file_type,
+        file_size,
+      );
+
+      return res.status(STATUS.OK).send({
+        data: updatedDocument,
+        message: "Document updated successfully",
       });
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);

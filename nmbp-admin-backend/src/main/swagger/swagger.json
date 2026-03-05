@@ -1385,7 +1385,7 @@
           "Admin"
         ],
         "summary": "Add Documents",
-        "description": "Upload documents to the system. Supports PDF, CSV, Excel (xlsx, xls), and JPEG files with maximum 10 MB file size. Requires authentication.",
+        "description": "Upload documents to the system. Supports PDF, CSV, Excel (xlsx, xls), PNG, JPEG and MP4 files with maximum 10 MB file size. Documents can be published immediately or saved as drafts. Requires authentication.",
         "consumes": [
           "multipart/form-data"
         ],
@@ -1405,19 +1405,15 @@
             "description": "Name of the document (3-255 characters)"
           },
           {
-            "name": "file",
-            "in": "formData",
-            "type": "file",
-            "required": true,
-            "description": "Document file (PDF, CSV, Excel, JPEG - max 10 MB)"
-          },
-          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
                 "document_name": {
+                  "example": "any"
+                },
+                "is_published": {
                   "example": "any"
                 }
               }
@@ -1497,6 +1493,59 @@
             "required": true,
             "type": "string",
             "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update Document",
+        "description": "Update an existing document. Can update document name, status, and optionally replace the file. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "document_name",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Name of the document (3-255 characters)"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "document_name": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                }
+              }
+            }
           }
         ],
         "responses": {
