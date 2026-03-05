@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import LockIcon from "../../../assets//lock.svg";
+import React, { useEffect, useState, useCallback } from "react";
+import LocationMap from "./LocationMap";
+import { useLogger, useToast } from "../../../hooks";
+import usersListService from "../../../pages/Admin/UserManagement/UserList/usersListService";
+import { LogLevel, ToastType } from "../../../enums";
 
 interface LocationDetailsProps {
   formData: any;
@@ -22,9 +25,147 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   handleCancel,
   handleSaveAndContinue,
 }) => {
-  const [district, setDistrict] = useState<string>("Harda");
   const [latitude, setLatitude] = useState<string>("22.3467");
   const [longitude, setLongitude] = useState<string>("77.0890");
+
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedDistrictName, setSelectedDistrictName] = useState<string>("");
+  const [selectedStateName, setSelectedStateName] = useState<string>("");
+  const [states, setStates] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const { log } = useLogger();
+  const { showToast } = useToast();
+
+  const listStates = useCallback(async () => {
+    try {
+      const response = await usersListService.listStates();
+      log(LogLevel.INFO, "States :: listStates", response);
+      if (response.data && response.data.data) {
+        setStates(response.data.data);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "Roles :: listRoles", error);
+      showToast(
+        "Failed to load roles. Please try again later.",
+        "Error",
+        ToastType.ERROR,
+      );
+    }
+  }, [log, showToast]);
+
+  const listDistrictsByStateId = useCallback(
+    async (stateId: string) => {
+      try {
+        const response = await usersListService.listDistrictsByStateId(stateId);
+        log(LogLevel.INFO, "Districts :: listDistrictsByStateId", response);
+        if (response.data && response.data.data) {
+          setDistricts(response.data.data);
+        }
+      } catch (error) {
+        log(LogLevel.ERROR, "Districts :: listDistrictsByStateId", error);
+        showToast(
+          "Failed to load districts. Please try again later.",
+          "Error",
+          ToastType.ERROR,
+        );
+      }
+    },
+    [log, showToast],
+  );
+
+  useEffect(() => {
+    listStates();
+  }, [listStates]);
+
+  useEffect(() => {
+    if (selectedState) {
+      listDistrictsByStateId(selectedState);
+    }
+  }, [selectedState, listDistrictsByStateId]);
+
+  const getUserLocation = useCallback(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude: lat, longitude: lng } = position.coords;
+          setLatitude(lat.toString());
+          setLongitude(lng.toString());
+          log(LogLevel.INFO, "User location obtained", `${lat}, ${lng}`);
+        },
+        (error) => {
+          log(LogLevel.WARN, "Geolocation error", error.message);
+          // Fallback to default location if geolocation fails
+          setLatitude("22.3467");
+          setLongitude("77.0890");
+          showToast(
+            "Unable to get your location. Using default location.",
+            "Info",
+            ToastType.WARNING,
+          );
+        },
+      );
+    } else {
+      log(LogLevel.WARN, "Geolocation", "Geolocation not supported");
+      showToast(
+        "Geolocation not supported on this device.",
+        "Warning",
+        ToastType.WARNING,
+      );
+    }
+  }, [log, showToast]);
+
+  // Handle map center updates based on state/district selection
+  useEffect(() => {
+    if (selectedState && selectedDistrict && selectedDistrictName) {
+      // Geocode district name to get its center coordinates
+      const geocodeDistrict = async () => {
+        try {
+          const query = `${selectedDistrictName}, ${selectedStateName}, India`;
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`,
+          );
+          const data = await response.json();
+          if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat).toFixed(6);
+            const lng = parseFloat(data[0].lon).toFixed(6);
+            setLatitude(lat);
+            setLongitude(lng);
+            console.log(`District ${selectedDistrictName} geocoded:`, lat, lng);
+            log(
+              LogLevel.INFO,
+              "District geocoded",
+              `${selectedDistrictName}: ${lat}, ${lng}`,
+            );
+          } else {
+            log(
+              LogLevel.WARN,
+              "Geocoding failed for district",
+              selectedDistrictName,
+            );
+            // Fallback to geolocation if geocoding fails
+            getUserLocation();
+          }
+        } catch (error) {
+          log(LogLevel.ERROR, "Geocoding error", error);
+          getUserLocation();
+        }
+      };
+      geocodeDistrict();
+    } else {
+      // If no state/district selected, use user's current location
+      getUserLocation();
+    }
+  }, [
+    selectedState,
+    selectedDistrict,
+    selectedDistrictName,
+    selectedStateName,
+    getUserLocation,
+    log,
+  ]);
+
+  console.log(selectedDistrictName, selectedStateName);
 
   return (
     <div className="p-5">
@@ -74,7 +215,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
         {/* Form Header */}
         <div className="p-6">
           <h2 className="font-semibold text-[#374151] mb-1">
-            Upload Images/Videos
+            Upload Location Details
           </h2>
           <p className="text-sm text-[#6B7280]">
             Please provide location details for geo-tagging
@@ -89,19 +230,61 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
               {/* District Field */}
               <div className="">
                 <label className="block text-sm font-medium text-[#374151] mb-2">
-                  District <span className="text-red-500">*</span>{" "}
-                  <img src={LockIcon} alt="Locked" className="inline" />
+                  State <span className="text-red-500">*</span>{" "}
+                  {/* <img src={LockIcon} alt="Locked" className="inline" /> */}
                 </label>
                 <select
-                  value={district}
-                  onChange={(e) => setDistrict(e.target.value)}
-                  className="w-full px-4 py-2 border border-[#D1D5DB] rounded-md outline-none text-[#374151] text-sm  bg-[#F3F4F6] focus:border-[#003366] transition"
+                  value={selectedState}
+                  onChange={(e) => {
+                    const stateId = e.target.value;
+                    const stateIdNum = parseInt(stateId, 10);
+                    const stateName =
+                      states.find((s) => s.state_id === stateIdNum)
+                        ?.state_name || "";
+                    setSelectedState(stateId);
+                    setSelectedStateName(stateName);
+                    setSelectedDistrict("");
+                    setSelectedDistrictName("");
+                  }}
+                  className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
                 >
-                  <option>Harda</option>
-                  <option>Amroha</option>
-                  <option>Auraiya</option>
-                  <option>Ayodhya</option>
-                  <option>Azamgarh</option>
+                  <option value="">All States</option>
+                  {states.map((state: any) => (
+                    <option key={state.state_id} value={state.state_id}>
+                      {state.state_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="">
+                <label className="block text-sm font-medium text-[#374151] mb-2">
+                  District <span className="text-red-500">*</span>{" "}
+                  {/* <img src={LockIcon} alt="Locked" className="inline" /> */}
+                </label>
+                <select
+                  value={selectedDistrict}
+                  disabled={!selectedState}
+                  onChange={(e) => {
+                    const districtId = e.target.value;
+                    const districtIdNum = parseInt(districtId, 10);
+                    const districtName =
+                      districts.find((d) => d.district_id === districtIdNum)
+                        ?.district_name || "";
+                    setSelectedDistrict(districtId);
+                    setSelectedDistrictName(districtName);
+                  }}
+                  className={`w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm ${!selectedState ? "bg-gray-100 !cursor-not-allowed" : "bg-white cursor-pointer"}`}
+                >
+                  <option value="">All Districts</option>
+                  {districts.map((district: any) => (
+                    <option
+                      key={district.district_id}
+                      value={district.district_id}
+                    >
+                      {district.district_name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -162,10 +345,10 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
 
             {/* Right Section - Map Display */}
             <div className="space-y-4">
-              <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg overflow-hidden">
-                {/* Map Container - This would be replaced with actual map component */}
+              {/* <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg overflow-hidden">
+              
                 <div className="relative h-[400px] bg-gray-200">
-                  {/* Placeholder for Map */}
+                 
                   <div className="absolute inset-0 flex items-center justify-center text-[#6B7280] text-sm bg-gradient-to-br from-gray-100 to-gray-200">
                     <div className="text-center">
                       <div className="text-4xl mb-2">🗺️</div>
@@ -173,7 +356,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
                     </div>
                   </div>
 
-                  {/* Map Pin Marker */}
+                
                   <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full">
                     <div className="relative">
                       <div className="w-10 h-10 bg-[#003366] rounded-full flex items-center justify-center shadow-lg">
@@ -194,7 +377,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
                   </div>
                 </div>
 
-                {/* Location Info Card */}
+             
                 <div className="bg-white p-4 border-t border-[#E5E7EB]">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 bg-[#003366] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
@@ -220,11 +403,20 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
                     </div>
                   </div>
                 </div>
+              </div> */}
+              <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg overflow-hidden h-[400px]">
+                <LocationMap
+                  latitude={latitude}
+                  longitude={longitude}
+                  setLatitude={setLatitude}
+                  setLongitude={setLongitude}
+                  selectedDistrictName={selectedDistrictName}
+                  selectedStateName={selectedStateName}
+                />
               </div>
 
-              {/* Use This Location Button */}
               <button
-                onClick={handleSaveAndContinue}
+                onClick={getUserLocation}
                 className="w-full px-6 py-3 bg-[#003366] text-white font-medium rounded-lg hover:opacity-90 transition text-sm flex items-center justify-center gap-2"
               >
                 <svg
@@ -238,7 +430,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
                     clipRule="evenodd"
                   />
                 </svg>
-                Use This Location
+                Use Current Location
               </button>
             </div>
           </div>

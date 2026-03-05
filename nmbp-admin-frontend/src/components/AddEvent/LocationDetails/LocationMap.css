@@ -1,0 +1,99 @@
+.map-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  z-index: 0;
+  position: relative;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  z-index: 0;
+}
+
+/* Z-index stacking context for leaflet layers */
+.leaflet-pane {
+  z-index: 100;
+}
+
+.leaflet-tile-pane {
+  z-index: 100;
+}
+
+.leaflet-shadow-pane {
+  z-index: 200;
+}
+
+.leaflet-overlay-pane {
+  z-index: 300;
+}
+
+.leaflet-marker-pane {
+  z-index: 400;
+}
+
+.leaflet-tooltip-pane {
+  z-index: 500;
+}
+
+.leaflet-popup-pane {
+  z-index: 600;
+}
+
+/* Ensure markers are properly visible */
+.leaflet-marker-icon {
+  z-index: 10;
+}
+
+.leaflet-marker-shadow {
+  z-index: 9;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Control buttons styling */
+.leaflet-control {
+  z-index: 700;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-control-container {
+  z-index: 700;
+}
+
+/* Ensure map tiles render properly */
+.leaflet-tile {
+  filter: inherit;
+}
+
+/* Fix any potential clipping issues */
+.leaflet-container {
+  box-sizing: border-box;
+}
+
+.leaflet-container * {
+  box-sizing: inherit;
+}
+
+/* Ensure proper mouse interaction */
+.leaflet-interactive {
+  cursor: pointer;
+}
+
+.leaflet-container a {
+  color: #0078a8;
+}
+
+.leaflet-container a.leaflet-active {
+  outline: 2px solid orange;
+}
+
+/* Attribution styling */
+.leaflet-attribution {
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  padding: 2px 8px;
+  z-index: 701;
+}
