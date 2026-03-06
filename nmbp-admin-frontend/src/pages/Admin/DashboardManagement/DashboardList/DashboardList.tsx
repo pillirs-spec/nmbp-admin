@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { debounce } from "lodash";
 import searchIcon from "../../../../assets/search-icon.svg";
-import AnnouncementIcon from "../../../../assets/announcement.svg";
-import LocationIcon from "../../../../assets/location.svg";
-import PrizeIcon from "../../../../assets/prize.svg";
 import { useNavigate } from "react-router-dom";
 import { LogLevel } from "../../../../enums";
-import { useLogger } from "../../../../hooks";
+import { useLogger, useToast } from "../../../../hooks";
 import dashboardListService from "./dashboardListService";
+import addEventService from "../../../../components/AddEvent/addEventService";
+import { ToastType } from "../../../../enums";
+import DeleteIcon from "../../../../assets/delete.svg";
 
 interface Submission {
+  event_id: string;
   state_name: string;
   district_name: string;
   activity_title: string;
@@ -32,12 +33,15 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [filterLocation, setFilterLocation] = useState<string>("All Location");
-  const [filterActivity, setFilterActivity] = useState<string>("All Activity");
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    show: boolean;
+    eventId: string;
+    eventTitle: string;
+  }>({ show: false, eventId: "", eventTitle: "" });
   const navigate = useNavigate();
   const { log } = useLogger();
-
-  const [pageSize, setPageSize] = useState<number>(10);
+  const { showToast } = useToast();
 
   const handleSearch = (value: string) => {
     if (value.length >= 3) {
@@ -55,7 +59,27 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  const getAllEvents = async () => {
+  const handleDeleteClick = (eventId: string, eventTitle: string) => {
+    setDeleteConfirm({ show: true, eventId, eventTitle });
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await addEventService.deleteEvent(deleteConfirm.eventId);
+      showToast("Event deleted successfully", ToastType.SUCCESS);
+      setDeleteConfirm({ show: false, eventId: "", eventTitle: "" });
+      getAllEvents();
+    } catch (error) {
+      log(LogLevel.ERROR, "DashboardList :: handleConfirmDelete", error);
+      showToast("Failed to delete event", ToastType.ERROR);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirm({ show: false, eventId: "", eventTitle: "" });
+  };
+
+  const getAllEvents = useCallback(async () => {
     try {
       const payload = {
         currentPage,
@@ -71,11 +95,11 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
     } catch (error) {
       log(LogLevel.ERROR, "DashboardList :: getAllEvents", error);
     }
-  };
+  }, [currentPage, pageSize, searchQuery, log]);
 
   useEffect(() => {
     getAllEvents();
-  }, [currentPage, searchQuery, pageSize]);
+  }, [getAllEvents]);
 
   return (
     <div>
@@ -200,29 +224,20 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 </select>
               </div> */}
 
-              <div className="relative col-span-6">
+              {/* <div className="relative col-span-6">
                 <select
                   value={filterActivity}
                   onChange={(e) => {
-                    setFilterActivity(e.target.value);
+                    setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
                   className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
                 >
                   {submissions.length > 0 && (
-                    <>
-                      <option value="All Activity">All Activity</option>
-                      {Array.from(
-                        new Set(submissions.map((s) => s.activity_title)),
-                      ).map((activity, index) => (
-                        <option key={index} value={activity}>
-                          {activity || "N/A"}
-                        </option>
-                      ))}
-                    </>
+                    <option value="">All Activity</option>
                   )}
                 </select>
-              </div>
+              </div> */}
             </div>
 
             <div className="max-h-[500px] mb-6 overflow-x-scroll overflow-y-auto rounded-lg border border-[#E5E7EB]">
@@ -316,8 +331,20 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                             .reverse()
                             .join("-")}
                         </td>
-                        <td className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]">
-                          Delete
+                        <td
+                          className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]"
+                          onClick={() =>
+                            handleDeleteClick(
+                              submission.event_id,
+                              submission.activity_title,
+                            )
+                          }
+                        >
+                          <img
+                            src={DeleteIcon}
+                            alt="delete-icon"
+                            className="w-4 h-4"
+                          />
                         </td>
                       </tr>
                     ))
@@ -416,6 +443,38 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <h2 className="text-xl font-semibold text-[#374151] mb-2">
+              Delete Event
+            </h2>
+            <p className="text-sm text-[#6B7280] mb-6">
+              Are you sure you want to delete the event{" "}
+              <span className="font-bold text-red-500">
+                {deleteConfirm.eventTitle}
+              </span>
+              <span className="ml-1">this action cannot be undone.</span>
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="p-2 border border-[#E5E7EB] text-[#374151] text-sm font-medium rounded hover:bg-[#F9FAFB] transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="p-2 bg-red-600 text-white font-medium text-sm rounded hover:bg-red-700 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

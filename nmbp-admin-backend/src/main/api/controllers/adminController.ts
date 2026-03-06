@@ -818,6 +818,44 @@ const adminController = {
     }
   },
 
+  deleteEvent: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: deleteEvent`;
+    /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Delete Event'
+                #swagger.description = 'Delete a specific event (draft or submitted) by ID. Requires authentication.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['event_id'] = {
+                    in: 'path',
+                    type: 'string',
+                    required: true,
+                    description: 'Event ID'
+                }
+    */
+    try {
+      const { event_id } = req.params;
+      logger.info(`${logPrefix} :: event_id :: ${event_id}`);
+
+      const result = await adminService.deleteEvent(event_id);
+
+      logger.info(`${logPrefix} :: Event deleted successfully`);
+      return res.status(STATUS.OK).send({
+        data: result,
+        message: "Event deleted successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "EVENT00005",
+        errorMessage: "Failed to delete event",
+      });
+    }
+  },
+
   listSubmittedEvents: async (req: Request, res: Response) => {
     const logPrefix = `adminController :: listSubmittedEvents`;
     /*        #swagger.tags = ['Admin']

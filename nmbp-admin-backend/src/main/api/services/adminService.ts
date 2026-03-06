@@ -836,6 +836,19 @@ const adminService = {
       throw new Error(error.message);
     }
   },
+
+  deleteEvent: async (event_id: string) => {
+    const logPrefix = `adminService :: deleteEvent :: event_id :: ${event_id}`;
+    try {
+      const result = await adminRepository.deleteEvent(event_id);
+
+      logger.info(`${logPrefix} :: Event deleted successfully`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminService;

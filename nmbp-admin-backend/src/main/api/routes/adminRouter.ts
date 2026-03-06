@@ -29,6 +29,8 @@ adminRouter.post("/add_event", adminController.addEvent);
 
 adminRouter.get("/get_event/:event_id", adminController.getEventById);
 
+adminRouter.delete("/delete_event/:event_id", adminController.deleteEvent);
+
 adminRouter.post("/list_events", adminController.listSubmittedEvents);
 
 adminRouter.post("/list_draft_events", adminController.listDraftEvents);

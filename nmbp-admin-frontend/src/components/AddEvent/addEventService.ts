@@ -1,4 +1,4 @@
-import { ApiResponse, get, post } from "../../api";
+import { ApiResponse, get, post, del } from "../../api";
 
 const addEventService = {
   addEvent: async (data: any): Promise<ApiResponse<any>> => {
@@ -157,6 +157,18 @@ const addEventService = {
       );
     } catch (error) {
       console.error("addEventService :: listDraftEvents error:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete Event - Delete an event by event_id
+   */
+  deleteEvent: async (event_id: string): Promise<ApiResponse<any>> => {
+    try {
+      return await del(`/api/v1/admin/delete_event/${event_id}`);
+    } catch (error) {
+      console.error("addEventService :: deleteEvent error:", error);
       throw error;
     }
   },

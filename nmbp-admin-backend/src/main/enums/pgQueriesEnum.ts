@@ -503,6 +503,10 @@ export enum AdminQueries {
     DELETE FROM t_event_media WHERE event_media_id = $1
   `,
 
+  DELETE_EVENT = `
+    DELETE FROM t_events WHERE event_id = $1
+  `,
+
   SUBMIT_EVENT = `
     UPDATE t_events
     SET event_submitted = true, updated_by = $2, date_updated = NOW()

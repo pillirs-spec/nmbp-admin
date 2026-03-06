@@ -578,6 +578,23 @@ const adminRepository = {
       throw new Error(error.message);
     }
   },
+
+  deleteEvent: async (event_id: string): Promise<any> => {
+    const logPrefix = `adminRepository :: deleteEvent`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.DELETE_EVENT,
+        values: [event_id],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: deleted`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminRepository;
