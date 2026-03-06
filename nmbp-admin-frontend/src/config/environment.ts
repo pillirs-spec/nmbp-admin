@@ -16,6 +16,8 @@ export const environment = {
   skipLoaderRoutes: [
     "/api/v1/auth/health",
     "/api/v1/admin/locations/activities",
+    "/api/v1/admin/locations/states",
+    "/api/v1/admin/locations/districts/:state_id",
   ],
   footerHiddenRoutes: ["/login", "/reset-password", "/forget-password"],
 };

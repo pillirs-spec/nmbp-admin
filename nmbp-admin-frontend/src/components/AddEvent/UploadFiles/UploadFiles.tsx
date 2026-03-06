@@ -133,7 +133,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
         </div>
 
         {/* Upload Grid */}
-        <div className="grid grid-cols-3 gap-6 mb-6 bg-white p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 bg-white p-6">
           {/* Uploaded Files */}
           {uploadedFiles.map((file) => (
             <div
@@ -154,14 +154,14 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
               </div>
 
               {/* File Info */}
-              <div className="flex justify-between items-center">
-                <div className="p-3 bg-white ">
-                  <p className="text-sm font-medium text-[#374151] truncate mb-1">
+              <div className="flex  items-start justify-between p-3 bg-white gap-2">
+                <div className="p-3 bg-white flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#374151] truncate mb-1 text-wrap">
                     {file.name}
                   </p>
                   <p className="text-xs text-[#6B7280]">{file.size}</p>
                 </div>
-                <div className="p-3 flex gap-2">
+                <div className="p-3 flex gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleEditFile(file.id)}
                     className="w-8 h-8  flex items-center justify-center  hover:bg-gray-100 hover:rounded-lg transition"
