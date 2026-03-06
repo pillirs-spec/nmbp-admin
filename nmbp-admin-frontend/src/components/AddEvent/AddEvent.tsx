@@ -50,18 +50,55 @@ const AddEvent = () => {
   // Load draft event on mount
   useEffect(() => {
     const loadDraft = async () => {
-      const draftEventId = localStorage.getItem("draft_event_id");
+      let draftEventId = localStorage.getItem("draft_event_id");
+
+      // If no draft_event_id in localStorage, check for user's draft events
+      if (!draftEventId) {
+        try {
+          setIsLoading(true);
+          const draftsResponse = await addEventService.listDraftEvents({
+            pageSize: 1,
+            pageNumber: 1,
+          });
+
+          if (draftsResponse.data?.data?.events?.length > 0) {
+            // Get the most recent draft event
+            const mostRecentDraft = draftsResponse.data.data.events[0];
+            draftEventId = mostRecentDraft.event_id;
+            if (draftEventId) {
+              localStorage.setItem("draft_event_id", draftEventId);
+              log(
+                LogLevel.INFO,
+                "AddEvent :: Found existing draft",
+                draftEventId,
+              );
+            }
+          } else {
+            // No drafts found, user is starting fresh
+            setIsLoading(false);
+            return;
+          }
+        } catch (error: any) {
+          log(LogLevel.ERROR, "AddEvent :: Failed to fetch drafts", error);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Load the draft event by ID
       if (draftEventId) {
         try {
           setIsLoading(true);
           const response = await addEventService.getEventById(draftEventId);
-          const eventData = response.data;
+          const eventData = response.data.data;
 
           setEventId(eventData.event_id || "");
 
           setFormData({
             activityType: eventData.activity_id?.toString() || "",
-            activityDate: eventData.activity_date || "",
+            activityDate: eventData.activity_date
+              ? new Date(eventData.activity_date).toISOString().split("T")[0]
+              : "",
             coordinatingDepartment:
               eventData.coordinating_department_name || "",
             activityTitle: eventData.activity_title || "",
@@ -81,18 +118,18 @@ const AddEvent = () => {
           });
 
           // Determine step to resume
-          if (eventData.media_files?.length > 0) {
-            setCurrentStep(4);
-            showToast("Draft loaded. Review and submit.", ToastType.INFO);
-          } else if (eventData.latitude && eventData.longitude) {
-            setCurrentStep(3);
-            showToast("Draft loaded. Continue from upload.", ToastType.INFO);
-          } else if (eventData.activity_id) {
-            setCurrentStep(2);
-            showToast("Draft loaded. Continue from location.", ToastType.INFO);
-          } else {
-            showToast("Draft loaded.", ToastType.INFO);
-          }
+          // if (eventData.media_files?.length > 0) {
+          //   setCurrentStep(4);
+          //   showToast("Draft loaded. Review and submit.", ToastType.INFO);
+          // } else if (eventData.latitude && eventData.longitude) {
+          //   setCurrentStep(3);
+          //   showToast("Draft loaded. Continue from upload.", ToastType.INFO);
+          // } else if (eventData.activity_id) {
+          //   setCurrentStep(2);
+          //   showToast("Draft loaded. Continue from location.", ToastType.INFO);
+          // } else {
+          //   showToast("Draft loaded.", ToastType.INFO);
+          // }
 
           log(LogLevel.INFO, "AddEvent :: Draft loaded", eventData);
         } catch (error: any) {
@@ -125,12 +162,7 @@ const AddEvent = () => {
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
     } else {
-      const shouldCancel = window.confirm(
-        "Are you sure? Your draft will be saved.",
-      );
-      if (shouldCancel) {
-        navigate(-1);
-      }
+      navigate(-1);
     }
   };
 
