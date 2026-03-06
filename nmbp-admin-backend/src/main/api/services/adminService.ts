@@ -658,6 +658,167 @@ const adminService = {
       throw new Error(error.message);
     }
   },
+
+  addEvent: async (
+    event_id: string | null,
+    activity_id: number | null,
+    activity_date: string | null,
+    activity_title: string | null,
+    coordinating_department_name: string | null,
+    number_of_participants: number | null,
+    number_of_female: number | null,
+    number_of_male: number | null,
+    number_of_educational_institutions: number | null,
+    description: string | null,
+    state_id: number | null,
+    district_id: number | null,
+    latitude: number | null,
+    longitude: number | null,
+    event_submitted: boolean,
+    media_files: any[],
+    userId: number,
+  ) => {
+    const logPrefix = `adminService :: addEvent :: event_id :: ${event_id}`;
+    try {
+      logger.info(
+        `${logPrefix} :: ${event_id ? "Updating" : "Creating"} event`,
+      );
+
+      // Add/Update event in database
+      const eventResult = await adminRepository.addEvent(
+        event_id,
+        activity_id,
+        activity_date,
+        activity_title,
+        coordinating_department_name,
+        number_of_participants,
+        number_of_female,
+        number_of_male,
+        number_of_educational_institutions,
+        description,
+        state_id,
+        district_id,
+        latitude,
+        longitude,
+        event_submitted,
+        userId,
+      );
+
+      if (!eventResult) {
+        throw new Error(`Failed to ${event_id ? "update" : "add"} event`);
+      }
+
+      // Upload media files to S3 and save to database (if provided)
+      const mediaResults = [];
+      if (media_files && media_files.length > 0) {
+        for (const file of media_files) {
+          try {
+            // Upload to S3
+            const fileName = `events/${eventResult.event_id}/${Date.now()}_${file.name}`;
+            const s3Url = await uploadToS3(file, userId, fileName);
+
+            if (s3Url) {
+              // Save media info to database
+              const mediaType = file.mimetype.startsWith("image/")
+                ? "image"
+                : "video";
+              const mediaResult = await adminRepository.addEventMedia(
+                eventResult.event_id,
+                s3Url,
+                mediaType,
+                file.size,
+              );
+              mediaResults.push(mediaResult);
+            }
+          } catch (fileError) {
+            logger.error(
+              `${logPrefix} :: Error uploading file ${file.name} :: ${fileError.message}`,
+            );
+            // Continue with other files even if one fails
+          }
+        }
+      }
+
+      logger.info(
+        `${logPrefix} :: Event ${event_id ? "updated" : "created"} successfully with ${mediaResults.length} media files`,
+      );
+
+      return {
+        event: eventResult,
+        media: mediaResults,
+      };
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listSubmittedEvents: async (
+    pageSize: number = 10,
+    pageNumber: number = 1,
+  ) => {
+    const logPrefix = `adminService :: listSubmittedEvents`;
+    try {
+      logger.info(
+        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber}`,
+      );
+
+      const events = await adminRepository.listSubmittedEvents(
+        pageSize,
+        pageNumber,
+      );
+
+      logger.info(
+        `${logPrefix} :: Retrieved ${events.length} submitted events`,
+      );
+      return events;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listDraftEvents: async (
+    userId: number,
+    pageSize: number = 10,
+    pageNumber: number = 1,
+  ) => {
+    const logPrefix = `adminService :: listDraftEvents :: userId :: ${userId}`;
+    try {
+      logger.info(
+        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber}`,
+      );
+
+      const events = await adminRepository.listDraftEvents(
+        userId,
+        pageSize,
+        pageNumber,
+      );
+
+      logger.info(`${logPrefix} :: Retrieved ${events.length} draft events`);
+      return events;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getEventById: async (event_id: string) => {
+    const logPrefix = `adminService :: getEventById :: event_id :: ${event_id}`;
+    try {
+      const event = await adminRepository.getEventById(event_id);
+
+      if (!event) {
+        throw new Error("Event not found");
+      }
+
+      logger.info(`${logPrefix} :: Event retrieved successfully`);
+      return event;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminService;

@@ -556,6 +556,365 @@ const adminController = {
         .send(errorCodes.documents.DOCUMENTS00000);
     }
   },
+
+  addEvent: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: addEvent`;
+    try {
+      logger.info(
+        `${logPrefix} :: Request received :: ${JSON.stringify(req.body)}`,
+      );
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Add/Update Event (Multi-Step Form)'
+                #swagger.description = 'Create a new event or update an existing draft event. Supports multi-step submission where each step saves as a draft (event_submitted=false). Final submission sets event_submitted=true to mark event as complete. Supports single or multiple media files (JPEG, PNG, MP4). Requires authentication.'
+                #swagger.consumes = ['multipart/form-data']
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['event_id'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: false,
+                    description: 'Event ID (provide to update existing draft, omit to create new event)'
+                }
+                #swagger.parameters['activity_id'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'Activity ID (Step 1)'
+                }
+                #swagger.parameters['activity_date'] = {
+                    in: 'formData',
+                    type: 'string',
+                    format: 'date',
+                    required: false,
+                    description: 'Activity date in YYYY-MM-DD format (Step 1)'
+                }
+                #swagger.parameters['activity_title'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: false,
+                    description: 'Activity title (Step 1)'
+                }
+                #swagger.parameters['coordinating_department_name'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: false,
+                    description: 'Coordinating department name (Step 1)'
+                }
+                #swagger.parameters['number_of_participants'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'Total number of participants (Step 1)'
+                }
+                #swagger.parameters['number_of_female'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'Number of female participants (Step 1)'
+                }
+                #swagger.parameters['number_of_male'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'Number of male participants (Step 1)'
+                }
+                #swagger.parameters['number_of_educational_institutions'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'Number of educational institutions (Step 1)'
+                }
+                #swagger.parameters['description'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: false,
+                    description: 'Event description (Step 1)'
+                }
+                #swagger.parameters['state_id'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'State ID (Step 2)'
+                }
+                #swagger.parameters['district_id'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'District ID (Step 2)'
+                }
+                #swagger.parameters['latitude'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'Event location latitude -90 to 90 (Step 2)'
+                }
+                #swagger.parameters['longitude'] = {
+                    in: 'formData',
+                    type: 'number',
+                    required: false,
+                    description: 'Event location longitude -180 to 180 (Step 2)'
+                }
+                #swagger.parameters['media_files'] = {
+                    in: 'formData',
+                    type: 'file',
+                    required: false,
+                    description: 'Media files - images (JPEG, PNG) or videos (MP4) - max 50 MB each. Can upload single or multiple files (Step 3)'
+                }
+                #swagger.parameters['event_submitted'] = {
+                    in: 'formData',
+                    type: 'string',
+                    required: false,
+                    description: 'Set to "true" for final submission (event_submitted=true marks event as complete) or "false"/"omit" to save as draft'
+                }
+            */
+
+      const userId = req.plainToken.user_id;
+
+      const {
+        event_id,
+        activity_id,
+        activity_date,
+        activity_title,
+        coordinating_department_name,
+        number_of_participants,
+        number_of_female,
+        number_of_male,
+        number_of_educational_institutions,
+        description,
+        state_id,
+        district_id,
+        latitude,
+        longitude,
+        event_submitted,
+      } = req.body;
+
+      // Handle multiple files - check if media_files is an array or single file
+      let media_files = [];
+      if (req.files?.media_files) {
+        const files = req.files.media_files;
+        media_files = Array.isArray(files) ? files : [files];
+      }
+
+      // Sanitize event_id - if provided as empty string, treat as null (new insert)
+      const sanitizedEventId =
+        event_id && typeof event_id === "string" && event_id.trim()
+          ? event_id.trim()
+          : null;
+
+      // Validate event data
+      const eventData = {
+        event_id: sanitizedEventId,
+        activity_id: activity_id ? parseInt(activity_id) : null,
+        activity_date: activity_date || null,
+        activity_title: activity_title || null,
+        coordinating_department_name: coordinating_department_name || null,
+        number_of_participants: number_of_participants
+          ? parseInt(number_of_participants)
+          : null,
+        number_of_female: number_of_female ? parseInt(number_of_female) : null,
+        number_of_male: number_of_male ? parseInt(number_of_male) : null,
+        number_of_educational_institutions: number_of_educational_institutions
+          ? parseInt(number_of_educational_institutions)
+          : null,
+        description: description || null,
+        state_id: state_id ? parseInt(state_id) : null,
+        district_id: district_id ? parseInt(district_id) : null,
+        latitude: latitude ? parseFloat(latitude) : null,
+        longitude: longitude ? parseFloat(longitude) : null,
+        event_submitted:
+          event_submitted === "true" || event_submitted === true ? true : false,
+        media_files,
+      };
+
+      const { error } = adminValidations.validateAddEvent(eventData);
+      if (error) {
+        logger.error(`${logPrefix} :: Validation error :: ${error.message}`);
+        return res.status(STATUS.BAD_REQUEST).send({
+          errorCode: "EVENT00001",
+          errorMessage: error.details
+            ? error.details[0].message
+            : error.message,
+        });
+      }
+
+      // Add/Update event with media files
+      const result = await adminService.addEvent(
+        eventData.event_id,
+        eventData.activity_id,
+        eventData.activity_date,
+        eventData.activity_title,
+        eventData.coordinating_department_name,
+        eventData.number_of_participants,
+        eventData.number_of_female,
+        eventData.number_of_male,
+        eventData.number_of_educational_institutions,
+        eventData.description,
+        eventData.state_id,
+        eventData.district_id,
+        eventData.latitude,
+        eventData.longitude,
+        eventData.event_submitted,
+        media_files,
+        userId,
+      );
+
+      logger.info(
+        `${logPrefix} :: Event ${sanitizedEventId ? "update" : "create"} operation - ${sanitizedEventId ? "Updating event ID: " + sanitizedEventId : "Creating new event"} successfully`,
+      );
+      return res.status(sanitizedEventId ? STATUS.OK : STATUS.CREATED).send({
+        data: result,
+        message: `Event ${sanitizedEventId ? "updated" : "created"} successfully${eventData.event_submitted ? " and submitted" : " as draft"}`,
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "EVENT00000",
+        errorMessage: "Failed to process event",
+      });
+    }
+  },
+
+  getEventById: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: getEventById`;
+    /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Get Event by ID'
+                #swagger.description = 'Retrieve a specific event (draft or submitted) by ID. Requires authentication.'
+                #swagger.consumes = ['multipart/form-data']
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+
+                #swagger.parameters['event_id'] = {
+                    in: 'path',
+                    type: 'string',
+                    required: true,
+                    description: 'Event ID'
+                }
+    */
+    try {
+      const { event_id } = req.params;
+      logger.info(`${logPrefix} :: event_id :: ${event_id}`);
+
+      const event = await adminService.getEventById(event_id);
+
+      logger.info(`${logPrefix} :: Event retrieved successfully`);
+      return res.status(STATUS.OK).send({
+        data: event,
+        message: "Event retrieved successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "EVENT00002",
+        errorMessage: "Failed to retrieve event",
+      });
+    }
+  },
+
+  listSubmittedEvents: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: listSubmittedEvents`;
+    /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'List Submitted Events'
+                #swagger.description = 'Retrieve all submitted events with pagination. Requires authentication.'
+               #swagger.consumes = ['multipart/form-data']
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    required: true,
+                    schema: {
+                        pageSize: 10,
+                        currentPage: 1
+                    }
+                }    
+    */
+    try {
+      const { pageSize = 10, currentPage = 1 } = req.body;
+      logger.info(
+        `${logPrefix} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage}`,
+      );
+
+      const events = await adminService.listSubmittedEvents(
+        pageSize,
+        currentPage,
+      );
+
+      logger.info(
+        `${logPrefix} :: Retrieved ${events.length} submitted events`,
+      );
+      return res.status(STATUS.OK).send({
+        data: events,
+        message: "Submitted events retrieved successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "EVENT00003",
+        errorMessage: "Failed to retrieve submitted events",
+      });
+    }
+  },
+
+  listDraftEvents: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: listDraftEvents`;
+
+    /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'List Draft Events'
+                #swagger.description = 'Retrieve all draft events with pagination. Requires authentication.'
+               #swagger.consumes = ['multipart/form-data']
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    required: true,
+                    schema: {
+                        pageSize: 10,
+                        currentPage: 1
+                    }
+                }
+
+    */
+    try {
+      const userId = req.plainToken.user_id;
+      const { pageSize = 10, currentPage = 1 } = req.body;
+      logger.info(
+        `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage}`,
+      );
+
+      const events = await adminService.listDraftEvents(
+        userId,
+        pageSize,
+        currentPage,
+      );
+
+      logger.info(`${logPrefix} :: Retrieved ${events.length} draft events`);
+      return res.status(STATUS.OK).send({
+        data: events,
+        message: "Draft events retrieved successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "EVENT00004",
+        errorMessage: "Failed to retrieve draft events",
+      });
+    }
+  },
 };
 
 export default adminController;

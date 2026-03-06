@@ -24,4 +24,13 @@ adminRouter.get(
   adminController.downloadDocument,
 );
 
+// Event Management APIs
+adminRouter.post("/add_event", adminController.addEvent);
+
+adminRouter.get("/get_event/:event_id", adminController.getEventById);
+
+adminRouter.post("/list_events", adminController.listSubmittedEvents);
+
+adminRouter.post("/list_draft_events", adminController.listDraftEvents);
+
 export default adminRouter;

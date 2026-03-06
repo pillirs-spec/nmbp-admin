@@ -1584,6 +1584,313 @@
           }
         }
       }
+    },
+    "/api/v1/admin/add_event": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Add/Update Event (Multi-Step Form)",
+        "description": "Create a new event or update an existing draft event. Supports multi-step submission where each step saves as a draft (event_submitted=false). Final submission sets event_submitted=true to mark event as complete. Supports single or multiple media files (JPEG, PNG, MP4). Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "event_id",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Event ID (provide to update existing draft, omit to create new event)"
+          },
+          {
+            "name": "activity_id",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Activity ID (Step 1)"
+          },
+          {
+            "name": "activity_date",
+            "in": "formData",
+            "type": "string",
+            "format": "date",
+            "required": false,
+            "description": "Activity date in YYYY-MM-DD format (Step 1)"
+          },
+          {
+            "name": "activity_title",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Activity title (Step 1)"
+          },
+          {
+            "name": "coordinating_department_name",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Coordinating department name (Step 1)"
+          },
+          {
+            "name": "number_of_participants",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Total number of participants (Step 1)"
+          },
+          {
+            "name": "number_of_female",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Number of female participants (Step 1)"
+          },
+          {
+            "name": "number_of_male",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Number of male participants (Step 1)"
+          },
+          {
+            "name": "number_of_educational_institutions",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Number of educational institutions (Step 1)"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Event description (Step 1)"
+          },
+          {
+            "name": "state_id",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "State ID (Step 2)"
+          },
+          {
+            "name": "district_id",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "District ID (Step 2)"
+          },
+          {
+            "name": "latitude",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Event location latitude -90 to 90 (Step 2)"
+          },
+          {
+            "name": "longitude",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Event location longitude -180 to 180 (Step 2)"
+          },
+          {
+            "name": "media_files",
+            "in": "formData",
+            "type": "file",
+            "required": false,
+            "description": "Media files - images (JPEG, PNG) or videos (MP4) - max 50 MB each. Can upload single or multiple files (Step 3)"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "event_id": {
+                  "example": "any"
+                },
+                "activity_id": {
+                  "example": "any"
+                },
+                "activity_date": {
+                  "example": "any"
+                },
+                "activity_title": {
+                  "example": "any"
+                },
+                "coordinating_department_name": {
+                  "example": "any"
+                },
+                "number_of_participants": {
+                  "example": "any"
+                },
+                "number_of_female": {
+                  "example": "any"
+                },
+                "number_of_male": {
+                  "example": "any"
+                },
+                "number_of_educational_institutions": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "state_id": {
+                  "example": "any"
+                },
+                "district_id": {
+                  "example": "any"
+                },
+                "latitude": {
+                  "example": "any"
+                },
+                "longitude": {
+                  "example": "any"
+                },
+                "event_submitted": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/get_event/{event_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Event by ID",
+        "description": "Retrieve a specific event (draft or submitted) by ID. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Event ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/list_events": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Submitted Events",
+        "description": "Retrieve all submitted events with pagination. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/list_draft_events": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Draft Events",
+        "description": "Retrieve all draft events with pagination. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
     }
   }
 }

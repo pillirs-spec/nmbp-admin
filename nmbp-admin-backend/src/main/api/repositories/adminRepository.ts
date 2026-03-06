@@ -373,6 +373,190 @@ const adminRepository = {
       throw new Error(error.message);
     }
   },
+
+  addEvent: async (
+    event_id: string | null,
+    activity_id: number | null,
+    activity_date: string | null,
+    activity_title: string | null,
+    coordinating_department_name: string | null,
+    number_of_participants: number | null,
+    number_of_female: number | null,
+    number_of_male: number | null,
+    number_of_educational_institutions: number | null,
+    description: string | null,
+    state_id: number | null,
+    district_id: number | null,
+    latitude: number | null,
+    longitude: number | null,
+    event_submitted: boolean,
+    userId: number,
+  ) => {
+    const logPrefix = `adminRepository :: addEvent :: event_id :: ${event_id}`;
+    try {
+      // First, ensure the tables exist
+      const createEventsTableQuery = {
+        text: pgQueries.AdminQueries.CREATE_EVENTS_TABLE,
+        values: [],
+      };
+      await pg.executeQueryPromise(createEventsTableQuery);
+      logger.debug(`${logPrefix} :: Events table created/verified`);
+
+      const createEventMediaTableQuery = {
+        text: pgQueries.AdminQueries.CREATE_EVENT_MEDIA_TABLE,
+        values: [],
+      };
+      await pg.executeQueryPromise(createEventMediaTableQuery);
+      logger.debug(`${logPrefix} :: Event media table created/verified`);
+
+      let result;
+
+      // If event_id is provided and not empty, UPDATE existing event
+      if (event_id && typeof event_id === "string" && event_id.trim()) {
+        logger.info(`${logPrefix} :: Updating existing event`);
+        const _query = {
+          text: pgQueries.AdminQueries.UPDATE_EVENT,
+          values: [
+            event_id,
+            activity_id,
+            activity_date,
+            activity_title,
+            coordinating_department_name,
+            number_of_participants,
+            number_of_female,
+            number_of_male,
+            number_of_educational_institutions,
+            description,
+            state_id,
+            district_id,
+            latitude,
+            longitude,
+            event_submitted,
+            userId,
+          ],
+        };
+        logger.debug(
+          `${logPrefix} :: UPDATE query :: ${JSON.stringify(_query)}`,
+        );
+        const queryResult = await pg.executeQueryPromise(_query);
+        result = queryResult.length ? queryResult[0] : null;
+      } else {
+        // INSERT new event
+        logger.info(`${logPrefix} :: Creating new event`);
+        const newEventId = require("uuid").v4();
+        const _query = {
+          text: pgQueries.AdminQueries.ADD_EVENT,
+          values: [
+            newEventId,
+            activity_id,
+            activity_date,
+            activity_title,
+            coordinating_department_name,
+            number_of_participants,
+            number_of_female,
+            number_of_male,
+            number_of_educational_institutions,
+            description,
+            state_id,
+            district_id,
+            latitude,
+            longitude,
+            userId,
+          ],
+        };
+        logger.debug(
+          `${logPrefix} :: INSERT query :: ${JSON.stringify(_query)}`,
+        );
+        const queryResult = await pg.executeQueryPromise(_query);
+        result = queryResult.length ? queryResult[0] : null;
+      }
+
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  addEventMedia: async (
+    event_id: string,
+    media_url: string,
+    media_type: string,
+    file_size: number,
+  ) => {
+    const logPrefix = `adminRepository :: addEventMedia :: event_id :: ${event_id}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.ADD_EVENT_MEDIA,
+        values: [event_id, media_url, media_type, file_size],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+      return result.length ? result[0] : null;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getEventById: async (event_id: string) => {
+    const logPrefix = `adminRepository :: getEventById :: event_id :: ${event_id}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.GET_EVENT_BY_ID,
+        values: [event_id],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+      return result.length ? result[0] : null;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listSubmittedEvents: async (pageSize: number, pageNumber: number) => {
+    const logPrefix = `adminRepository :: listSubmittedEvents`;
+    try {
+      const offset = (pageNumber - 1) * pageSize;
+      const _query = {
+        text: pgQueries.AdminQueries.LIST_SUBMITTED_EVENTS,
+        values: [pageSize, offset],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result count :: ${result.length}`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listDraftEvents: async (
+    userId: number,
+    pageSize: number,
+    pageNumber: number,
+  ) => {
+    const logPrefix = `adminRepository :: listDraftEvents :: userId :: ${userId}`;
+    try {
+      const offset = (pageNumber - 1) * pageSize;
+      const _query = {
+        text: pgQueries.AdminQueries.LIST_DRAFT_EVENTS,
+        values: [userId, pageSize, offset],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result count :: ${result.length}`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminRepository;

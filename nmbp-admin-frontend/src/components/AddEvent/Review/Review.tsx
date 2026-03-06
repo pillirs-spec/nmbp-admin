@@ -174,13 +174,19 @@ const Review: React.FC<ReviewProps> = ({
                 <p className="text-xs text-[#6B7280] font-medium mb-1">
                   District
                 </p>
-                <p className="text-sm  text-[#374151]">Harda, Madhya Pradesh</p>
+                <p className="text-sm  text-[#374151]">
+                  {formData.district_id || "N/A"}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">
                   Location Coordinates
                 </p>
-                <p className="text-sm text-[#374151]">22.3467, 77.0890</p>
+                <p className="text-sm text-[#374151]">
+                  {formData.latitude && formData.longitude
+                    ? `${formData.latitude}, ${formData.longitude}`
+                    : "N/A"}
+                </p>
               </div>
             </div>
           </div>
@@ -196,31 +202,42 @@ const Review: React.FC<ReviewProps> = ({
               </span>
             </div>
             <div className="grid grid-cols-3 gap-6 ">
-              {/* Image Card 1 */}
-              <div className="h-60 border border-[#E5E7EB] rounded-lg overflow-hidden bg-[#F9FAFB]">
-                <div className="h-44 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-3xl">
-                  🖼️
+              {formData.media_files && formData.media_files.length > 0 ? (
+                formData.media_files.map((file: File, index: number) => (
+                  <div
+                    key={index}
+                    className="h-60 border border-[#E5E7EB] rounded-lg overflow-hidden bg-[#F9FAFB]"
+                  >
+                    <div className="h-44 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-3xl overflow-hidden">
+                      {file.type.startsWith("image") ? (
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={file.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <video
+                          src={URL.createObjectURL(file)}
+                          className="w-full h-full object-cover"
+                          controls
+                        />
+                      )}
+                    </div>
+                    <div className="p-3 bg-white border-t border-[#E5E7EB]">
+                      <p className="text-[13px] font-semibold text-[#374151] truncate mb-1">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-[#6B7280]">
+                        {(file.size / (1024 * 1024)).toFixed(1)} MB
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-8 text-[#6B7280]">
+                  <p className="text-sm">No media files uploaded</p>
                 </div>
-                <div className="p-3 bg-white border-t border-[#E5E7EB]">
-                  <p className="text-[13px] font-semibold text-[#374151] truncate mb-1">
-                    Activity_Name_DD/MM/YYYY.jpg
-                  </p>
-                  <p className="text-xs text-[#6B7280]">1.8 Mb</p>
-                </div>
-              </div>
-
-              {/* Image Card 2 */}
-              <div className="h-60 border border-[#E5E7EB] rounded-lg overflow-hidden bg-[#F9FAFB]">
-                <div className="h-44 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-3xl">
-                  🖼️
-                </div>
-                <div className="p-3 bg-white border-t border-[#E5E7EB]">
-                  <p className="text-[13px] font-medium text-[#374151] truncate mb-1">
-                    Activity_Name_DD/MM/YYYY.jpg
-                  </p>
-                  <p className="text-xs text-[#6B7280]">1.8 Mb</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -231,7 +248,7 @@ const Review: React.FC<ReviewProps> = ({
             onClick={handleCancel}
             className="px-6 py-2 border-[1px] border-[#003366] text-[#003366] font-[500] rounded-lg hover:bg-blue-50 transition text-sm"
           >
-            Cancel
+            Back
           </button>
           <button
             onClick={handleSubmit}

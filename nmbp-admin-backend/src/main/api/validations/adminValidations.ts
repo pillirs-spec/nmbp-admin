@@ -91,6 +91,84 @@ const adminValidations = {
     });
     return updateDocumentSchema.validate(document);
   },
+
+  validateAddEvent: (event: any): Joi.ValidationResult => {
+    const addEventSchema = Joi.object({
+      event_id: Joi.string().optional().allow(null, ""),
+      activity_id: Joi.alternatives()
+        .try(Joi.number().integer().positive(), Joi.string().regex(/^\d+$/))
+        .optional()
+        .allow(null, ""),
+      activity_date: Joi.alternatives()
+        .try(Joi.date().iso(), Joi.string().regex(/^\d{4}-\d{2}-\d{2}$/))
+        .optional()
+        .allow(null, ""),
+      activity_title: Joi.string().max(255).optional().allow(null, ""),
+      coordinating_department_name: Joi.string()
+        .max(255)
+        .optional()
+        .allow(null, ""),
+      number_of_participants: Joi.alternatives()
+        .try(Joi.number().integer().min(0), Joi.string().regex(/^\d+$/))
+        .optional()
+        .allow(null, ""),
+      number_of_female: Joi.alternatives()
+        .try(Joi.number().integer().min(0), Joi.string().regex(/^\d+$/))
+        .optional()
+        .allow(null, ""),
+      number_of_male: Joi.alternatives()
+        .try(Joi.number().integer().min(0), Joi.string().regex(/^\d+$/))
+        .optional()
+        .allow(null, ""),
+      number_of_educational_institutions: Joi.alternatives()
+        .try(Joi.number().integer().min(0), Joi.string().regex(/^\d+$/))
+        .optional()
+        .allow(null, ""),
+      description: Joi.string().max(2000).optional().allow(null, ""),
+      state_id: Joi.alternatives()
+        .try(Joi.number().integer().positive(), Joi.string().regex(/^\d+$/))
+        .optional()
+        .allow(null, ""),
+      district_id: Joi.alternatives()
+        .try(Joi.number().integer().positive(), Joi.string().regex(/^\d+$/))
+        .optional()
+        .allow(null, ""),
+      latitude: Joi.alternatives()
+        .try(
+          Joi.number().min(-90).max(90),
+          Joi.string().regex(/^-?\d+(\.\d+)?$/),
+        )
+        .optional()
+        .allow(null, ""),
+      longitude: Joi.alternatives()
+        .try(
+          Joi.number().min(-180).max(180),
+          Joi.string().regex(/^-?\d+(\.\d+)?$/),
+        )
+        .optional()
+        .allow(null, ""),
+      event_submitted: Joi.boolean().optional().default(false),
+      media_files: Joi.array()
+        .items(
+          Joi.object({
+            name: Joi.string().required(),
+            mimetype: Joi.string()
+              .valid("image/jpeg", "image/jpg", "image/png", "video/mp4")
+              .required(),
+            data: Joi.binary().required(),
+            size: Joi.number()
+              .max(50 * 1024 * 1024)
+              .required()
+              .messages({
+                "number.max": "Each file size should not exceed 50MB",
+              }),
+          }).unknown(true),
+        )
+        .optional()
+        .allow(null),
+    });
+    return addEventSchema.validate(event);
+  },
 };
 
 export default adminValidations;
