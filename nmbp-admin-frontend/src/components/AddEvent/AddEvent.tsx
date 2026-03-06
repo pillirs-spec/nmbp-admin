@@ -245,7 +245,7 @@ const AddEvent = () => {
           setFormData((prev) => ({ ...prev, media_files: [] }));
         }
 
-        showToast(`Step ${currentStep} saved as draft.`, ToastType.SUCCESS);
+        // showToast(`Step ${currentStep} saved as draft.`, ToastType.SUCCESS);
         setCurrentStep((prev) => prev + 1);
       }
     } catch (error: any) {

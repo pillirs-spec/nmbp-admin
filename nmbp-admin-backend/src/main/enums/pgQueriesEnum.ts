@@ -419,31 +419,76 @@ export enum AdminQueries {
 
   GET_EVENT_BY_ID = `
     SELECT e.*, 
+           s.state_name,
+           d.district_name,
+           a.activity_name,
            array_agg(json_build_object('event_media_id', em.event_media_id, 'media_url', em.media_url, 'media_type', em.media_type, 'file_size', em.file_size)) FILTER (WHERE em.event_media_id IS NOT NULL) as media_files
     FROM t_events e
     LEFT JOIN t_event_media em ON e.event_id = em.event_id
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
     WHERE e.event_id = $1
-    GROUP BY e.event_id
+    GROUP BY e.event_id, s.state_name, d.district_name, a.activity_name
   `,
 
   LIST_SUBMITTED_EVENTS = `
     SELECT e.*, 
+           s.state_name,
+           d.district_name,
+           a.activity_name,
            array_agg(json_build_object('event_media_id', em.event_media_id, 'media_url', em.media_url, 'media_type', em.media_type, 'file_size', em.file_size)) FILTER (WHERE em.event_media_id IS NOT NULL) as media_files
     FROM t_events e
     LEFT JOIN t_event_media em ON e.event_id = em.event_id
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
     WHERE e.event_submitted = true
-    GROUP BY e.event_id
+    AND (
+      $3 = '' 
+      OR e.activity_title ILIKE '%' || $3 || '%'
+      OR a.activity_name ILIKE '%' || $3 || '%'
+      OR s.state_name ILIKE '%' || $3 || '%'
+      OR d.district_name ILIKE '%' || $3 || '%'
+    )
+    GROUP BY e.event_id, s.state_name, d.district_name, a.activity_name
     ORDER BY e.date_created DESC
     LIMIT $1 OFFSET $2
   `,
 
+  SUBMITTED_EVENTS_COUNT = `
+    SELECT COUNT(*) as count
+    FROM t_events e
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
+    WHERE e.event_submitted = true
+    AND (
+      $1 = '' 
+      OR e.activity_title ILIKE '%' || $1 || '%'
+      OR a.activity_name ILIKE '%' || $1 || '%'
+      OR s.state_name ILIKE '%' || $1 || '%'
+      OR d.district_name ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_SUBMITTED_EVENTS_COUNT = `
+    SELECT COUNT(*) as count FROM t_events WHERE event_submitted = true
+  `,
+
   LIST_DRAFT_EVENTS = `
     SELECT e.*, 
+           s.state_name,
+           d.district_name,
+           a.activity_name,
            array_agg(json_build_object('event_media_id', em.event_media_id, 'media_url', em.media_url, 'media_type', em.media_type, 'file_size', em.file_size)) FILTER (WHERE em.event_media_id IS NOT NULL) as media_files
     FROM t_events e
     LEFT JOIN t_event_media em ON e.event_id = em.event_id
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
     WHERE e.event_submitted = false AND e.created_by = $1
-    GROUP BY e.event_id
+    GROUP BY e.event_id, s.state_name, d.district_name, a.activity_name
     ORDER BY e.date_updated DESC
     LIMIT $2 OFFSET $3
   `,

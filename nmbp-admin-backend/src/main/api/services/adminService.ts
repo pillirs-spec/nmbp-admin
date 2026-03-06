@@ -756,22 +756,39 @@ const adminService = {
   listSubmittedEvents: async (
     pageSize: number = 10,
     pageNumber: number = 1,
+    search: string = "",
   ) => {
     const logPrefix = `adminService :: listSubmittedEvents`;
     try {
       logger.info(
-        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber}`,
+        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search}`,
       );
 
       const events = await adminRepository.listSubmittedEvents(
         pageSize,
         pageNumber,
+        search,
       );
 
       logger.info(
         `${logPrefix} :: Retrieved ${events.length} submitted events`,
       );
       return events;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getSubmittedEventsCount: async (search: string = "") => {
+    const logPrefix = `adminService :: getSubmittedEventsCount`;
+    try {
+      logger.info(`${logPrefix} :: search :: ${search}`);
+
+      const count = await adminRepository.getSubmittedEventsCount(search);
+
+      logger.info(`${logPrefix} :: Total count :: ${count}`);
+      return count;
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
       throw new Error(error.message);

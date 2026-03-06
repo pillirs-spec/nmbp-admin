@@ -518,18 +518,39 @@ const adminRepository = {
     }
   },
 
-  listSubmittedEvents: async (pageSize: number, pageNumber: number) => {
+  listSubmittedEvents: async (
+    pageSize: number,
+    pageNumber: number,
+    search: string = "",
+  ) => {
     const logPrefix = `adminRepository :: listSubmittedEvents`;
     try {
       const offset = (pageNumber - 1) * pageSize;
       const _query = {
         text: pgQueries.AdminQueries.LIST_SUBMITTED_EVENTS,
-        values: [pageSize, offset],
+        values: [pageSize, offset, search],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
       const result = await pg.executeQueryPromise(_query);
       logger.info(`${logPrefix} :: db result count :: ${result.length}`);
       return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getSubmittedEventsCount: async (search: string = "") => {
+    const logPrefix = `adminRepository :: getSubmittedEventsCount`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.SUBMITTED_EVENTS_COUNT,
+        values: [search],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: count :: ${result[0]?.count || 0}`);
+      return parseInt(result[0]?.count || 0);
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
       throw new Error(error.message);

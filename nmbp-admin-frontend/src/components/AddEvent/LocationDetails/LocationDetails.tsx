@@ -86,7 +86,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const handleSaveAndContinueWithValidation = async () => {
     const isValid = await validateForm();
     if (isValid) {
-      showToast("Location details validated", "success");
+      // showToast("Location details validated", "success");
       handleSaveAndContinue();
     } else {
       showToast("Please check location details", "error");

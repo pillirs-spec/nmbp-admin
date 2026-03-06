@@ -82,7 +82,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
   const handleSaveAndContinueWithValidation = async () => {
     const isValid = await validateForm();
     if (isValid) {
-      showToast("Activity details validated successfully", "success");
+      // showToast("Activity details validated successfully", "success");
       handleSaveAndContinue();
     } else {
       showToast("Please fill all mandatory fields correctly", "error");
@@ -240,6 +240,7 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
               <input
                 type="date"
                 name="activityDate"
+                min={new Date().toISOString().split("T")[0]}
                 value={formData.activityDate}
                 onChange={handleInputChangeWithCalculation}
                 className={`w-full px-4 py-2 border rounded-md outline-none text-[#374151] text-sm focus:border-[#003366] transition ${

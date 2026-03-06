@@ -835,26 +835,35 @@ const adminController = {
                     required: true,
                     schema: {
                         pageSize: 10,
-                        currentPage: 1
+                        currentPage: 1,
+                        search: ""
                     }
                 }    
     */
     try {
-      const { pageSize = 10, currentPage = 1 } = req.body;
+      const { pageSize = 10, currentPage = 1, search = "" } = req.body;
       logger.info(
-        `${logPrefix} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage}`,
+        `${logPrefix} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: search :: ${search}`,
       );
 
       const events = await adminService.listSubmittedEvents(
         pageSize,
         currentPage,
+        search,
       );
 
+      const totalCount = await adminService.getSubmittedEventsCount(search);
+
       logger.info(
-        `${logPrefix} :: Retrieved ${events.length} submitted events`,
+        `${logPrefix} :: Retrieved ${events.length} submitted events :: Total count :: ${totalCount}`,
       );
       return res.status(STATUS.OK).send({
-        data: events,
+        data: {
+          events,
+          totalCount,
+          pageSize,
+          currentPage,
+        },
         message: "Submitted events retrieved successfully",
       });
     } catch (error) {

@@ -223,9 +223,9 @@ const ImportantDocumentsList = () => {
                   <tr>
                     <td
                       colSpan={12}
-                      className="px-6 py-8 text-center text-[#374151] font-semibold"
+                      className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                     >
-                      No Data Found
+                      No data found
                     </td>
                   </tr>
                 )}
@@ -292,11 +292,14 @@ const ImportantDocumentsList = () => {
               <select
                 className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
                 value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
               >
-                <option>10</option>
-                <option>50</option>
-                <option>100</option>
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
               of <span className="font-semibold">{documents?.length}</span>{" "}
               items
