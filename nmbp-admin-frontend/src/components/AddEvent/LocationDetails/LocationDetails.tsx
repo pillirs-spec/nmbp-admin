@@ -317,6 +317,16 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
     }
   }, [formData.latitude, formData.longitude]);
 
+  // Initialize state and district names from formData (for draft loading)
+  useEffect(() => {
+    if (formData.state_name) {
+      setSelectedStateName(formData.state_name);
+    }
+    if (formData.district_name) {
+      setSelectedDistrictName(formData.district_name);
+    }
+  }, [formData.state_name, formData.district_name]);
+
   return (
     <div className="p-5">
       {/* Step Indicator */}
@@ -408,10 +418,22 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
                         value: stateId,
                       },
                     } as any);
+                    handleInputChange({
+                      target: {
+                        name: "state_name",
+                        value: stateName,
+                      },
+                    } as any);
                     // Reset district in formData
                     handleInputChange({
                       target: {
                         name: "district_id",
+                        value: "",
+                      },
+                    } as any);
+                    handleInputChange({
+                      target: {
+                        name: "district_name",
                         value: "",
                       },
                     } as any);
@@ -457,6 +479,12 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
                       target: {
                         name: "district_id",
                         value: districtId,
+                      },
+                    } as any);
+                    handleInputChange({
+                      target: {
+                        name: "district_name",
+                        value: districtName,
                       },
                     } as any);
                   }}

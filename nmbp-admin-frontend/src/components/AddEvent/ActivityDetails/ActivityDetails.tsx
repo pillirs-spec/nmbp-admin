@@ -123,11 +123,11 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
       const femaleCount =
         name === "numberOfFemale"
           ? parseInt(value) || 0
-          : formData.numberOfFemale || 0;
+          : parseInt(String(formData.numberOfFemale)) || 0;
       const maleCount =
         name === "numberOfMale"
           ? parseInt(value) || 0
-          : formData.numberOfMale || 0;
+          : parseInt(String(formData.numberOfMale)) || 0;
 
       // Trigger the calculation through a synthetic event
       const syntheticEvent = {

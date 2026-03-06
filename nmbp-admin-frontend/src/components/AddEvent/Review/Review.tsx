@@ -175,7 +175,7 @@ const Review: React.FC<ReviewProps> = ({
                   District
                 </p>
                 <p className="text-sm  text-[#374151]">
-                  {formData.district_id || "N/A"}
+                  {formData.district_name || "N/A"}
                 </p>
               </div>
               <div>
