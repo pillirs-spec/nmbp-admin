@@ -103,7 +103,7 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
 
   return (
     <div>
-      {role}
+      {/* {role} */}
 
       <div className="w-full h-full p-2 overflow-y-auto">
         <div className="">
@@ -117,12 +117,14 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 Last updated: 27 Aug 2024, 02:00 PM
               </p> */}
             </div>
-            <button
-              onClick={handleAddEvent}
-              className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
-            >
-              Add Event +
-            </button>
+            {role.includes("state") ? null : (
+              <button
+                onClick={handleAddEvent}
+                className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
+              >
+                Add Event +
+              </button>
+            )}
           </div>
 
           {/* KPI Cards */}

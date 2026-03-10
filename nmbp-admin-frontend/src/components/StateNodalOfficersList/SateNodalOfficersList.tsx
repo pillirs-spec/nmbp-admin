@@ -7,7 +7,7 @@ import CopyIcon from "../../assets/copy.svg";
 import PDFIcon from "../../assets/pdf.svg";
 import nodalOfficersService from "../../pages/Admin/NodalOfficersManagement/NodalOfficersList/nodalOfficersService";
 import { LogLevel, ToastType } from "../../enums";
-import { useLogger, useToast } from "../../hooks";
+import { useAuth, useLogger, useToast } from "../../hooks";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -39,6 +39,7 @@ const StateNodalOfficersList = () => {
   const [pageSize, setPageSize] = useState<number>(10);
   const { log } = useLogger();
   const { showToast } = useToast();
+  const { userDetails } = useAuth();
 
   // useEffect(() => {
   //   try {
@@ -402,7 +403,7 @@ const StateNodalOfficersList = () => {
         </div>
 
         {/* Selected Officer Info Card */}
-        {/* {selectedOfficer && (
+        {userDetails.role_name.toLowerCase().includes("state") && (
           <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
@@ -410,7 +411,7 @@ const StateNodalOfficersList = () => {
                   State Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.state_name}
+                  {userDetails.state_name}
                 </p>
               </div>
               <div>
@@ -418,7 +419,7 @@ const StateNodalOfficersList = () => {
                   District Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.district_name}
+                  {userDetails.district_name}
                 </p>
               </div>
               <div>
@@ -426,26 +427,24 @@ const StateNodalOfficersList = () => {
                   Officer Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.display_name}
+                  {userDetails.display_name}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">Email</p>
-                <p className="text-sm text-[#374151]">
-                  {selectedOfficer.email_id}
-                </p>
+                <p className="text-sm text-[#374151]">{userDetails.email_id}</p>
               </div>
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">
                   Contact Number
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.mobile_number}
+                  {userDetails.mobile_number}
                 </p>
               </div>
             </div>
           </div>
-        )} */}
+        )}
 
         {/* Table Container */}
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
