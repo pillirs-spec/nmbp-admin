@@ -743,6 +743,23 @@ const adminService = {
         `${logPrefix} :: Event ${event_id ? "updated" : "created"} successfully with ${mediaResults.length} media files`,
       );
 
+      const eventsKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_LIST,
+        {},
+      );
+      const eventsCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_COUNT,
+        {},
+      );
+      const eventsTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${eventsKey}*`);
+      await redis.deleteRedis(eventsCountKey);
+      await redis.deleteRedis(eventsTotalCountKey);
+
       return {
         event: eventResult,
         media: mediaResults,
@@ -764,15 +781,41 @@ const adminService = {
         `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search}`,
       );
 
+      let key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_LIST,
+        {},
+      );
+
+      if (search) {
+        key += `|search:${search}`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+      }
+
+      if (pageNumber) {
+        key += `|offset:${pageNumber}`;
+      }
+
+      const cachedEvents = await redis.GetKeyRedis(key);
+      if (cachedEvents) {
+        logger.info(
+          `${logPrefix} :: cached result of submitted events :: ${cachedEvents}`,
+        );
+        return JSON.parse(cachedEvents);
+      }
+
       const events = await adminRepository.listSubmittedEvents(
         pageSize,
         pageNumber,
         search,
       );
 
-      logger.info(
-        `${logPrefix} :: Retrieved ${events.length} submitted events`,
-      );
+      if (events && events.length > 0) {
+        redis.SetRedis(key, events, CacheTTL.LONG);
+      }
+
       return events;
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
@@ -843,6 +886,22 @@ const adminService = {
       const result = await adminRepository.deleteEvent(event_id);
 
       logger.info(`${logPrefix} :: Event deleted successfully`);
+      const eventsKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_LIST,
+        {},
+      );
+      const eventsCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_COUNT,
+        {},
+      );
+      const eventsTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${eventsKey}*`);
+      await redis.deleteRedis(eventsCountKey);
+      await redis.deleteRedis(eventsTotalCountKey);
       return result;
     } catch (error) {
       logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
