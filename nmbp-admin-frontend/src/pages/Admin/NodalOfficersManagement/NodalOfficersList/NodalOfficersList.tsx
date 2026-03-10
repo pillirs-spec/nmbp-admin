@@ -34,7 +34,7 @@ const NodalOfficersList: React.FC<NodalOfficersListProps> = ({ role }) => {
   const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const location = useLocation();
 
-  const pageSize = 200;
+  const [pageSize, setPageSize] = useState<number>(10);
 
   // Mock data - Replace with actual API call
   const mockOfficers: Officer[] = [

@@ -34,7 +34,7 @@ const StatesList = () => {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const { log } = useLogger();
 
-  const pageSize = 200;
+  const [pageSize, setPageSize] = useState<number>(10);
 
   const mockActivities: Activity[] = [
     {
@@ -587,10 +587,17 @@ const StatesList = () => {
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>2</option>
-                <option>50</option>
-                <option>200</option>
+              <select
+                value={pageSize}
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
               of <span className="font-semibold">{totalCount}</span> items
             </div>

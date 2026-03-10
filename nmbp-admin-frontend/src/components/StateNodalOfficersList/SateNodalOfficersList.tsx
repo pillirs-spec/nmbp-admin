@@ -564,7 +564,7 @@ const StateNodalOfficersList = () => {
                 disabled={currentPage === 1}
                 className="w-7 h-7 flex items-center justify-center text-sm font-bold text-[#9161FF] hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
-                &lt;
+                +
               </button>
 
               {Array.from(
@@ -605,23 +605,30 @@ const StateNodalOfficersList = () => {
                   )
                 }
                 disabled={currentPage === Math.ceil(totalCount / pageSize)}
-                className="w-7 h-7 flex items-center justify-center text-sm font-bold text-[#9161FF] hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className={`w-7 h-7 flex items-center justify-center text-sm font-bold transition ${
+                  currentPage === Math.ceil(totalCount / pageSize)
+                    ? " text-[#9161FF] cursor-not-allowed"
+                    : "  hover:bg-pink-50"
+                }`}
               >
-                &gt;
+                +
               </button>
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
               <select
-                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
                 value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
               >
-                <option>10</option>
-                <option>50</option>
-                <option>100</option>
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
-              of <span className="font-semibold">{officers?.length}</span> items
+              of <span className="font-semibold">{totalCount}</span> items
             </div>
           </div>
         </div>
