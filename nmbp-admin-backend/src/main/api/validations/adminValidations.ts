@@ -169,6 +169,13 @@ const adminValidations = {
     });
     return addEventSchema.validate(event);
   },
+
+  validateFeedback: (feedback: any): Joi.ValidationResult => {
+    const feedbackSchema = Joi.object({
+      feedback: Joi.string().min(3).max(200).required(),
+    });
+    return feedbackSchema.validate(feedback);
+  },
 };
 
 export default adminValidations;

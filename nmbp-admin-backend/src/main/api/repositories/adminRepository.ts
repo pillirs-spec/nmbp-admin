@@ -595,6 +595,52 @@ const adminRepository = {
       throw new Error(error.message);
     }
   },
+
+  addFeedback: async (userId: number, feedback: string): Promise<any> => {
+    const logPrefix = `adminRepository :: addFeedback :: userId :: ${userId} :: feedback :: ${feedback}`;
+    try {
+      const createFeedbackTableQuery = {
+        text: pgQueries.FeedbackQueries.CREATE_FEEDBACK_TABLE,
+        values: [],
+      };
+      await pg.executeQueryPromise(createFeedbackTableQuery);
+      logger.debug(`${logPrefix} :: Feedback table created/verified`);
+
+      const _query = {
+        text: pgQueries.FeedbackQueries.ADD_FEEDBACK,
+        values: [feedback, userId],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: feedback added`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listFeedback: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+  ) => {
+    const logPrefix = `adminRepository :: listFeedback`;
+    try {
+      const offset = (Number(currentPage) - 1) * Number(pageSize);
+      const _query = {
+        text: pgQueries.FeedbackQueries.LIST_FEEDBACKS,
+        values: [pageSize, offset, searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result count :: ${result.length}`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminRepository;

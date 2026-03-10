@@ -256,6 +256,13 @@ const formBuilder = {
   },
 };
 
+const feedback = {
+  FEEDBACK00000: {
+    errorCode: "FEEDBACK00000",
+    errorMessage: "Internal Server Error",
+  },
+};
+
 export {
   users,
   roles,
@@ -267,4 +274,5 @@ export {
   states,
   activities,
   documents,
+  feedback,
 };

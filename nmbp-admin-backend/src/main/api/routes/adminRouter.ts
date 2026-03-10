@@ -35,4 +35,8 @@ adminRouter.post("/list_events", adminController.listSubmittedEvents);
 
 adminRouter.post("/list_draft_events", adminController.listDraftEvents);
 
+adminRouter.post("/add_feedback", adminController.addFeedback);
+
+adminRouter.post("/list_feedback", adminController.listFeedback);
+
 export default adminRouter;

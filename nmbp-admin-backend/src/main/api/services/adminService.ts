@@ -908,6 +908,98 @@ const adminService = {
       throw new Error(error.message);
     }
   },
+
+  addFeedback: async (userId: number, feedback: string) => {
+    const logPrefix = `adminService :: addFeedback :: userId :: ${userId}`;
+    try {
+      logger.info(`${logPrefix} :: Adding feedback to database`);
+
+      const feedbackResult = await adminRepository.addFeedback(
+        userId,
+        feedback,
+      );
+
+      if (!feedbackResult) {
+        throw new Error(`Failed to add feedback`);
+      }
+
+      logger.info(`${logPrefix} :: Feedback added successfully`);
+
+      const feedbackKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_LIST,
+        {},
+      );
+      const feedbackCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_COUNT,
+        {},
+      );
+      const feedbackTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${feedbackKey}*`);
+      await redis.deleteRedis(feedbackCountKey);
+      await redis.deleteRedis(feedbackTotalCountKey);
+      return feedbackResult;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listFeedback: async (
+    pageSize: number = 10,
+    pageNumber: number = 1,
+    search: string = "",
+  ) => {
+    const logPrefix = `adminService :: listFeedback`;
+    try {
+      logger.info(
+        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search}`,
+      );
+
+      let key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_LIST,
+        {},
+      );
+
+      if (search) {
+        key += `|search:${search}`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+      }
+
+      if (pageNumber) {
+        key += `|offset:${pageNumber}`;
+      }
+
+      const cachedFeedback = await redis.GetKeyRedis(key);
+      if (cachedFeedback) {
+        logger.info(
+          `${logPrefix} :: cached result of feedback :: ${cachedFeedback}`,
+        );
+        return JSON.parse(cachedFeedback);
+      }
+
+      const feedbackList = await adminRepository.listFeedback(
+        pageSize,
+        pageNumber,
+        search,
+      );
+
+      if (feedbackList && feedbackList.length > 0) {
+        redis.SetRedis(key, feedbackList, CacheTTL.LONG);
+      }
+
+      return feedbackList;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminService;

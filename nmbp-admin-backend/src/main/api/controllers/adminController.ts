@@ -148,7 +148,7 @@ const adminController = {
     const logPrefix = `adminController :: getDnoList`;
     try {
       logger.info(`${logPrefix} :: Request received`);
-      /*                #swagger.tags = ['Admin']
+      /*        #swagger.tags = ['Admin']
                 #swagger.summary = 'Get DNO List'
                 #swagger.description = 'Retrieve a list of DNOs. Requires authentication.'
                 #swagger.parameters['Authorization'] = {
@@ -167,7 +167,7 @@ const adminController = {
                         selectedState: 1
                     }
                 }  
-            */
+        */
 
       const pageSize = req.body.pageSize || 11;
       const currentPage = req.body.currentPage
@@ -959,6 +959,104 @@ const adminController = {
       return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
         errorCode: "EVENT00004",
         errorMessage: "Failed to retrieve draft events",
+      });
+    }
+  },
+
+  addFeedback: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: addFeedback`;
+    try {
+      logger.info(
+        `${logPrefix} :: Request received :: ${JSON.stringify(req.body)}`,
+      );
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Add Feedback'
+                #swagger.description = 'Add general feedback.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    required: true,
+                    schema: {
+                        feedback: "Easy to access and use",
+                    }
+                }  
+        */
+      const userId = req.plainToken.user_id;
+      const { error } = adminValidations.validateFeedback(req.body);
+      if (error) {
+        if (error.details != null)
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.feedback.FEEDBACK00000.errorCode,
+            errorMessage: error.details[0].message,
+          });
+        else
+          return res.status(STATUS.BAD_REQUEST).send({
+            errorCode: errorCodes.feedback.FEEDBACK00000.errorCode,
+            errorMessage: error.message,
+          });
+      }
+      const result = await adminService.addFeedback(userId, req.body.feedback);
+
+      return res.status(STATUS.CREATED).send({
+        data: result,
+        message: "Feedback submitted successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "FEEDBACK00000",
+        errorMessage: "Failed to submit feedback",
+      });
+    }
+  },
+
+  listFeedback: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: listFeedback`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'List Feedback'
+                #swagger.description = 'Retrieve all feedback entries. Requires authentication.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['body'] = {
+                    in: 'body',
+                    required: true,
+                    schema: {
+                        pageSize: 10,
+                        currentPage: 1,
+                        searchFilter: "Enum",
+                       
+                    }
+                }   
+        */
+      const { pageSize, currentPage, searchFilter } = req.body;
+      logger.info(
+        `${logPrefix} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
+      );
+      const feedbackList = await adminService.listFeedback(
+        pageSize,
+        currentPage,
+        searchFilter,
+      );
+      return res.status(STATUS.OK).send({
+        data: feedbackList,
+        message: "Feedback retrieved successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "FEEDBACK00000",
+        errorMessage: "Failed to retrieve feedback",
       });
     }
   },

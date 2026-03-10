@@ -310,3 +310,7 @@ SELECT setval('m_permissions_permission_id_seq', (SELECT MAX(permission_id) FROM
 SELECT setval('m_menus_menu_id_seq', (SELECT MAX(menu_id) FROM m_menus));
 SELECT setval('m_users_user_id_seq', (SELECT MAX(user_id) FROM m_users));
 SELECT setval('password_policies_id_seq', (SELECT MAX(id) FROM password_policies));
+
+-- Table: t_feedback (Sample data)
+INSERT INTO t_feedback (feedback, created_by, date_created, date_updated) 
+VALUES ('Great application and easy to use', 1, NOW(), NOW());

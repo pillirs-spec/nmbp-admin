@@ -1804,6 +1804,36 @@
         }
       }
     },
+    "/api/v1/admin/delete_event/{event_id}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete Event",
+        "description": "Delete a specific event (draft or submitted) by ID. Requires authentication.",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Event ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/admin/list_events": {
       "post": {
         "tags": [
@@ -1836,6 +1866,10 @@
                 "currentPage": {
                   "type": "number",
                   "example": 1
+                },
+                "search": {
+                  "type": "string",
+                  "example": ""
                 }
               }
             }
@@ -1880,6 +1914,88 @@
                 "currentPage": {
                   "type": "number",
                   "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/add_feedback": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Add Feedback",
+        "description": "Add general feedback.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "feedback": {
+                  "type": "string",
+                  "example": "Easy to access and use"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/list_feedback": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Feedback",
+        "description": "Retrieve all feedback entries. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "Enum"
                 }
               }
             }

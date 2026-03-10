@@ -514,3 +514,68 @@ export enum AdminQueries {
     RETURNING *
   `,
 }
+
+export enum FeedbackQueries {
+  CREATE_FEEDBACK_TABLE = `
+    CREATE TABLE IF NOT EXISTS t_feedback (
+      feedback_id SERIAL PRIMARY KEY,
+      feedback TEXT NOT NULL,
+      created_by INT REFERENCES m_users(user_id),
+      date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `,
+
+  ADD_FEEDBACK = `
+    INSERT INTO t_feedback(feedback, created_by, date_created, date_updated)
+    VALUES ($1, $2, NOW(), NOW())
+    RETURNING feedback_id, feedback, created_by, date_created, date_updated
+  `,
+
+  GET_FEEDBACK_BY_ID = `
+    SELECT 
+      f.feedback_id,
+      f.feedback,
+      f.created_by,
+      u.display_name AS created_by_name,
+      f.date_created,
+      f.date_updated
+    FROM t_feedback f
+    LEFT JOIN m_users u ON f.created_by = u.user_id
+    WHERE f.feedback_id = $1
+  `,
+
+  LIST_FEEDBACKS = `
+    SELECT 
+      f.feedback_id,
+      f.feedback,
+      f.created_by,
+      u.display_name AS created_by_name,
+      f.date_created,
+      f.date_updated
+    FROM t_feedback f
+    LEFT JOIN m_users u ON f.created_by = u.user_id
+    WHERE (
+      f.feedback ILIKE '%' || $3 || '%'
+    )
+    ORDER BY f.date_created DESC
+    LIMIT $1 OFFSET $2
+  `,
+
+  FEEDBACKS_COUNT = `
+    SELECT COUNT(*) as count FROM t_feedback
+  `,
+
+  UPDATE_FEEDBACK = `
+    UPDATE t_feedback
+    SET 
+      feedback = $2,
+      date_updated = NOW()
+    WHERE feedback_id = $1
+    RETURNING feedback_id, feedback, created_by, date_created, date_updated
+  `,
+
+  DELETE_FEEDBACK = `
+    DELETE FROM t_feedback WHERE feedback_id = $1
+  `,
+}
