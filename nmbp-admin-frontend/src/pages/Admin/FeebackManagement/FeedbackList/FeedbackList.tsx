@@ -5,6 +5,7 @@ import CopyIcon from "../../../../assets/copy.svg";
 import ExcelIcon from "../../../../assets/excel.svg";
 import PdfIcon from "../../../../assets/pdf.svg";
 import PrintIcon from "../../../../assets/print.svg";
+import { useNavigate } from "react-router-dom";
 
 interface Feedback {
   id: string;
@@ -27,6 +28,7 @@ const FeedbackList = () => {
   const [selectedFeedbackId, setSelectedFeedbackId] = useState<string | null>(
     null,
   );
+  const navigate = useNavigate();
 
   // Mock data - Replace with actual API call
   const mockFeedbacks: Feedback[] = [
@@ -134,27 +136,39 @@ const FeedbackList = () => {
   const endIndex = Math.min(startIndex + pageSize, feedbacks.length);
   const paginatedFeedbacks = feedbacks.slice(startIndex, endIndex);
 
+  const handleAddFeedback = () => {
+    console.log("Navigating to Add Feedback form");
+    navigate("/feedback/add");
+    // Add navigation logic here (e.g., using React Router)
+  };
+
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
       <div className="p-5">
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <div className="mb-8 flex flex-col sm:flex-row sm:justify-between gap-4 items-center">
           <h2 className="text-2xl font-semibold text-[#374151]">
             Feedback & Grievance Redressal
           </h2>
-          <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end">
-            <button onClick={() => handleExport("copy")} className="">
-              <img src={CopyIcon} alt="copy" className="w-16 h-16" />
-            </button>
-            <button onClick={() => handleExport("excel")} className="">
-              <img src={ExcelIcon} alt="excel" className="w-16 h-16" />
-            </button>
-            <button onClick={() => handleExport("pdf")} className="">
-              <img src={PdfIcon} alt="pdf" className="w-16 h-16" />
-            </button>
-            <button onClick={() => handleExport("print")} className="">
-              <img src={PrintIcon} alt="print" className="w-16 h-16" />
-            </button>
-          </div>
+          <button
+            onClick={handleAddFeedback}
+            className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
+          >
+            Add Feedback +
+          </button>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end mb-5">
+          <button onClick={() => handleExport("copy")} className="">
+            <img src={CopyIcon} alt="copy" className="w-16 h-16" />
+          </button>
+          <button onClick={() => handleExport("excel")} className="">
+            <img src={ExcelIcon} alt="excel" className="w-16 h-16" />
+          </button>
+          <button onClick={() => handleExport("pdf")} className="">
+            <img src={PdfIcon} alt="pdf" className="w-16 h-16" />
+          </button>
+          <button onClick={() => handleExport("print")} className="">
+            <img src={PrintIcon} alt="print" className="w-16 h-16" />
+          </button>
         </div>
 
         <div className="bg-white rounded-md border border-[#E5E7EB]">
