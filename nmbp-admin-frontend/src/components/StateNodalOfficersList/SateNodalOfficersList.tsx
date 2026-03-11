@@ -404,7 +404,7 @@ const StateNodalOfficersList = () => {
 
         {/* Selected Officer Info Card */}
         {userDetails.role_name.toLowerCase().includes("state") && (
-          <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-6">
+          <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-6 relative">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">
@@ -443,6 +443,9 @@ const StateNodalOfficersList = () => {
                 </p>
               </div>
             </div>
+            <p className="absolute right-0 top-0 bg-[#003366] px-4 py-1 text-white rounded-bl-md text-xs font-semibold">
+              Self
+            </p>
           </div>
         )}
 
