@@ -39,7 +39,6 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const { showToast } = useToast();
 
-  // Validation schema
   const validationSchema = Yup.object().shape({
     activityType: Yup.string().required("Activity Type is required"),
     activityDate: Yup.string().required("Activity Date is required"),
@@ -47,18 +46,11 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
       "Coordinating Department is required",
     ),
     activityTitle: Yup.string().required("Activity Title is required"),
-    numberOfEducationalInstitutions: Yup.number()
-      .min(
-        1,
-        "Number of Educational Institutions is mandatory and must be greater than 0",
-      )
-      .required("Number of Educational Institutions is required"),
-    numberOfFemale: Yup.number()
-      .min(1, "Number of Female is mandatory and must be greater than 0")
-      .required("Number of Female is required"),
-    numberOfMale: Yup.number()
-      .min(1, "Number of Male is mandatory and must be greater than 0")
-      .required("Number of Male is required"),
+    numberOfEducationalInstitutions: Yup.string().required(
+      "Number of Educational Institutions is required",
+    ),
+    numberOfFemale: Yup.string().required("Number of Female is required"),
+    numberOfMale: Yup.string().required("Number of Male is required"),
   });
 
   // Validate form
@@ -137,6 +129,29 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
         },
       } as any;
       handleInputChange(syntheticEvent);
+    }
+  };
+
+  const handleNumericKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allowedKeys = [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "Tab",
+    ];
+    if (!allowedKeys.includes(e.key)) {
+      e.preventDefault();
     }
   };
 
@@ -310,16 +325,18 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                 <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
+                type="text"
                 name="numberOfEducationalInstitutions"
                 value={formData.numberOfEducationalInstitutions}
                 onChange={handleInputChangeWithCalculation}
+                onKeyDown={handleNumericKeyDown}
+                maxLength={6}
                 className={`w-full px-4 py-2 border rounded-md outline-none text-[#374151] text-sm focus:border-[#003366] transition ${
                   errors.numberOfEducationalInstitutions
                     ? "border-red-500 focus:border-red-500"
                     : "border-[#E5E7EB]"
                 }`}
-                placeholder="0"
+                placeholder="45"
               />
               {errors.numberOfEducationalInstitutions && (
                 <p className="text-red-500 text-xs mt-1">
@@ -336,16 +353,18 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                 Number of Female <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
+                type="text"
                 name="numberOfFemale"
                 value={formData.numberOfFemale}
                 onChange={handleInputChangeWithCalculation}
+                onKeyDown={handleNumericKeyDown}
+                maxLength={6}
                 className={`w-full px-4 py-2 border rounded-md outline-none text-[#374151] text-sm focus:border-[#003366] transition ${
                   errors.numberOfFemale
                     ? "border-red-500 focus:border-red-500"
                     : "border-[#E5E7EB]"
                 }`}
-                placeholder="0"
+                placeholder="20"
               />
               {errors.numberOfFemale && (
                 <p className="text-red-500 text-xs mt-1">
@@ -358,16 +377,18 @@ const ActivityDetails: React.FC<ActivityDetailsProps> = ({
                 Number of Male <span className="text-red-500">*</span>
               </label>
               <input
-                type="number"
+                type="text"
                 name="numberOfMale"
                 value={formData.numberOfMale}
                 onChange={handleInputChangeWithCalculation}
+                onKeyDown={handleNumericKeyDown}
+                maxLength={6}
                 className={`w-full px-4 py-2 border rounded-md outline-none text-[#374151] text-sm focus:border-[#003366] transition ${
                   errors.numberOfMale
                     ? "border-red-500 focus:border-red-500"
                     : "border-[#E5E7EB]"
                 }`}
-                placeholder="0"
+                placeholder="10"
               />
               {errors.numberOfMale && (
                 <p className="text-red-500 text-xs mt-1">
