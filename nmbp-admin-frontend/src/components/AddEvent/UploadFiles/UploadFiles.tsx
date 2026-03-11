@@ -36,6 +36,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
   handleSaveAndContinue,
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [error, setError] = useState<string>("");
 
   // Initialize/restore uploadedFiles from formData when entering Step 3
   useEffect(() => {
@@ -87,6 +88,8 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
             file: file,
           };
           setUploadedFiles((prev) => [...prev, newFile]);
+          // Clear error when file is uploaded
+          setError("");
           // Update formData with the actual File object
           setFormData((prev: any) => ({
             ...prev,
@@ -115,6 +118,15 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
 
   const handleEditFile = (id: number) => {
     console.log("Edit file:", id);
+  };
+
+  const handleSaveAndContinueWithValidation = () => {
+    if (uploadedFiles.length === 0) {
+      setError("Please upload at least one photo or video");
+      return;
+    }
+    setError("");
+    handleSaveAndContinue();
   };
 
   return (
@@ -206,12 +218,12 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
                   <p className="text-xs text-[#6B7280]">{file.size}</p>
                 </div>
                 <div className="p-3 flex gap-2 flex-shrink-0">
-                  <button
+                  {/* <button
                     onClick={() => handleEditFile(file.id)}
                     className="w-8 h-8  flex items-center justify-center  hover:bg-gray-100 hover:rounded-lg transition"
                   >
                     <img src={EditIcon} alt="edit" />
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => handleDeleteFile(file.id)}
                     className="w-8 h-8 flex items-center justify-center  hover:bg-red-50 hover:rounded-lg transition"
@@ -245,6 +257,13 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="px-6 pb-3">
+            <p className="text-red-500 text-xs font-medium">{error}</p>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex justify-between items-center p-6">
           <button
@@ -254,7 +273,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
             Back
           </button>
           <button
-            onClick={handleSaveAndContinue}
+            onClick={handleSaveAndContinueWithValidation}
             className="px-8 py-2 bg-[#003366] text-white font-[500] rounded-lg hover:opacity-90 transition text-sm flex items-center gap-2"
           >
             Save and Continue <span>→</span>

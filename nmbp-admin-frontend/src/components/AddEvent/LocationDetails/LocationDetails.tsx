@@ -49,10 +49,10 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const { log } = useLogger();
   const { showToast } = useToast();
 
-  // Validation schema - all fields optional
+  // Validation schema - state and district are required
   const validationSchema = Yup.object().shape({
-    state_id: Yup.string(),
-    district_id: Yup.string(),
+    state_id: Yup.string().required("State is required"),
+    district_id: Yup.string().required("District is required"),
     latitude: Yup.string(),
     longitude: Yup.string(),
   });
