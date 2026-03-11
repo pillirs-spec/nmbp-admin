@@ -258,14 +258,15 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Activity Date
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                      Participants
-                    </th>
+
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Male Participants
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Female Participants
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      Total Participants
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Cordinating Department
@@ -310,14 +311,15 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                             .reverse()
                             .join("-")}
                         </td>
-                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                          {submission.number_of_participants}
-                        </td>
+
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
                           {submission.number_of_male}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
                           {submission.number_of_female}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
+                          {submission.number_of_participants}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
                           {submission.coordinating_department_name}
