@@ -455,6 +455,53 @@ const adminController = {
     }
   },
 
+  previewDocument: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: previewDocument`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Preview Document'
+                #swagger.description = 'Get a signed preview URL for a document. The URL is valid for 5 minutes. For images and PDFs, the URL can be used to directly preview the document. For other file types, the URL can be used to download the document for preview.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['document_id'] = {
+                    in: 'path',
+                    type: 'string',
+                    required: true,
+                    description: 'Document ID'
+                }
+      */
+      const { document_id } = req.params;
+
+      if (!document_id) {
+        return res.status(STATUS.BAD_REQUEST).send({
+          data: null,
+          message: "Missing required field: document_id",
+        });
+      }
+      const previewUrl = await adminService.getDocumentPreviewUrl(document_id);
+      if (!previewUrl) {
+        return res.status(STATUS.NOT_FOUND).send({
+          data: null,
+          message: "Document not found or unable to generate preview URL",
+        });
+      }
+      return res.status(STATUS.OK).send({
+        data: {
+          preview_url: previewUrl,
+          expires_in_seconds: 300,
+        },
+        message: "Preview URL generated successfully. Valid for 5 minutes.",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+    }
+  },
+
   updateDocument: async (req: Request, res: Response) => {
     const logPrefix = `adminController :: updateDocument`;
     try {

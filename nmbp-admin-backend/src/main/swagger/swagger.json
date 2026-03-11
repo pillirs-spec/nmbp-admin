@@ -1585,6 +1585,36 @@
         }
       }
     },
+    "/api/v1/admin/documents/{document_id}/preview": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Preview Document",
+        "description": "Get a signed preview URL for a document. The URL is valid for 5 minutes. For images and PDFs, the URL can be used to directly preview the document. For other file types, the URL can be used to download the document for preview.",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/v1/admin/add_event": {
       "post": {
         "tags": [
@@ -1969,7 +1999,7 @@
           "Admin"
         ],
         "summary": "List Feedback",
-        "description": "Retrieve all feedback entries. Requires authentication.",
+        "description": "Retrieve all feedback entries. Only shows feedback created by the current user. Requires authentication.",
         "parameters": [
           {
             "name": "Authorization",

@@ -585,6 +585,30 @@ const adminService = {
     }
   },
 
+  getDocumentPreviewUrl: async (document_id: string) => {
+    const logPrefix = `adminService :: getDocumentPreviewUrl :: document_id :: ${document_id}`;
+    try {
+      logger.info(
+        `${logPrefix} :: Fetching document and generating preview URL`,
+      );
+      const document = await adminRepository.getDocumentById(document_id);
+      if (!document) {
+        logger.warn(`${logPrefix} :: Document not found`);
+        return null;
+      }
+      const previewUrl = await getSignedS3Url(document.file_url, 300);
+      logger.info(
+        `${logPrefix} :: Preview URL generated successfully for file: ${document.file_url}`,
+      );
+      return previewUrl;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error generating preview URL :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
   updateDocument: async (
     document_id: string,
     document_name: string,

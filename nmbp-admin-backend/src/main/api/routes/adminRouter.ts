@@ -24,7 +24,11 @@ adminRouter.get(
   adminController.downloadDocument,
 );
 
-// Event Management APIs
+adminRouter.get(
+  "/documents/:document_id/preview",
+  adminController.previewDocument,
+);
+
 adminRouter.post("/add_event", adminController.addEvent);
 
 adminRouter.get("/get_event/:event_id", adminController.getEventById);
