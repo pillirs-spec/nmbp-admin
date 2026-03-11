@@ -5,6 +5,7 @@ import { errorCodes } from "../../config";
 import { adminService } from "../services";
 import { adminValidations } from "../validations";
 import { v4 as uuidv4 } from "uuid";
+import { adminRepository } from "../repositories";
 
 const adminController = {
   health: (req: Request, res: Response): Response => {
@@ -169,17 +170,33 @@ const adminController = {
                 }  
         */
 
-      const pageSize = req.body.pageSize || 11;
+      const userId = req.plainToken.user_id;
+      const pageSize = req.body.pageSize || 10;
       const currentPage = req.body.currentPage
         ? (req.body.currentPage - 1) * pageSize
         : 10;
       const selectedState = Number(req.body.selectedState) || 0;
       const searchFilter = req.body.searchFilter || "";
+
+      const user = await adminRepository.getUserByUserId(userId);
+
+      if (!user) {
+        return res.status(STATUS.NOT_FOUND).send({
+          data: null,
+          message: "User not found",
+        });
+      }
+
+      const stateId = user.state_id;
+      const userRoleName = user.role_name || "";
+
       const dnoList = await adminService.getDnoList(
         pageSize,
         currentPage,
         searchFilter,
         selectedState,
+        stateId,
+        userRoleName,
       );
 
       const dnoCount = await adminService.dnoCount(searchFilter);

@@ -154,17 +154,45 @@ const adminRepository = {
     }
   },
 
+  getUserByUserId: async (userId: number) => {
+    const logPrefix = `adminRepository :: getUserByUserId :: userId :: ${userId}`;
+    try {
+      const _query = {
+        text: pgQueries.AdminQueries.GET_USER_BY_USER_ID,
+        values: [userId],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0] : null;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
   getDnoList: async (
     pageSize: number,
     currentPage: number,
     searchFilter: string,
     selectedState: number,
+    stateId: number,
+    userRoleName: string,
   ) => {
-    const logPrefix = `adminRepository :: getDnoList :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState}`;
+    const logPrefix = `adminRepository :: getDnoList :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState} :: stateId :: ${stateId} :: userRoleName :: ${userRoleName}`;
     try {
       const _query = {
         text: pgQueries.AdminQueries.GET_DNO_LIST,
-        values: [pageSize, currentPage, searchFilter, selectedState],
+        values: [
+          pageSize,
+          currentPage,
+          searchFilter,
+          selectedState,
+          stateId,
+          userRoleName,
+        ],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
 

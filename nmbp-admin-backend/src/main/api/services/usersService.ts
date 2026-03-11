@@ -42,7 +42,20 @@ const usersService = {
       }
 
       user.password = encryptedPassword;
-      user.display_name = JSONUTIL.capitalize(user.display_name.trim());
+      // Capitalize display_name without using JSONUTIL to avoid toUpperCase error
+      if (user.display_name && typeof user.display_name === "string") {
+        const trimmed = user.display_name.trim();
+        if (trimmed.length > 0) {
+          user.display_name =
+            trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+        } else {
+          user.display_name =
+            `${user.first_name || ""} ${user.last_name || ""}`.trim();
+        }
+      } else {
+        user.display_name =
+          `${user.first_name || ""} ${user.last_name || ""}`.trim();
+      }
       const userId = await usersRepository.createUser(user);
 
       if (!userId) {

@@ -194,6 +194,13 @@ export enum AdminQueries {
     WHERE r.role_name = 'State Nodal Officer'
    `,
 
+  GET_USER_BY_USER_ID = `
+    SELECT u.user_id, u.display_name, u.mobile_number, u.email_id, u.state_id, u.district_id, u.role_id, r.role_name
+    FROM m_users u
+    LEFT JOIN m_roles r ON u.role_id = r.role_id
+    WHERE u.user_id = $1
+    `,
+
   GET_DNO_LIST = `
   SELECT 
     u.user_id,
@@ -210,11 +217,15 @@ export enum AdminQueries {
   INNER JOIN m_roles r ON u.role_id = r.role_id
   LEFT JOIN m_states s ON u.state_id = s.state_id
   LEFT JOIN m_districts d ON u.district_id = d.district_id
+  
   WHERE u.role_id = (
       SELECT role_id 
       FROM m_roles 
       WHERE role_name = 'District Nodal Officer'
-  ) AND ($4 = 0 OR u.state_id = $4)
+  ) AND (
+      ($6 ILIKE '%Admin%' AND ($4 = 0 OR u.state_id = $4))
+      OR (NOT $6 ILIKE '%Admin%' AND u.state_id = $5)
+  )
   AND (
       u.display_name ILIKE '%' || $3 || '%'
       OR s.state_name ILIKE '%' || $3 || '%'

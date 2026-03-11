@@ -291,8 +291,10 @@ const adminService = {
     currentPage: number,
     searchFilter: string,
     selectedState: number,
+    stateId: number,
+    userRoleName: string,
   ) => {
-    const logPrefix = `adminService :: getDnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState}`;
+    const logPrefix = `adminService :: getDnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState} :: stateId :: ${stateId} :: userRoleName :: ${userRoleName}`;
     try {
       logger.info(`${logPrefix} :: Fetching DNO list from database`);
       let key = redisKeysFormatter.getFormattedRedisKey(RedisKeys.DNO_LIST, {});
@@ -316,6 +318,9 @@ const adminService = {
         key += `|state:${selectedState}`;
         whereQuery += ` AND state_id = '${selectedState}'`;
       }
+      if (userRoleName) {
+        key += `|role:${userRoleName}`;
+      }
 
       const cachedSnoList = await redis.GetKeyRedis(key);
       if (cachedSnoList) {
@@ -329,6 +334,8 @@ const adminService = {
         currentPage,
         searchFilter,
         selectedState,
+        stateId,
+        userRoleName,
       );
       if (snoList && snoList.length > 0)
         redis.SetRedis(key, snoList, CacheTTL.LONG);
