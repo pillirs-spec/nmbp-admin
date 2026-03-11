@@ -4,6 +4,7 @@ import { LogLevel, ToastType } from "../../enums";
 import { useNavigate } from "react-router-dom";
 import { useForm, yupResolver } from "@mantine/form";
 import addFeedbackValidations from "./addFeedbackValidations";
+import feedbackService from "../../pages/Admin/FeebackManagement/FeedbackList/feedbackService";
 
 const AddFeedback = () => {
   const navigate = useNavigate();
@@ -28,8 +29,22 @@ const AddFeedback = () => {
       );
       return;
     }
-    console.log("Form submitted", form.values);
     try {
+      const payload = {
+        feedback: form.values.feedback,
+      };
+
+      const response = await feedbackService.addFeedback(payload);
+      if (response.status === 201) {
+        showToast(
+          "Feedback submitted successfully.",
+          "Success",
+          ToastType.SUCCESS,
+        );
+        setTimeout(() => {
+          navigate("/feedback");
+        }, 1500);
+      }
     } catch (error) {
       log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
     }

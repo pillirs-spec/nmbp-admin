@@ -7,7 +7,7 @@ import PdfIcon from "../../../../assets/pdf.svg";
 import PrintIcon from "../../../../assets/print.svg";
 import { useNavigate } from "react-router-dom";
 import feedbackService from "./feedbackService";
-import { LogLevel } from "../../../../enums";
+import { LogLevel, ToastType } from "../../../../enums";
 import { useLogger, useToast } from "../../../../hooks";
 
 interface Feedback {
@@ -79,8 +79,10 @@ const FeedbackList = () => {
       };
 
       const response = await feedbackService.getAllFeedbacks(payload);
-      setFeedbacks(response.data.data);
-      setTotalCount(response.data.totalCount);
+      if (response.status === 200) {
+        setFeedbacks(response.data.data);
+        setTotalCount(response.data.totalCount);
+      }
     } catch (error) {
       log(LogLevel.ERROR, "FeedbackList :: getAllFeedbacksList", error);
     }
