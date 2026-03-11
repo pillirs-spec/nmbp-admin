@@ -223,8 +223,13 @@ export enum AdminQueries {
       FROM m_roles 
       WHERE role_name = 'District Nodal Officer'
   ) AND (
-      ($6 ILIKE '%Admin%' AND ($4 = 0 OR u.state_id = $4))
-      OR (NOT $6 ILIKE '%Admin%' AND u.state_id = $5)
+      -- If selectedState is provided (> 0), show only that state
+      ($4 > 0 AND u.state_id = $4)
+      -- Otherwise, apply admin/non-admin logic
+      OR ($4 = 0 AND (
+          ($6 ILIKE '%Admin%')
+          OR (NOT $6 ILIKE '%Admin%' AND u.state_id = $5)
+      ))
   )
   AND (
       u.display_name ILIKE '%' || $3 || '%'
