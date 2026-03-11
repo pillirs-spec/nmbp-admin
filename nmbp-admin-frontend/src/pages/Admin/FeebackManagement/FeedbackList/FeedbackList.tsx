@@ -8,7 +8,7 @@ import PrintIcon from "../../../../assets/print.svg";
 import { useNavigate } from "react-router-dom";
 import feedbackService from "./feedbackService";
 import { LogLevel, ToastType } from "../../../../enums";
-import { useLogger, useToast } from "../../../../hooks";
+import { useAuth, useLogger, useToast } from "../../../../hooks";
 
 interface Feedback {
   feedback_id: string;
@@ -28,6 +28,7 @@ const FeedbackList = () => {
   );
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { userDetails } = useAuth();
   const { log } = useLogger();
 
   const handleSearch = (value: string) => {
@@ -97,7 +98,7 @@ const FeedbackList = () => {
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
       <div className="p-5">
-        <div className="mb-8 flex flex-col sm:flex-row sm:justify-between gap-4 items-center">
+        <div className="mb-5 flex flex-col sm:flex-row sm:justify-between gap-4 items-center">
           <h2 className="text-2xl font-semibold text-[#374151]">
             Feedback & Grievance Redressal
           </h2>
@@ -108,7 +109,7 @@ const FeedbackList = () => {
             Add Feedback +
           </button>
         </div>
-        <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end mb-5">
+        <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end mb-4">
           <button onClick={() => handleExport("copy")} className="">
             <img src={CopyIcon} alt="copy" className="w-16 h-16" />
           </button>
@@ -121,6 +122,45 @@ const FeedbackList = () => {
           <button onClick={() => handleExport("print")} className="">
             <img src={PrintIcon} alt="print" className="w-16 h-16" />
           </button>
+        </div>
+
+        <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <p className="text-xs text-[#6B7280] font-medium mb-1">
+                State Name
+              </p>
+              <p className="text-sm text-[#374151]">{userDetails.state_name}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#6B7280] font-medium mb-1">
+                District Name
+              </p>
+              <p className="text-sm text-[#374151]">
+                {userDetails.district_name}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-[#6B7280] font-medium mb-1">
+                Officer Name
+              </p>
+              <p className="text-sm text-[#374151]">
+                {userDetails.display_name}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-[#6B7280] font-medium mb-1">Email</p>
+              <p className="text-sm text-[#374151]">{userDetails.email_id}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#6B7280] font-medium mb-1">
+                Contact Number
+              </p>
+              <p className="text-sm text-[#374151]">
+                {userDetails.mobile_number}
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="bg-white rounded-md border border-[#E5E7EB]">
