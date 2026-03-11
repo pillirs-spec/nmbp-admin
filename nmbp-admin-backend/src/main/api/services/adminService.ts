@@ -952,17 +952,22 @@ const adminService = {
     pageSize: number = 10,
     pageNumber: number = 1,
     search: string = "",
+    userId: number,
   ) => {
     const logPrefix = `adminService :: listFeedback`;
     try {
       logger.info(
-        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search}`,
+        `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search}`,
       );
 
       let key = redisKeysFormatter.getFormattedRedisKey(
         RedisKeys.FEEDBACK_LIST,
         {},
       );
+
+      if (userId) {
+        key += `|userId:${userId}`;
+      }
 
       if (search) {
         key += `|search:${search}`;
@@ -988,6 +993,7 @@ const adminService = {
         pageSize,
         pageNumber,
         search,
+        userId,
       );
 
       if (feedbackList && feedbackList.length > 0) {
@@ -1001,12 +1007,12 @@ const adminService = {
     }
   },
 
-  feedbackCount: async (search: string = "") => {
+  feedbackCount: async (search: string = "", userId: number) => {
     const logPrefix = `adminService :: feedbackCount`;
     try {
-      logger.info(`${logPrefix} :: search :: ${search}`);
+      logger.info(`${logPrefix} :: userId :: ${userId} :: search :: ${search}`);
 
-      const count = await adminRepository.feedbackCount(search);
+      const count = await adminRepository.feedbackCount(search, userId);
 
       logger.info(`${logPrefix} :: Total count :: ${count}`);
       return count;
@@ -1016,14 +1022,17 @@ const adminService = {
     }
   },
 
-  totalFeedbackCount: async () => {
+  totalFeedbackCount: async (userId: number) => {
     const logPrefix = `adminService :: totalFeedbackCount`;
     try {
-      logger.info(`${logPrefix} :: Counting total feedback in database`);
-      const key = redisKeysFormatter.getFormattedRedisKey(
-        RedisKeys.FEEDBACK_TOTAL_COUNT,
-        {},
+      logger.info(
+        `${logPrefix} :: userId :: ${userId} :: Counting total feedback in database`,
       );
+      const key =
+        redisKeysFormatter.getFormattedRedisKey(
+          RedisKeys.FEEDBACK_TOTAL_COUNT,
+          {},
+        ) + `|userId:${userId}`;
 
       const cachedTotalCount = await redis.GetKeyRedis(key);
       if (cachedTotalCount) {
@@ -1033,7 +1042,7 @@ const adminService = {
         return JSON.parse(cachedTotalCount);
       }
 
-      const count = await adminRepository.totalFeedbackCount();
+      const count = await adminRepository.totalFeedbackCount(userId);
       if (count !== null && count !== undefined) {
         redis.SetRedis(key, count, CacheTTL.LONG);
       }

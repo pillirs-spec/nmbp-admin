@@ -1021,7 +1021,7 @@ const adminController = {
       logger.info(`${logPrefix} :: Request received`);
       /*        #swagger.tags = ['Admin']
                 #swagger.summary = 'List Feedback'
-                #swagger.description = 'Retrieve all feedback entries. Requires authentication.'
+                #swagger.description = 'Retrieve all feedback entries. Only shows feedback created by the current user. Requires authentication.'
                 #swagger.parameters['Authorization'] = {
                     in: 'header',
                     required: true,
@@ -1039,18 +1039,23 @@ const adminController = {
                     }
                 }   
         */
+      const userId = req.plainToken.user_id;
       const { pageSize, currentPage, searchFilter } = req.body;
       logger.info(
-        `${logPrefix} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
+        `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
       );
       const feedbackList = await adminService.listFeedback(
         pageSize,
         currentPage,
         searchFilter,
+        userId,
       );
 
-      const feedbackCount = await adminService.feedbackCount(searchFilter);
-      const totalFeedbackCount = await adminService.totalFeedbackCount();
+      const feedbackCount = await adminService.feedbackCount(
+        searchFilter,
+        userId,
+      );
+      const totalFeedbackCount = await adminService.totalFeedbackCount(userId);
       return res.status(STATUS.OK).send({
         data: feedbackList,
         feedbackCount,

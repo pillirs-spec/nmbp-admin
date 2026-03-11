@@ -558,21 +558,22 @@ export enum FeedbackQueries {
     WHERE (
       f.feedback ILIKE '%' || $3 || '%'
     )
+    AND f.created_by = $4
     ORDER BY f.date_created DESC
     LIMIT $1 OFFSET $2
   `,
 
   FEEDBACKS_COUNT = `
-  
-  SELECT COUNT(*) as count
+    SELECT COUNT(*) as count
     FROM t_feedback
     WHERE (
       feedback ILIKE '%' || $1 || '%'
     )
+    AND created_by = $2
   `,
 
   TOTAL_FEEDBACKS_COUNT = `
-    SELECT COUNT(*) as count FROM t_feedback
+    SELECT COUNT(*) as count FROM t_feedback WHERE created_by = $1
   `,
 
   UPDATE_FEEDBACK = `
