@@ -70,8 +70,34 @@ const ImportantDocumentsList = () => {
     navigate("/important-documents/add");
   };
 
-  const handleDownloadDocument = () => {
-    console.log("handle download document");
+  const handleDownloadDocument = async (document_id: string) => {
+    try {
+      const response =
+        await importantDocumentService.downloadDocument(document_id);
+      if (response.status === 200) {
+        const downloadUrl = response.data.data.download_url;
+        const documentName = response.data.data.document_name;
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", documentName);
+        link.setAttribute("target", "_blank");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast(
+          "Document downloaded successfully",
+          "success",
+          ToastType.SUCCESS,
+        );
+      }
+    } catch (error) {
+      log(
+        LogLevel.ERROR,
+        "ImportantDocumentsList :: handleDownloadDocument",
+        error,
+      );
+    }
   };
 
   const getAllDocumentsList = async () => {
@@ -213,7 +239,9 @@ const ImportantDocumentsList = () => {
                         <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
                           <button
                             className="text-[#003366] font-[500]"
-                            onClick={handleDownloadDocument}
+                            onClick={() =>
+                              handleDownloadDocument(document.document_id)
+                            }
                           >
                             <IconDownload size={20} color="red" />
                           </button>
@@ -224,19 +252,22 @@ const ImportantDocumentsList = () => {
                         <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
                           <button
                             className="text-[#003366] font-[500]"
-                            onClick={handleDownloadDocument}
+                            onClick={() =>
+                              handleDownloadDocument(document.document_id)
+                            }
                           >
                             <IconDownload size={20} color="red" />
                           </button>
                         </td>
                       ) : (
                         <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
-                          <button
+                          {/* <button
                             className="text-[#003366] font-[500]"
                             onClick={handleViewDocument}
                           >
                             <IconEye size={20} color="red" />
-                          </button>
+                          </button> */}
+
                           <button
                             className="text-[#003366] font-[500]"
                             onClick={() =>
@@ -244,6 +275,15 @@ const ImportantDocumentsList = () => {
                             }
                           >
                             <IconEdit size={20} />
+                          </button>
+
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={() =>
+                              handleDownloadDocument(document.document_id)
+                            }
+                          >
+                            <IconDownload size={20} color="red" />
                           </button>
                         </td>
                       )}

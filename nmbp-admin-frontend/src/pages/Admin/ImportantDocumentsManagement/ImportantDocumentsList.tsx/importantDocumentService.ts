@@ -20,4 +20,8 @@ export const importantDocumentService = {
   ): Promise<ApiResponse<any>> => {
     return await get(`/api/v1/admin/documents/${documentId}`);
   },
+
+  downloadDocument: async (documentId: string): Promise<ApiResponse<any>> => {
+    return await get(`/api/v1/admin/documents/${documentId}/download`);
+  },
 };
