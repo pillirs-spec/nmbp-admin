@@ -149,7 +149,9 @@ export enum AdminQueries {
     u.display_name,
     u.mobile_number,
     u.email_id,
+    s.state_id,
     s.state_name,
+    d.district_id,
     d.district_name,
     r.role_name,
     u.date_updated
@@ -198,7 +200,9 @@ export enum AdminQueries {
     u.display_name,
     u.mobile_number,
     u.email_id,
+    s.state_id,
     s.state_name,
+    d.district_id,
     d.district_name,
     r.role_name,
     u.date_updated
