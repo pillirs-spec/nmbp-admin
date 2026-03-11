@@ -805,11 +805,13 @@ const adminService = {
     pageSize: number = 10,
     pageNumber: number = 1,
     search: string = "",
+    userId: number,
+    userRoleName: string = "",
   ) => {
     const logPrefix = `adminService :: listSubmittedEvents`;
     try {
       logger.info(
-        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search}`,
+        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search} :: userId :: ${userId} :: userRoleName :: ${userRoleName}`,
       );
 
       let key = redisKeysFormatter.getFormattedRedisKey(
@@ -819,6 +821,14 @@ const adminService = {
 
       if (search) {
         key += `|search:${search}`;
+      }
+
+      if (userId) {
+        key += `|userId:${userId}`;
+      }
+
+      if (userRoleName) {
+        key += `|role:${userRoleName}`;
       }
 
       if (pageSize) {
@@ -841,6 +851,8 @@ const adminService = {
         pageSize,
         pageNumber,
         search,
+        userId,
+        userRoleName,
       );
 
       if (events && events.length > 0) {
@@ -854,12 +866,22 @@ const adminService = {
     }
   },
 
-  getSubmittedEventsCount: async (search: string = "") => {
+  getSubmittedEventsCount: async (
+    search: string = "",
+    userId: number,
+    userRoleName: string = "",
+  ) => {
     const logPrefix = `adminService :: getSubmittedEventsCount`;
     try {
-      logger.info(`${logPrefix} :: search :: ${search}`);
+      logger.info(
+        `${logPrefix} :: search :: ${search} :: userId :: ${userId} :: userRoleName :: ${userRoleName}`,
+      );
 
-      const count = await adminRepository.getSubmittedEventsCount(search);
+      const count = await adminRepository.getSubmittedEventsCount(
+        search,
+        userId,
+        userRoleName,
+      );
 
       logger.info(`${logPrefix} :: Total count :: ${count}`);
       return count;

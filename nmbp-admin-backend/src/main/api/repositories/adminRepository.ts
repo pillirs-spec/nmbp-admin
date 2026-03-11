@@ -550,13 +550,15 @@ const adminRepository = {
     pageSize: number,
     pageNumber: number,
     search: string = "",
+    userId: number,
+    userRoleName: string,
   ) => {
     const logPrefix = `adminRepository :: listSubmittedEvents`;
     try {
       const offset = (pageNumber - 1) * pageSize;
       const _query = {
         text: pgQueries.AdminQueries.LIST_SUBMITTED_EVENTS,
-        values: [pageSize, offset, search],
+        values: [pageSize, offset, search, userRoleName, userId],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
       const result = await pg.executeQueryPromise(_query);
@@ -568,12 +570,16 @@ const adminRepository = {
     }
   },
 
-  getSubmittedEventsCount: async (search: string = "") => {
+  getSubmittedEventsCount: async (
+    search: string = "",
+    userId: number,
+    userRoleName: string,
+  ) => {
     const logPrefix = `adminRepository :: getSubmittedEventsCount`;
     try {
       const _query = {
         text: pgQueries.AdminQueries.SUBMITTED_EVENTS_COUNT,
-        values: [search],
+        values: [search, userId, userRoleName],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
       const result = await pg.executeQueryPromise(_query);

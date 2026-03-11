@@ -465,6 +465,12 @@ export enum AdminQueries {
     LEFT JOIN m_activities a ON e.activity_id = a.activity_id
     WHERE e.event_submitted = true
     AND (
+      -- If role_name includes 'Admin' or 'State', show all events
+      ($4 ILIKE '%Admin%' OR $4 ILIKE '%State%')
+      -- Otherwise, show only events created by the user
+      OR (NOT $4 ILIKE '%Admin%' AND NOT $4 ILIKE '%State%' AND e.created_by = $5)
+    )
+    AND (
       $3 = '' 
       OR e.activity_title ILIKE '%' || $3 || '%'
       OR a.activity_name ILIKE '%' || $3 || '%'
@@ -483,6 +489,12 @@ export enum AdminQueries {
     LEFT JOIN m_districts d ON e.district_id = d.district_id
     LEFT JOIN m_activities a ON e.activity_id = a.activity_id
     WHERE e.event_submitted = true
+    AND (
+      -- If role_name includes 'Admin' or 'State', count all events
+      ($3 ILIKE '%Admin%' OR $3 ILIKE '%State%')
+      -- Otherwise, count only events created by the user
+      OR (NOT $3 ILIKE '%Admin%' AND NOT $3 ILIKE '%State%' AND e.created_by = $2)
+    )
     AND (
       $1 = '' 
       OR e.activity_title ILIKE '%' || $1 || '%'

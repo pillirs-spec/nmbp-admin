@@ -924,7 +924,7 @@ const adminController = {
     const logPrefix = `adminController :: listSubmittedEvents`;
     /*        #swagger.tags = ['Admin']
                 #swagger.summary = 'List Submitted Events'
-                #swagger.description = 'Retrieve all submitted events with pagination. Requires authentication.'
+                #swagger.description = 'Retrieve submitted events. Admin users see all events, non-admin users see only their own. Requires authentication.'
                #swagger.consumes = ['multipart/form-data']
                 #swagger.parameters['Authorization'] = {
                     in: 'header',
@@ -943,18 +943,36 @@ const adminController = {
                 }    
     */
     try {
+      const userId = req.plainToken.user_id;
       const { pageSize = 10, currentPage = 1, search = "" } = req.body;
       logger.info(
-        `${logPrefix} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: search :: ${search}`,
+        `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: search :: ${search}`,
       );
+
+      const user = await adminRepository.getUserByUserId(userId);
+
+      if (!user) {
+        return res.status(STATUS.NOT_FOUND).send({
+          data: null,
+          message: "User not found",
+        });
+      }
+
+      const userRoleName = user.role_name || "";
 
       const events = await adminService.listSubmittedEvents(
         pageSize,
         currentPage,
         search,
+        userId,
+        userRoleName,
       );
 
-      const totalCount = await adminService.getSubmittedEventsCount(search);
+      const totalCount = await adminService.getSubmittedEventsCount(
+        search,
+        userId,
+        userRoleName,
+      );
 
       logger.info(
         `${logPrefix} :: Retrieved ${events.length} submitted events :: Total count :: ${totalCount}`,
