@@ -13,8 +13,9 @@ import {
   IconVideo,
   IconEdit,
   IconEye,
+  IconDownload,
 } from "@tabler/icons-react";
-import { useLogger, useToast } from "../../../../hooks";
+import { useAuth, useLogger, useToast } from "../../../../hooks";
 import { LogLevel, ToastType } from "../../../../enums";
 
 interface Document {
@@ -35,6 +36,7 @@ const ImportantDocumentsList = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { log } = useLogger();
+  const { userDetails } = useAuth();
 
   const handleSearch = (value: string) => {
     if (value.length >= 3) {
@@ -66,6 +68,10 @@ const ImportantDocumentsList = () => {
 
   const handleAddDocument = () => {
     navigate("/important-documents/add");
+  };
+
+  const handleDownloadDocument = () => {
+    console.log("handle download document");
   };
 
   const getAllDocumentsList = async () => {
@@ -201,22 +207,46 @@ const ImportantDocumentsList = () => {
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
-                        <button
-                          className="text-[#003366] font-[500]"
-                          onClick={handleViewDocument}
-                        >
-                          <IconEye size={20} color="red" />
-                        </button>
-                        <button
-                          className="text-[#003366] font-[500]"
-                          onClick={() =>
-                            handleEditDocument(document.document_id)
-                          }
-                        >
-                          <IconEdit size={20} />
-                        </button>
-                      </td>
+                      {userDetails?.role_name
+                        .toLowerCase()
+                        .includes("state") ? (
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={handleDownloadDocument}
+                          >
+                            <IconDownload size={20} color="red" />
+                          </button>
+                        </td>
+                      ) : userDetails?.role_name
+                          .toLowerCase()
+                          .includes("district") ? (
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={handleDownloadDocument}
+                          >
+                            <IconDownload size={20} color="red" />
+                          </button>
+                        </td>
+                      ) : (
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={handleViewDocument}
+                          >
+                            <IconEye size={20} color="red" />
+                          </button>
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={() =>
+                              handleEditDocument(document.document_id)
+                            }
+                          >
+                            <IconEdit size={20} />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))
                 ) : (

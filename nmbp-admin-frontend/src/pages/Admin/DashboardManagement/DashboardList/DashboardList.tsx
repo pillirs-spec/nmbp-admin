@@ -117,7 +117,7 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 Last updated: 27 Aug 2024, 02:00 PM
               </p> */}
             </div>
-            {role?.includes("state") ? null : (
+            {role?.toLowerCase().includes("state") ? null : (
               <button
                 onClick={handleAddEvent}
                 className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
@@ -279,9 +279,11 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Created At
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                      Action
-                    </th>
+                    {role?.toLowerCase().includes("state") ? null : (
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                        Action
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -333,21 +335,24 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                             .reverse()
                             .join("-")}
                         </td>
-                        <td
-                          className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]"
-                          onClick={() =>
-                            handleDeleteClick(
-                              submission.event_id,
-                              submission.activity_title,
-                            )
-                          }
-                        >
-                          <img
-                            src={DeleteIcon}
-                            alt="delete-icon"
-                            className="w-4 h-4"
-                          />
-                        </td>
+
+                        {role?.toLowerCase().includes("state") ? null : (
+                          <td
+                            className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]"
+                            onClick={() =>
+                              handleDeleteClick(
+                                submission.event_id,
+                                submission.activity_title,
+                              )
+                            }
+                          >
+                            <img
+                              src={DeleteIcon}
+                              alt="delete-icon"
+                              className="w-4 h-4"
+                            />
+                          </td>
+                        )}
                       </tr>
                     ))
                   ) : (
