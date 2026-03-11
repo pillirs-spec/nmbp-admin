@@ -195,9 +195,9 @@ const FeedbackList = () => {
                   <tr>
                     <td
                       colSpan={12}
-                      className="px-6 py-8 text-center text-[#374151] font-semibold"
+                      className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                     >
-                      No Data Found
+                      No data found
                     </td>
                   </tr>
                 )}
