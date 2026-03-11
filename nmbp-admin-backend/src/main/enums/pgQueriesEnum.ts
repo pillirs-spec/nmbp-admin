@@ -563,6 +563,15 @@ export enum FeedbackQueries {
   `,
 
   FEEDBACKS_COUNT = `
+  
+  SELECT COUNT(*) as count
+    FROM t_feedback
+    WHERE (
+      feedback ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_FEEDBACKS_COUNT = `
     SELECT COUNT(*) as count FROM t_feedback
   `,
 

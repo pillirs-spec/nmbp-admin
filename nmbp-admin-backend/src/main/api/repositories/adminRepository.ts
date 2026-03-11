@@ -641,6 +641,44 @@ const adminRepository = {
       throw new Error(error.message);
     }
   },
+
+  feedbackCount: async (searchFilter: string) => {
+    const logPrefix = `adminRepository :: feedbackCount :: searchFilter :: ${searchFilter}`;
+    try {
+      const _query = {
+        text: pgQueries.FeedbackQueries.FEEDBACKS_COUNT,
+        values: [searchFilter],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  totalFeedbackCount: async () => {
+    const logPrefix = `adminRepository :: totalFeedbackCount`;
+    try {
+      const _query = {
+        text: pgQueries.FeedbackQueries.TOTAL_FEEDBACKS_COUNT,
+        values: [],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+
+      const result = await pg.executeQueryPromise(_query);
+      logger.debug(`${logPrefix} :: db result :: ${JSON.stringify(result)}`);
+
+      return result.length ? result[0].count : 0;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminRepository;

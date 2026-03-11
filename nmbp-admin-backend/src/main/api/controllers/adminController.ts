@@ -1048,8 +1048,13 @@ const adminController = {
         currentPage,
         searchFilter,
       );
+
+      const feedbackCount = await adminService.feedbackCount(searchFilter);
+      const totalFeedbackCount = await adminService.totalFeedbackCount();
       return res.status(STATUS.OK).send({
         data: feedbackList,
+        feedbackCount,
+        totalFeedbackCount,
         message: "Feedback retrieved successfully",
       });
     } catch (error) {

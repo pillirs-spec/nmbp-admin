@@ -1000,6 +1000,51 @@ const adminService = {
       throw new Error(error.message);
     }
   },
+
+  feedbackCount: async (search: string = "") => {
+    const logPrefix = `adminService :: feedbackCount`;
+    try {
+      logger.info(`${logPrefix} :: search :: ${search}`);
+
+      const count = await adminRepository.feedbackCount(search);
+
+      logger.info(`${logPrefix} :: Total count :: ${count}`);
+      return count;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  totalFeedbackCount: async () => {
+    const logPrefix = `adminService :: totalFeedbackCount`;
+    try {
+      logger.info(`${logPrefix} :: Counting total feedback in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_TOTAL_COUNT,
+        {},
+      );
+
+      const cachedTotalCount = await redis.GetKeyRedis(key);
+      if (cachedTotalCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of feedback :: ${cachedTotalCount}`,
+        );
+        return JSON.parse(cachedTotalCount);
+      }
+
+      const count = await adminRepository.totalFeedbackCount();
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting total feedback :: ${error.message} :: ${error}`,
+      );
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminService;

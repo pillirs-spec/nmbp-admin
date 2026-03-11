@@ -81,7 +81,7 @@ const FeedbackList = () => {
       const response = await feedbackService.getAllFeedbacks(payload);
       if (response.status === 200) {
         setFeedbacks(response.data.data);
-        setTotalCount(response.data.totalCount);
+        setTotalCount(response.data.totalFeedbackCount);
       }
     } catch (error) {
       log(LogLevel.ERROR, "FeedbackList :: getAllFeedbacksList", error);
@@ -251,9 +251,9 @@ const FeedbackList = () => {
                   setCurrentPage(1);
                 }}
               >
-                <option>10</option>
-                <option>50</option>
-                <option>100</option>
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
               of{" "}
               <span className="font-medium text-[#374151]">{totalCount}</span>{" "}
