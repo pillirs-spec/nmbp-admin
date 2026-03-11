@@ -578,18 +578,28 @@ export enum FeedbackQueries {
     WHERE (
       f.feedback ILIKE '%' || $3 || '%'
     )
-    AND f.created_by = $4
+    AND (
+      -- If role_name includes 'Admin', show all feedbacks
+      ($5 ILIKE '%Admin%')
+      -- Otherwise, show only feedbacks created by the user
+      OR (NOT $5 ILIKE '%Admin%' AND f.created_by = $4)
+    )
     ORDER BY f.date_created DESC
     LIMIT $1 OFFSET $2
   `,
 
   FEEDBACKS_COUNT = `
     SELECT COUNT(*) as count
-    FROM t_feedback
+    FROM t_feedback f
     WHERE (
-      feedback ILIKE '%' || $1 || '%'
+      f.feedback ILIKE '%' || $1 || '%'
     )
-    AND created_by = $2
+    AND (
+      -- If role_name includes 'Admin', count all feedbacks
+      ($3 ILIKE '%Admin%')
+      -- Otherwise, count only feedbacks created by the user
+      OR (NOT $3 ILIKE '%Admin%' AND f.created_by = $2)
+    )
   `,
 
   TOTAL_FEEDBACKS_COUNT = `

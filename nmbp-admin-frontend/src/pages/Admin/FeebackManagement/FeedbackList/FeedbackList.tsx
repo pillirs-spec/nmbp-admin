@@ -305,12 +305,14 @@ const FeedbackList = () => {
           <h2 className="text-2xl font-semibold text-[#374151]">
             Feedback & Grievance Redressal
           </h2>
-          <button
-            onClick={handleAddFeedback}
-            className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
-          >
-            Add Feedback +
-          </button>
+          {userDetails.role_name.toLowerCase().includes("admin") ? null : (
+            <button
+              onClick={handleAddFeedback}
+              className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
+            >
+              Add Feedback +
+            </button>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end mb-4">
           <button onClick={() => handleExport("copy")} className="">
@@ -327,44 +329,48 @@ const FeedbackList = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <p className="text-xs text-[#6B7280] font-medium mb-1">
-                State Name
-              </p>
-              <p className="text-sm text-[#374151]">{userDetails.state_name}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#6B7280] font-medium mb-1">
-                District Name
-              </p>
-              <p className="text-sm text-[#374151]">
-                {userDetails.district_name}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-[#6B7280] font-medium mb-1">
-                Officer Name
-              </p>
-              <p className="text-sm text-[#374151]">
-                {userDetails.display_name}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-[#6B7280] font-medium mb-1">Email</p>
-              <p className="text-sm text-[#374151]">{userDetails.email_id}</p>
-            </div>
-            <div>
-              <p className="text-xs text-[#6B7280] font-medium mb-1">
-                Contact Number
-              </p>
-              <p className="text-sm text-[#374151]">
-                {userDetails.mobile_number}
-              </p>
+        {userDetails.role_name.toLowerCase().includes("admin") ? null : (
+          <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  State Name
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.state_name}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  District Name
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.district_name}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  Officer Name
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.display_name}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">Email</p>
+                <p className="text-sm text-[#374151]">{userDetails.email_id}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  Contact Number
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.mobile_number}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="bg-white rounded-md border border-[#E5E7EB]">
           {/* Export Buttons and Controls */}

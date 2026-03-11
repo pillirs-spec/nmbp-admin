@@ -1085,7 +1085,7 @@ const adminController = {
       logger.info(`${logPrefix} :: Request received`);
       /*        #swagger.tags = ['Admin']
                 #swagger.summary = 'List Feedback'
-                #swagger.description = 'Retrieve all feedback entries. Only shows feedback created by the current user. Requires authentication.'
+                #swagger.description = 'Retrieve feedback entries. Admin users see all feedbacks, non-admin users see only their own. Requires authentication.'
                 #swagger.parameters['Authorization'] = {
                     in: 'header',
                     required: true,
@@ -1108,16 +1108,30 @@ const adminController = {
       logger.info(
         `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`,
       );
+
+      const user = await adminRepository.getUserByUserId(userId);
+
+      if (!user) {
+        return res.status(STATUS.NOT_FOUND).send({
+          data: null,
+          message: "User not found",
+        });
+      }
+
+      const userRoleName = user.role_name || "";
+
       const feedbackList = await adminService.listFeedback(
         pageSize,
         currentPage,
         searchFilter,
         userId,
+        userRoleName,
       );
 
       const feedbackCount = await adminService.feedbackCount(
         searchFilter,
         userId,
+        userRoleName,
       );
       const totalFeedbackCount = await adminService.totalFeedbackCount(userId);
       return res.status(STATUS.OK).send({

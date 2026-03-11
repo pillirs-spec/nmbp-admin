@@ -984,11 +984,12 @@ const adminService = {
     pageNumber: number = 1,
     search: string = "",
     userId: number,
+    userRoleName: string = "",
   ) => {
     const logPrefix = `adminService :: listFeedback`;
     try {
       logger.info(
-        `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search}`,
+        `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search} :: userRoleName :: ${userRoleName}`,
       );
 
       let key = redisKeysFormatter.getFormattedRedisKey(
@@ -1012,6 +1013,10 @@ const adminService = {
         key += `|offset:${pageNumber}`;
       }
 
+      if (userRoleName) {
+        key += `|role:${userRoleName}`;
+      }
+
       const cachedFeedback = await redis.GetKeyRedis(key);
       if (cachedFeedback) {
         logger.info(
@@ -1025,6 +1030,7 @@ const adminService = {
         pageNumber,
         search,
         userId,
+        userRoleName,
       );
 
       if (feedbackList && feedbackList.length > 0) {
@@ -1038,12 +1044,22 @@ const adminService = {
     }
   },
 
-  feedbackCount: async (search: string = "", userId: number) => {
+  feedbackCount: async (
+    search: string = "",
+    userId: number,
+    userRoleName: string = "",
+  ) => {
     const logPrefix = `adminService :: feedbackCount`;
     try {
-      logger.info(`${logPrefix} :: userId :: ${userId} :: search :: ${search}`);
+      logger.info(
+        `${logPrefix} :: userId :: ${userId} :: search :: ${search} :: userRoleName :: ${userRoleName}`,
+      );
 
-      const count = await adminRepository.feedbackCount(search, userId);
+      const count = await adminRepository.feedbackCount(
+        search,
+        userId,
+        userRoleName,
+      );
 
       logger.info(`${logPrefix} :: Total count :: ${count}`);
       return count;

@@ -653,13 +653,14 @@ const adminRepository = {
     currentPage: number,
     searchFilter: string,
     userId: number,
+    userRoleName: string,
   ) => {
     const logPrefix = `adminRepository :: listFeedback`;
     try {
       const offset = (Number(currentPage) - 1) * Number(pageSize);
       const _query = {
         text: pgQueries.FeedbackQueries.LIST_FEEDBACKS,
-        values: [pageSize, offset, searchFilter, userId],
+        values: [pageSize, offset, searchFilter, userId, userRoleName],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
       const result = await pg.executeQueryPromise(_query);
@@ -671,12 +672,16 @@ const adminRepository = {
     }
   },
 
-  feedbackCount: async (searchFilter: string, userId: number) => {
-    const logPrefix = `adminRepository :: feedbackCount :: searchFilter :: ${searchFilter} :: userId :: ${userId}`;
+  feedbackCount: async (
+    searchFilter: string,
+    userId: number,
+    userRoleName: string,
+  ) => {
+    const logPrefix = `adminRepository :: feedbackCount :: searchFilter :: ${searchFilter} :: userId :: ${userId} :: userRoleName :: ${userRoleName}`;
     try {
       const _query = {
         text: pgQueries.FeedbackQueries.FEEDBACKS_COUNT,
-        values: [searchFilter, userId],
+        values: [searchFilter, userId, userRoleName],
       };
       logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
 
