@@ -21,6 +21,7 @@ interface Submission {
   coordinating_department_name: string;
   number_of_educational_institutions: number;
   location: string;
+  updated_by_name: string;
   date_updated: string;
 }
 
@@ -278,6 +279,9 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                       Location
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      Created By
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Created At
                     </th>
                     {role?.toLowerCase().includes("state") ? null : (
@@ -329,6 +333,10 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
                           {submission.district_name}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
+                          {submission.updated_by_name}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
                           {submission.date_updated
