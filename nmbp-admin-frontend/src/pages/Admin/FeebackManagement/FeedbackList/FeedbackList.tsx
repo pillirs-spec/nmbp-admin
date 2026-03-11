@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import feedbackService from "./feedbackService";
 import { LogLevel, ToastType } from "../../../../enums";
 import { useAuth, useLogger, useToast } from "../../../../hooks";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Feedback {
   feedback_id: string;
@@ -61,12 +64,25 @@ const FeedbackList = () => {
   };
 
   const handleExport = (type: string) => {
-    console.log(`Exporting as ${type}`);
-    // Add export logic here
+    switch (type) {
+      case "pdf":
+        handleExportToPDF();
+        break;
+      case "excel":
+        handleExportCSV();
+        break;
+      case "print":
+        handlePrint();
+        break;
+      case "copy":
+        handleCopy();
+        break;
+      default:
+        showToast("Invalid export type", "Error", ToastType.ERROR);
+    }
   };
 
   const handleAddFeedback = () => {
-    console.log("Navigating to Add Feedback form");
     navigate("/feedback/add");
     // Add navigation logic here (e.g., using React Router)
   };
@@ -89,7 +105,182 @@ const FeedbackList = () => {
     }
   };
 
-  console.log(feedbacks);
+  const handleExportToPDF = () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to export", "Error", ToastType.ERROR);
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(14);
+    doc.text("State Nodal Officer List", 14, 15);
+
+    // Table Columns
+    const tableColumn = ["Feedback", "Posted On"];
+
+    // Table Rows
+    const tableRows = feedbacks.map((feedback: any) => [
+      feedback.feedback,
+      feedback.date_updated.split("T")[0].split("-").reverse().join("-"),
+    ]);
+
+    // Generate Table
+    autoTable(doc, {
+      startY: 20,
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    // Download
+    doc.save("feedback_list.pdf");
+  };
+
+  const handleExportCSV = () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to export", "Error", ToastType.ERROR);
+      return;
+    }
+
+    // Define CSV headers
+    const headers = ["Feedback", "Posted On"];
+
+    // Convert data to CSV rows
+    const rows = feedbacks.map((feedback) => [
+      feedback.feedback,
+      feedback.date_updated.split("T")[0].split("-").reverse().join("-"),
+    ]);
+
+    // Combine headers + rows
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    // Create Blob
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    // Download file
+    saveAs(blob, "feedback_list.csv");
+  };
+
+  const handlePrint = () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to print", "Error", ToastType.ERROR);
+      return;
+    }
+
+    const tableRows = feedbacks
+      .map(
+        (feedback) => `
+        <tr>
+          <td>${feedback.feedback}</td>
+          <td>${feedback.date_updated.split("T")[0].split("-").reverse().join("-")}</td>
+         
+         
+        </tr>
+      `,
+      )
+      .join("");
+
+    const printWindow = window.open("", "", "width=1000,height=700");
+
+    if (!printWindow) {
+      showToast("Unable to open print window", "Error", ToastType.ERROR);
+      return;
+    }
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Feedback List</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            th { background-color: #003366; color: white; }
+          </style>
+        </head>
+        <body>
+          <h2>Feedback List</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Feedback</th>
+                <th>Posted On</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const handleCopy = async () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to copy", "Error", ToastType.ERROR);
+      return;
+    }
+
+    try {
+      const headers = ["Feedback", "Posted On"];
+      const plainTextData = [
+        headers.join("\t"),
+        ...feedbacks.map((feedback) =>
+          [
+            feedback.feedback,
+            feedback.date_updated.split("T")[0].split("-").reverse().join("-"),
+          ].join("\t"),
+        ),
+      ].join("\n");
+
+      const tableRows = feedbacks
+        .map(
+          (feedback) => `
+        <tr>
+          <td>${feedback.feedback}</td>
+          <td>${feedback.date_updated.split("T")[0].split("-").reverse().join("-")}</td>
+         
+        </tr>
+      `,
+        )
+        .join("");
+
+      const htmlTable = `
+      <table border="1" style="border-collapse: collapse; font-family: Arial;">
+        <thead>
+          <tr style="background-color:#003366; color:white;">
+            <th>Feedback</th>
+            <th>Posted On</th>
+           
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+    `;
+
+      // Copy both formats
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([htmlTable], { type: "text/html" }),
+          "text/plain": new Blob([plainTextData], { type: "text/plain" }),
+        }),
+      ]);
+
+      showToast("Table copied successfully!", "Success", ToastType.SUCCESS);
+    } catch (error) {
+      log(LogLevel.ERROR, "Error copying to clipboard", error);
+      showToast("Failed to copy data", "Error", ToastType.ERROR);
+    }
+  };
 
   useEffect(() => {
     getAllFeedbacksList();
