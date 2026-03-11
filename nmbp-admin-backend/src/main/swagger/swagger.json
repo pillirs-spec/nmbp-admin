@@ -2007,6 +2007,36 @@
           }
         }
       }
+    },
+    "/api/v1/admin/delete_feedback/{feedback_id}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete Feedback",
+        "description": "Delete a specific feedback entry by ID. Requires authentication.",
+        "parameters": [
+          {
+            "name": "feedback_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Feedback ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
     }
   }
 }

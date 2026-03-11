@@ -1045,6 +1045,35 @@ const adminService = {
       throw new Error(error.message);
     }
   },
+
+  deleteFeedback: async (feedback_id: number) => {
+    const logPrefix = `adminService :: deleteFeedback :: feedback_id :: ${feedback_id}`;
+    try {
+      const result = await adminRepository.deleteFeedback(feedback_id);
+
+      logger.info(`${logPrefix} :: Feedback deleted successfully`);
+      const feedbackKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_LIST,
+        {},
+      );
+      const feedbackCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_COUNT,
+        {},
+      );
+      const feedbackTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${feedbackKey}*`);
+      await redis.deleteRedis(feedbackCountKey);
+      await redis.deleteRedis(feedbackTotalCountKey);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminService;

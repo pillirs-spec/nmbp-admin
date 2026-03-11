@@ -679,6 +679,23 @@ const adminRepository = {
       throw new Error(error.message);
     }
   },
+
+  deleteFeedback: async (feedback_id: number): Promise<any> => {
+    const logPrefix = `adminRepository :: deleteFeedback`;
+    try {
+      const _query = {
+        text: pgQueries.FeedbackQueries.DELETE_FEEDBACK,
+        values: [feedback_id],
+      };
+      logger.debug(`${logPrefix} :: query :: ${JSON.stringify(_query)}`);
+      const result = await pg.executeQueryPromise(_query);
+      logger.info(`${logPrefix} :: db result :: deleted`);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
 };
 
 export default adminRepository;

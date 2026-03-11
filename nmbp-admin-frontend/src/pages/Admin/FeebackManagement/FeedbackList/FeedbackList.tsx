@@ -51,11 +51,23 @@ const FeedbackList = () => {
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log("Deleting feedback:", selectedFeedbackId);
-    // Add delete API call here
-    setShowDeleteModal(false);
-    setSelectedFeedbackId(null);
+  const handleConfirmDelete = async () => {
+    if (selectedFeedbackId) {
+      const response =
+        await feedbackService.deleteFeedbackById(selectedFeedbackId);
+      if (response.status === 200) {
+        setShowDeleteModal(false);
+        setSelectedFeedbackId(null);
+        showToast(
+          "Feedback deleted successfully",
+          "Success",
+          ToastType.SUCCESS,
+        );
+        getAllFeedbacksList();
+      } else {
+        showToast("Failed to delete feedback", "Error", ToastType.ERROR);
+      }
+    }
   };
 
   const handleCancelDelete = () => {

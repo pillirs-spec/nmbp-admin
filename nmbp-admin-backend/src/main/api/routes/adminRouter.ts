@@ -39,4 +39,9 @@ adminRouter.post("/add_feedback", adminController.addFeedback);
 
 adminRouter.post("/list_feedback", adminController.listFeedback);
 
+adminRouter.delete(
+  "/delete_feedback/:feedback_id",
+  adminController.deleteFeedback,
+);
+
 export default adminRouter;

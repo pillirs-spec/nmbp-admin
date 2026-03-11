@@ -1065,6 +1065,44 @@ const adminController = {
       });
     }
   },
+
+  deleteFeedback: async (req: Request, res: Response) => {
+    const logPrefix = `adminController :: deleteFeedback`;
+    try {
+      logger.info(`${logPrefix} :: Request received`);
+      /*        #swagger.tags = ['Admin']
+                #swagger.summary = 'Delete Feedback'
+                #swagger.description = 'Delete a specific feedback entry by ID. Requires authentication.'
+                #swagger.parameters['Authorization'] = {
+                    in: 'header',
+                    required: true,
+                    type: "string",
+                    description: "JWT token for authentication"
+                }
+                #swagger.parameters['feedback_id'] = {
+                    in: 'path',
+                    type: 'string',
+                    required: true,
+                    description: 'Feedback ID'
+                }
+    */
+      const { feedback_id } = req.params;
+      logger.info(`${logPrefix} :: feedback_id :: ${feedback_id}`);
+      const result = await adminService.deleteFeedback(feedback_id);
+
+      logger.info(`${logPrefix} :: Feedback deleted successfully`);
+      return res.status(STATUS.OK).send({
+        data: result,
+        message: "Feedback deleted successfully",
+      });
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      return res.status(STATUS.INTERNAL_SERVER_ERROR).send({
+        errorCode: "FEEDBACK00001",
+        errorMessage: "Failed to delete feedback",
+      });
+    }
+  },
 };
 
 export default adminController;
