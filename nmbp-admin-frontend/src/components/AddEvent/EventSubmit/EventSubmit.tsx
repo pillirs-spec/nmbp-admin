@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Success from "../../../assets/success.svg";
 
@@ -13,11 +13,44 @@ interface EventSubmitProps {
     numberOfMale: number;
     numberOfParticipants: number;
     description: string;
+    latitude?: string | number;
+    longitude?: string | number;
   };
 }
 
 const EventSubmit: React.FC<EventSubmitProps> = ({ formData }) => {
   const navigate = useNavigate();
+  const [location, setLocation] = useState<string>("Loading location...");
+
+  // Fetch location from latitude and longitude
+  useEffect(() => {
+    const fetchLocation = async () => {
+      const latitude = parseFloat(String(formData.latitude));
+      const longitude = parseFloat(String(formData.longitude));
+
+      if (latitude && longitude) {
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          );
+          const data = await response.json();
+          const locationName =
+            data.address?.city ||
+            data.address?.town ||
+            data.address?.village ||
+            data.address?.county ||
+            `${latitude}, ${longitude}`;
+          const state = data.address?.state || "";
+          setLocation(state ? `${locationName}, ${state}` : locationName);
+        } catch (error) {
+          console.error("Error fetching location:", error);
+          setLocation(`${latitude}, ${longitude}`);
+        }
+      }
+    };
+
+    fetchLocation();
+  }, [formData.latitude, formData.longitude]);
 
   const handleSubmitNew = () => {
     window.location.reload();
@@ -73,7 +106,7 @@ const EventSubmit: React.FC<EventSubmitProps> = ({ formData }) => {
           </div>
           <div className="mt-4 pt-4">
             <p className="text-xs text-[#6B7280] mb-1 font-medium">Location</p>
-            <p className="text-[#374151] text-sm">Harda, Madhya Pradesh</p>
+            <p className="text-[#374151] text-sm">{location}</p>
           </div>
         </div>
 

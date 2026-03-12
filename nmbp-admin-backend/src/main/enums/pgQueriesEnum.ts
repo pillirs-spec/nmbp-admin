@@ -149,7 +149,9 @@ export enum AdminQueries {
     u.display_name,
     u.mobile_number,
     u.email_id,
+    s.state_id,
     s.state_name,
+    d.district_id,
     d.district_name,
     r.role_name,
     u.date_updated
@@ -192,13 +194,22 @@ export enum AdminQueries {
     WHERE r.role_name = 'State Nodal Officer'
    `,
 
+  GET_USER_BY_USER_ID = `
+    SELECT u.user_id, u.display_name, u.mobile_number, u.email_id, u.state_id, u.district_id, u.role_id, r.role_name
+    FROM m_users u
+    LEFT JOIN m_roles r ON u.role_id = r.role_id
+    WHERE u.user_id = $1
+    `,
+
   GET_DNO_LIST = `
   SELECT 
     u.user_id,
     u.display_name,
     u.mobile_number,
     u.email_id,
+    s.state_id,
     s.state_name,
+    d.district_id,
     d.district_name,
     r.role_name,
     u.date_updated
@@ -206,11 +217,20 @@ export enum AdminQueries {
   INNER JOIN m_roles r ON u.role_id = r.role_id
   LEFT JOIN m_states s ON u.state_id = s.state_id
   LEFT JOIN m_districts d ON u.district_id = d.district_id
+  
   WHERE u.role_id = (
       SELECT role_id 
       FROM m_roles 
       WHERE role_name = 'District Nodal Officer'
-  ) AND ($4 = 0 OR u.state_id = $4)
+  ) AND (
+      -- If selectedState is provided (> 0), show only that state
+      ($4 > 0 AND u.state_id = $4)
+      -- Otherwise, apply admin/non-admin logic
+      OR ($4 = 0 AND (
+          ($6 ILIKE '%Admin%')
+          OR (NOT $6 ILIKE '%Admin%' AND u.state_id = $5)
+      ))
+  )
   AND (
       u.display_name ILIKE '%' || $3 || '%'
       OR s.state_name ILIKE '%' || $3 || '%'
@@ -239,4 +259,377 @@ export enum AdminQueries {
     LEFT JOIN m_roles r ON u.role_id = r.role_id
     WHERE r.role_name = 'District Nodal Officer'
    `,
+
+  CREATE_DOCUMENTS_TABLE = `
+    CREATE TABLE IF NOT EXISTS t_documents (
+      document_id VARCHAR(255) PRIMARY KEY,
+      document_name VARCHAR(255) NOT NULL,
+      file_url TEXT NOT NULL,
+      file_type VARCHAR(100),
+      file_size INTEGER,
+      is_published BOOLEAN DEFAULT FALSE,
+      created_by INT REFERENCES m_users(user_id),
+      updated_by INT REFERENCES m_users(user_id),
+      date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `,
+
+  ADD_DOCUMENT = `
+    INSERT INTO t_documents(document_id, document_name, file_url, created_by, updated_by, file_type, file_size, is_published, date_created, date_updated) 
+    VALUES ($1, $2, $3, $4, $4, $5, $6, $7, NOW(), NOW())
+    RETURNING document_id, document_name, file_url, created_by, updated_by, file_type, file_size, is_published, date_created, date_updated
+  `,
+
+  GET_DOCUMENT_BY_ID = `
+  SELECT 
+    t.document_id, 
+    t.document_name, 
+    t.file_url, 
+    t.file_type, 
+    t.file_size, 
+    t.is_published,
+    t.created_by,
+    creator.user_name AS created_by,
+    t.updated_by,
+    updater.user_name AS updated_by,
+    t.date_created, 
+    t.date_updated
+  FROM t_documents t
+  LEFT JOIN m_users creator ON t.created_by = creator.user_id
+  LEFT JOIN m_users updater ON t.updated_by = updater.user_id
+  WHERE t.document_id = $1
+`,
+
+  LIST_DOCUMENTS = `
+  SELECT 
+    t.document_id, 
+    t.document_name, 
+    t.file_url, 
+    t.file_type, 
+    t.file_size, 
+    t.is_published,
+    t.created_by,
+    creator.display_name AS created_by,
+    t.updated_by,
+    updater.display_name AS updated_by,
+    t.date_created, 
+    t.date_updated
+  FROM t_documents t
+  LEFT JOIN m_users creator ON t.created_by = creator.user_id
+  LEFT JOIN m_users updater ON t.updated_by = updater.user_id
+  WHERE (
+    t.document_name ILIKE '%' || $3 || '%'
+  )
+  ORDER BY t.date_created DESC
+  LIMIT $1 OFFSET $2
+`,
+
+  DOCUMENTS_COUNT = `
+    SELECT COUNT(*) as count
+    FROM t_documents
+    WHERE (
+      document_name ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_DOCUMENTS_COUNT = `
+    SELECT COUNT(*) as count FROM t_documents
+  `,
+
+  UPDATE_DOCUMENT = `
+    UPDATE t_documents
+    SET 
+      document_name = $2,
+      file_url = COALESCE($3, file_url),
+      file_type = COALESCE($4, file_type),
+      file_size = COALESCE($5, file_size),
+      is_published = $6,
+      updated_by = $7,
+      date_updated = NOW()
+    WHERE document_id = $1
+    RETURNING document_id, document_name, file_url, file_type, file_size, is_published, created_by, updated_by, date_created, date_updated
+  `,
+}
+
+export enum AdminQueries {
+  CREATE_EVENTS_TABLE = `
+    CREATE TABLE IF NOT EXISTS t_events (
+      event_id VARCHAR(255) PRIMARY KEY,
+      activity_id INTEGER,
+      activity_date DATE,
+      activity_title VARCHAR(255),
+      coordinating_department_name VARCHAR(255),
+      number_of_participants INTEGER,
+      number_of_female INTEGER,
+      number_of_male INTEGER,
+      number_of_educational_institutions INTEGER,
+      description TEXT,
+      state_id INTEGER,
+      district_id INTEGER,
+      latitude DECIMAL(10, 8),
+      longitude DECIMAL(11, 8),
+      event_submitted BOOLEAN DEFAULT FALSE,
+      created_by INTEGER REFERENCES m_users(user_id),
+      updated_by INTEGER REFERENCES m_users(user_id),
+      date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `,
+
+  CREATE_EVENT_MEDIA_TABLE = `
+    CREATE TABLE IF NOT EXISTS t_event_media (
+      event_media_id SERIAL PRIMARY KEY,
+      event_id VARCHAR(255) NOT NULL REFERENCES t_events(event_id) ON DELETE CASCADE,
+      media_url TEXT NOT NULL,
+      media_type VARCHAR(50) NOT NULL,
+      file_size INTEGER,
+      date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `,
+
+  ADD_EVENT = `
+    INSERT INTO t_events(
+      event_id, 
+      activity_id, 
+      activity_date,
+      activity_title,
+      coordinating_department_name, 
+      number_of_participants, 
+      number_of_female, 
+      number_of_male, 
+      number_of_educational_institutions, 
+      description, 
+      state_id, 
+      district_id, 
+      latitude, 
+      longitude, 
+      event_submitted,
+      created_by, 
+      updated_by, 
+      date_created, 
+      date_updated
+    ) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, false, $15, $15, NOW(), NOW()) 
+    RETURNING *
+  `,
+
+  UPDATE_EVENT = `
+    UPDATE t_events
+    SET
+      activity_id = CASE WHEN $2::text IS NOT NULL AND $2::text != '' THEN $2::INTEGER ELSE activity_id END,
+      activity_date = CASE WHEN $3::text IS NOT NULL AND $3::text != '' THEN $3::DATE ELSE activity_date END,
+      activity_title = CASE WHEN $4::text IS NOT NULL AND $4::text != '' THEN $4 ELSE activity_title END,
+      coordinating_department_name = CASE WHEN $5::text IS NOT NULL AND $5::text != '' THEN $5 ELSE coordinating_department_name END,
+      number_of_participants = CASE WHEN $6::text IS NOT NULL AND $6::text != '' THEN $6::INTEGER ELSE number_of_participants END,
+      number_of_female = CASE WHEN $7::text IS NOT NULL AND $7::text != '' THEN $7::INTEGER ELSE number_of_female END,
+      number_of_male = CASE WHEN $8::text IS NOT NULL AND $8::text != '' THEN $8::INTEGER ELSE number_of_male END,
+      number_of_educational_institutions = CASE WHEN $9::text IS NOT NULL AND $9::text != '' THEN $9::INTEGER ELSE number_of_educational_institutions END,
+      description = CASE WHEN $10::text IS NOT NULL AND $10::text != '' THEN $10 ELSE description END,
+      state_id = CASE WHEN $11::text IS NOT NULL AND $11::text != '' THEN $11::INTEGER ELSE state_id END,
+      district_id = CASE WHEN $12::text IS NOT NULL AND $12::text != '' THEN $12::INTEGER ELSE district_id END,
+      latitude = CASE WHEN $13::text IS NOT NULL AND $13::text != '' THEN $13::DECIMAL(10,8) ELSE latitude END,
+      longitude = CASE WHEN $14::text IS NOT NULL AND $14::text != '' THEN $14::DECIMAL(11,8) ELSE longitude END,
+      event_submitted = CASE WHEN $15::text IS NOT NULL THEN $15::BOOLEAN ELSE event_submitted END,
+      updated_by = $16,
+      date_updated = CURRENT_TIMESTAMP
+    WHERE event_id = $1
+    RETURNING *
+  `,
+
+  GET_EVENT_BY_ID = `
+    SELECT e.*, 
+           s.state_name,
+           d.district_name,
+           a.activity_name,
+           array_agg(json_build_object('event_media_id', em.event_media_id, 'media_url', em.media_url, 'media_type', em.media_type, 'file_size', em.file_size)) FILTER (WHERE em.event_media_id IS NOT NULL) as media_files
+    FROM t_events e
+    LEFT JOIN t_event_media em ON e.event_id = em.event_id
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
+    WHERE e.event_id = $1
+    GROUP BY e.event_id, s.state_name, d.district_name, a.activity_name
+  `,
+
+  LIST_SUBMITTED_EVENTS = `
+    SELECT e.*, 
+           s.state_name,
+           d.district_name,
+           a.activity_name,
+           u_updated.display_name AS updated_by_name,
+           array_agg(json_build_object('event_media_id', em.event_media_id, 'media_url', em.media_url, 'media_type', em.media_type, 'file_size', em.file_size)) FILTER (WHERE em.event_media_id IS NOT NULL) as media_files
+    FROM t_events e
+    LEFT JOIN t_event_media em ON e.event_id = em.event_id
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
+    LEFT JOIN m_users u_updated ON e.updated_by = u_updated.user_id
+    WHERE e.event_submitted = true
+    AND (
+      -- If role_name includes 'Admin' or 'State', show all events
+      ($4 ILIKE '%Admin%' OR $4 ILIKE '%State%')
+      -- Otherwise, show only events created by the user
+      OR (NOT $4 ILIKE '%Admin%' AND NOT $4 ILIKE '%State%' AND e.created_by = $5)
+    )
+    AND (
+      $3 = '' 
+      OR e.activity_title ILIKE '%' || $3 || '%'
+      OR a.activity_name ILIKE '%' || $3 || '%'
+      OR s.state_name ILIKE '%' || $3 || '%'
+      OR d.district_name ILIKE '%' || $3 || '%'
+    )
+    GROUP BY e.event_id, s.state_name, d.district_name, a.activity_name, u_updated.display_name
+    ORDER BY e.date_created DESC
+    LIMIT $1 OFFSET $2
+  `,
+
+  SUBMITTED_EVENTS_COUNT = `
+    SELECT COUNT(*) as count
+    FROM t_events e
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
+    WHERE e.event_submitted = true
+    AND (
+      -- If role_name includes 'Admin' or 'State', count all events
+      ($3 ILIKE '%Admin%' OR $3 ILIKE '%State%')
+      -- Otherwise, count only events created by the user
+      OR (NOT $3 ILIKE '%Admin%' AND NOT $3 ILIKE '%State%' AND e.created_by = $2)
+    )
+    AND (
+      $1 = '' 
+      OR e.activity_title ILIKE '%' || $1 || '%'
+      OR a.activity_name ILIKE '%' || $1 || '%'
+      OR s.state_name ILIKE '%' || $1 || '%'
+      OR d.district_name ILIKE '%' || $1 || '%'
+    )
+  `,
+
+  TOTAL_SUBMITTED_EVENTS_COUNT = `
+    SELECT COUNT(*) as count FROM t_events WHERE event_submitted = true
+  `,
+
+  LIST_DRAFT_EVENTS = `
+    SELECT e.*, 
+           s.state_name,
+           d.district_name,
+           a.activity_name,
+           array_agg(json_build_object('event_media_id', em.event_media_id, 'media_url', em.media_url, 'media_type', em.media_type, 'file_size', em.file_size)) FILTER (WHERE em.event_media_id IS NOT NULL) as media_files
+    FROM t_events e
+    LEFT JOIN t_event_media em ON e.event_id = em.event_id
+    LEFT JOIN m_states s ON e.state_id = s.state_id
+    LEFT JOIN m_districts d ON e.district_id = d.district_id
+    LEFT JOIN m_activities a ON e.activity_id = a.activity_id
+    WHERE e.event_submitted = false AND e.created_by = $1
+    GROUP BY e.event_id, s.state_name, d.district_name, a.activity_name
+    ORDER BY e.date_updated DESC
+    LIMIT $2 OFFSET $3
+  `,
+
+  ADD_EVENT_MEDIA = `
+    INSERT INTO t_event_media(event_id, media_url, media_type, file_size)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *
+  `,
+
+  DELETE_EVENT_MEDIA = `
+    DELETE FROM t_event_media WHERE event_media_id = $1
+  `,
+
+  DELETE_EVENT = `
+    DELETE FROM t_events WHERE event_id = $1
+  `,
+
+  SUBMIT_EVENT = `
+    UPDATE t_events
+    SET event_submitted = true, updated_by = $2, date_updated = NOW()
+    WHERE event_id = $1
+    RETURNING *
+  `,
+}
+
+export enum FeedbackQueries {
+  CREATE_FEEDBACK_TABLE = `
+    CREATE TABLE IF NOT EXISTS t_feedback (
+      feedback_id SERIAL PRIMARY KEY,
+      feedback TEXT NOT NULL,
+      created_by INT REFERENCES m_users(user_id),
+      date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `,
+
+  ADD_FEEDBACK = `
+    INSERT INTO t_feedback(feedback, created_by, date_created, date_updated)
+    VALUES ($1, $2, NOW(), NOW())
+    RETURNING feedback_id, feedback, created_by, date_created, date_updated
+  `,
+
+  GET_FEEDBACK_BY_ID = `
+    SELECT 
+      f.feedback_id,
+      f.feedback,
+      f.created_by,
+      u.display_name AS created_by_name,
+      f.date_created,
+      f.date_updated
+    FROM t_feedback f
+    LEFT JOIN m_users u ON f.created_by = u.user_id
+    WHERE f.feedback_id = $1
+  `,
+
+  LIST_FEEDBACKS = `
+    SELECT 
+      f.feedback_id,
+      f.feedback,
+      f.created_by,
+      u.display_name AS created_by_name,
+      f.date_created,
+      f.date_updated
+    FROM t_feedback f
+    LEFT JOIN m_users u ON f.created_by = u.user_id
+    WHERE (
+      f.feedback ILIKE '%' || $3 || '%'
+    )
+    AND (
+      -- If role_name includes 'Admin', show all feedbacks
+      ($5 ILIKE '%Admin%')
+      -- Otherwise, show only feedbacks created by the user
+      OR (NOT $5 ILIKE '%Admin%' AND f.created_by = $4)
+    )
+    ORDER BY f.date_created DESC
+    LIMIT $1 OFFSET $2
+  `,
+
+  FEEDBACKS_COUNT = `
+    SELECT COUNT(*) as count
+    FROM t_feedback f
+    WHERE (
+      f.feedback ILIKE '%' || $1 || '%'
+    )
+    AND (
+      -- If role_name includes 'Admin', count all feedbacks
+      ($3 ILIKE '%Admin%')
+      -- Otherwise, count only feedbacks created by the user
+      OR (NOT $3 ILIKE '%Admin%' AND f.created_by = $2)
+    )
+  `,
+
+  TOTAL_FEEDBACKS_COUNT = `
+    SELECT COUNT(*) as count FROM t_feedback WHERE created_by = $1
+  `,
+
+  UPDATE_FEEDBACK = `
+    UPDATE t_feedback
+    SET 
+      feedback = $2,
+      date_updated = NOW()
+    WHERE feedback_id = $1
+    RETURNING feedback_id, feedback, created_by, date_created, date_updated
+  `,
+
+  DELETE_FEEDBACK = `
+    DELETE FROM t_feedback WHERE feedback_id = $1
+  `,
 }

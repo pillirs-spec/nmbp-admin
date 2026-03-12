@@ -1313,7 +1313,7 @@
                 },
                 "searchFilter": {
                   "type": "string",
-                  "example": "Admin"
+                  "example": "Venkatesh"
                 },
                 "selectedState": {
                   "type": "number",
@@ -1370,6 +1370,695 @@
                 }
               }
             }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/add_documents": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Add Documents",
+        "description": "Upload documents to the system. Supports PDF, CSV, Excel (xlsx, xls), PNG, JPEG and MP4 files with maximum 10 MB file size. Documents can be published immediately or saved as drafts. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "document_name",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Name of the document (3-255 characters)"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "document_name": {
+                  "example": "any"
+                },
+                "is_published": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/documents/list": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Documents (Paginated)",
+        "description": "Retrieve a paginated list of documents with optional filtering by search term. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "document_name_or_user"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/documents/{document_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Document by ID",
+        "description": "Retrieve document details by document ID. Returns document metadata including file URL.",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update Document",
+        "description": "Update an existing document. Can update document name, status, and optionally replace the file. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "document_name",
+            "in": "formData",
+            "type": "string",
+            "required": true,
+            "description": "Name of the document (3-255 characters)"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "document_name": {
+                  "example": "any"
+                },
+                "is_published": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/documents/{document_id}/download": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Download Document",
+        "description": "Get a signed download URL for a document. The URL is valid for 5 minutes.",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/documents/{document_id}/preview": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Preview Document",
+        "description": "Get a signed preview URL for a document. The URL is valid for 5 minutes. For images and PDFs, the URL can be used to directly preview the document. For other file types, the URL can be used to download the document for preview.",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Document ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/add_event": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Add/Update Event (Multi-Step Form)",
+        "description": "Create a new event or update an existing draft event. Supports multi-step submission where each step saves as a draft (event_submitted=false). Final submission sets event_submitted=true to mark event as complete. Supports single or multiple media files (JPEG, PNG, MP4). Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "event_id",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Event ID (provide to update existing draft, omit to create new event)"
+          },
+          {
+            "name": "activity_id",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Activity ID (Step 1)"
+          },
+          {
+            "name": "activity_date",
+            "in": "formData",
+            "type": "string",
+            "format": "date",
+            "required": false,
+            "description": "Activity date in YYYY-MM-DD format (Step 1)"
+          },
+          {
+            "name": "activity_title",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Activity title (Step 1)"
+          },
+          {
+            "name": "coordinating_department_name",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Coordinating department name (Step 1)"
+          },
+          {
+            "name": "number_of_participants",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Total number of participants (Step 1)"
+          },
+          {
+            "name": "number_of_female",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Number of female participants (Step 1)"
+          },
+          {
+            "name": "number_of_male",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Number of male participants (Step 1)"
+          },
+          {
+            "name": "number_of_educational_institutions",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Number of educational institutions (Step 1)"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "type": "string",
+            "required": false,
+            "description": "Event description (Step 1)"
+          },
+          {
+            "name": "state_id",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "State ID (Step 2)"
+          },
+          {
+            "name": "district_id",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "District ID (Step 2)"
+          },
+          {
+            "name": "latitude",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Event location latitude -90 to 90 (Step 2)"
+          },
+          {
+            "name": "longitude",
+            "in": "formData",
+            "type": "number",
+            "required": false,
+            "description": "Event location longitude -180 to 180 (Step 2)"
+          },
+          {
+            "name": "media_files",
+            "in": "formData",
+            "type": "file",
+            "required": false,
+            "description": "Media files - images (JPEG, PNG) or videos (MP4) - max 50 MB each. Can upload single or multiple files (Step 3)"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "event_id": {
+                  "example": "any"
+                },
+                "activity_id": {
+                  "example": "any"
+                },
+                "activity_date": {
+                  "example": "any"
+                },
+                "activity_title": {
+                  "example": "any"
+                },
+                "coordinating_department_name": {
+                  "example": "any"
+                },
+                "number_of_participants": {
+                  "example": "any"
+                },
+                "number_of_female": {
+                  "example": "any"
+                },
+                "number_of_male": {
+                  "example": "any"
+                },
+                "number_of_educational_institutions": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                },
+                "state_id": {
+                  "example": "any"
+                },
+                "district_id": {
+                  "example": "any"
+                },
+                "latitude": {
+                  "example": "any"
+                },
+                "longitude": {
+                  "example": "any"
+                },
+                "event_submitted": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/get_event/{event_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Event by ID",
+        "description": "Retrieve a specific event (draft or submitted) by ID. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Event ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/delete_event/{event_id}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete Event",
+        "description": "Delete a specific event (draft or submitted) by ID. Requires authentication.",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Event ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/list_events": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Submitted Events",
+        "description": "Retrieve all submitted events with pagination. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "search": {
+                  "type": "string",
+                  "example": ""
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/list_draft_events": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Draft Events",
+        "description": "Retrieve all draft events with pagination. Requires authentication.",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/add_feedback": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Add Feedback",
+        "description": "Add general feedback.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "feedback": {
+                  "type": "string",
+                  "example": "Easy to access and use"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/list_feedback": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Feedback",
+        "description": "Retrieve all feedback entries. Only shows feedback created by the current user. Requires authentication.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pageSize": {
+                  "type": "number",
+                  "example": 10
+                },
+                "currentPage": {
+                  "type": "number",
+                  "example": 1
+                },
+                "searchFilter": {
+                  "type": "string",
+                  "example": "Enum"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/v1/admin/delete_feedback/{feedback_id}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete Feedback",
+        "description": "Delete a specific feedback entry by ID. Requires authentication.",
+        "parameters": [
+          {
+            "name": "feedback_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Feedback ID"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "type": "string",
+            "description": "JWT token for authentication"
           }
         ],
         "responses": {

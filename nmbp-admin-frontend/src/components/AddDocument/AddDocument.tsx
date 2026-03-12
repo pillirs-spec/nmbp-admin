@@ -1,13 +1,20 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LogLevel, ToastType } from "../../enums";
+import { useLogger, useToast } from "../../hooks";
+import { importantDocumentService } from "../../pages/Admin/ImportantDocumentsManagement/ImportantDocumentsList.tsx/importantDocumentService";
 
 const AddDocument = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
-    status: "Save and publish",
+    status: "",
     documentFile: null as File | null,
   });
+  const { log } = useLogger();
+  const { showToast } = useToast();
+  const location = useLocation();
+  const documentId = location.state?.documentId;
 
   const [fileName, setFileName] = useState<string>("");
 
@@ -25,8 +32,8 @@ const AddDocument = () => {
     const file = e.target.files?.[0];
     if (file) {
       // Check file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size exceeds 5MB");
+      if (file.size > 10 * 1024 * 1024) {
+        showToast("File size exceeds 10MB", "error", ToastType.ERROR);
         return;
       }
 
@@ -37,9 +44,16 @@ const AddDocument = () => {
         "image/jpg",
         "image/png",
         "video/mp4",
+        "text/csv",
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       ];
       if (!allowedTypes.includes(file.type)) {
-        alert("Invalid file type. Allowed: PDF, JPG, JPEG, PNG, mp4");
+        showToast(
+          "Invalid file type. Allowed: PDF, JPG, JPEG, PNG, mp4",
+          "error",
+          ToastType.ERROR,
+        );
         return;
       }
 
@@ -51,12 +65,66 @@ const AddDocument = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Add API call here
+    try {
+      const payload = new FormData();
+      payload.append("document_name", formData.title);
+      payload.append("is_published", formData.status);
+      if (formData.documentFile) {
+        payload.append("file", formData.documentFile);
+      }
+      const response = await (documentId
+        ? importantDocumentService.updateDocument(documentId, payload)
+        : importantDocumentService.addDocument(payload));
+      if (response.status === 201 || response.status === 200) {
+        showToast(
+          documentId
+            ? "Document updated successfully"
+            : "Document added successfully",
+          "success",
+          ToastType.SUCCESS,
+        );
+        setTimeout(() => {
+          navigate("/important-documents");
+        }, 1500);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
+    }
     navigate(-1);
   };
+
+  const getDocumentDetailsByDocumentId = async (documentId: string) => {
+    try {
+      const response =
+        await importantDocumentService.getDocumentDetailsByDocumentId(
+          documentId,
+        );
+      if (response.status === 200) {
+        const documentData = response.data.data;
+        setFormData({
+          title: documentData.document_name,
+          status: documentData.is_published.toString(),
+          documentFile: null,
+        });
+        setFileName(documentData.file_name || "");
+      }
+    } catch (error) {
+      log(
+        LogLevel.ERROR,
+        "AddDocument :: getDocumentDetailsByDocumentId",
+        error,
+      );
+      showToast("Failed to fetch document details", "error", ToastType.ERROR);
+    }
+  };
+
+  useEffect(() => {
+    if (documentId) {
+      getDocumentDetailsByDocumentId(documentId);
+    }
+  }, [documentId]);
 
   return (
     <div className="p-5 mt-40 md:mt-0">
@@ -109,7 +177,7 @@ const AddDocument = () => {
                   </div>
                 </div>
                 <span className="text-[#27682A] text-xs inline-block">
-                  (Allowed: PDF, JPG, JPEG, PNG, mp4 | Max Size: 5MB)
+                  (Allowed: PDF, JPG, JPEG, PNG, mp4 | Max Size: 10MB)
                 </span>
               </div>
 
@@ -125,8 +193,9 @@ const AddDocument = () => {
                   className="w-full px-4 py-2 border border-[#E5E7EB] rounded-md outline-none text-[#374151] text-sm  bg-white focus:border-[#003366] transition cursor-pointer"
                   required
                 >
-                  <option value="Save and publish">Save and publish</option>
-                  <option value="Draft">Draft</option>
+                  <option value="">Select</option>
+                  <option value="true">Publish</option>
+                  <option value="false">Draft</option>
                 </select>
               </div>
             </div>
@@ -144,7 +213,7 @@ const AddDocument = () => {
                 type="submit"
                 className="px-12 py-2 bg-[#003366] text-white font-[500] rounded-lg  text-sm"
               >
-                Submit
+                {documentId ? "Update" : "Submit"}
               </button>
             </div>
           </form>

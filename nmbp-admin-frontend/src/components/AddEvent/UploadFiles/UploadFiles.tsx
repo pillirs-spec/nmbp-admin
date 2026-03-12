@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import EditIcon from "../../../assets/edit.svg";
 import DeleteIcon from "../../../assets/delete.svg";
 import UploadFile from "../../../assets/upload.svg";
 
 interface UploadFilesProps {
   formData: any;
+  setFormData: React.Dispatch<React.SetStateAction<any>>;
   handleInputChange: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -22,32 +23,55 @@ interface UploadedFile {
   size: string;
   url: string;
   type: "image" | "video";
+  file: File;
 }
 
 const UploadFiles: React.FC<UploadFilesProps> = ({
   formData,
+  setFormData,
   handleInputChange,
   steps,
   currentStep,
   handleCancel,
   handleSaveAndContinue,
 }) => {
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([
-    {
-      id: 1,
-      name: "Activity_Name_DD/MM/YYYY.jpg",
-      size: "1.8 MB",
-      url: "/path/to/image1.jpg",
-      type: "image",
-    },
-    {
-      id: 2,
-      name: "Activity_Name_DD/MM/YYYY.jpg",
-      size: "1.8 MB",
-      url: "/path/to/image2.jpg",
-      type: "image",
-    },
-  ]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [error, setError] = useState<string>("");
+
+  // Initialize/restore uploadedFiles from formData when entering Step 3
+  useEffect(() => {
+    if (
+      currentStep === 3 &&
+      formData.media_files &&
+      formData.media_files.length > 0 &&
+      uploadedFiles.length === 0
+    ) {
+      const filePromises = formData.media_files.map(
+        (file: File, index: number) => {
+          return new Promise<UploadedFile>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              const uploadedFile: UploadedFile = {
+                id: index,
+                name: file.name,
+                size: (file.size / (1024 * 1024)).toFixed(1) + " MB",
+                url: event.target?.result as string,
+                type: file.type.startsWith("image") ? "image" : "video",
+                file: file,
+              };
+              resolve(uploadedFile);
+            };
+            reader.readAsDataURL(file);
+          });
+        },
+      );
+
+      Promise.all(filePromises).then((files) => {
+        setUploadedFiles(files);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -61,8 +85,16 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
             size: (file.size / (1024 * 1024)).toFixed(1) + " MB",
             url: event.target?.result as string,
             type: file.type.startsWith("image") ? "image" : "video",
+            file: file,
           };
           setUploadedFiles((prev) => [...prev, newFile]);
+          // Clear error when file is uploaded
+          setError("");
+          // Update formData with the actual File object
+          setFormData((prev: any) => ({
+            ...prev,
+            media_files: [...(prev.media_files || []), file],
+          }));
         };
         reader.readAsDataURL(file);
       });
@@ -70,11 +102,31 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
   };
 
   const handleDeleteFile = (id: number) => {
+    const fileToDelete = uploadedFiles.find((f) => f.id === id);
     setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
+    // Remove from formData
+    if (fileToDelete) {
+      setFormData((prev: any) => ({
+        ...prev,
+        media_files: prev.media_files.filter(
+          (f: File) =>
+            f.name !== fileToDelete.name || f.size !== fileToDelete.file.size,
+        ),
+      }));
+    }
   };
 
   const handleEditFile = (id: number) => {
     console.log("Edit file:", id);
+  };
+
+  const handleSaveAndContinueWithValidation = () => {
+    if (uploadedFiles.length === 0) {
+      setError("Please upload at least one photo or video");
+      return;
+    }
+    setError("");
+    handleSaveAndContinue();
   };
 
   return (
@@ -133,7 +185,7 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
         </div>
 
         {/* Upload Grid */}
-        <div className="grid grid-cols-3 gap-6 mb-6 bg-white p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6 bg-white p-6">
           {/* Uploaded Files */}
           {uploadedFiles.map((file) => (
             <div
@@ -141,33 +193,37 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
               className="relative border border-[#E5E7EB] rounded-lg overflow-hidden"
             >
               {/* Image Preview */}
-              <div className="h-48 bg-[#F9FAFB] flex items-center justify-center">
+              <div className="h-48 bg-[#F9FAFB] flex items-center justify-center overflow-hidden">
                 {file.type === "image" ? (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-4xl">
-                    🖼️
-                  </div>
+                  <img
+                    src={file.url}
+                    alt={file.name}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-white text-4xl">
-                    🎥
-                  </div>
+                  <video
+                    src={file.url}
+                    className="w-full h-full object-cover"
+                    controls
+                  />
                 )}
               </div>
 
               {/* File Info */}
-              <div className="flex justify-between items-center">
-                <div className="p-3 bg-white ">
-                  <p className="text-sm font-medium text-[#374151] truncate mb-1">
+              <div className="flex  items-start justify-between p-3 bg-white gap-2">
+                <div className="p-3 bg-white flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#374151] truncate mb-1 text-wrap">
                     {file.name}
                   </p>
                   <p className="text-xs text-[#6B7280]">{file.size}</p>
                 </div>
-                <div className="p-3 flex gap-2">
-                  <button
+                <div className="p-3 flex gap-2 flex-shrink-0">
+                  {/* <button
                     onClick={() => handleEditFile(file.id)}
                     className="w-8 h-8  flex items-center justify-center  hover:bg-gray-100 hover:rounded-lg transition"
                   >
                     <img src={EditIcon} alt="edit" />
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => handleDeleteFile(file.id)}
                     className="w-8 h-8 flex items-center justify-center  hover:bg-red-50 hover:rounded-lg transition"
@@ -201,16 +257,23 @@ const UploadFiles: React.FC<UploadFilesProps> = ({
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="px-6 pb-3">
+            <p className="text-red-500 text-xs font-medium">{error}</p>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex justify-between items-center p-6">
           <button
             onClick={handleCancel}
             className="px-6 py-2 border-[1px] border-[#003366] text-[#003366] font-[500] rounded-lg hover:bg-blue-50 transition text-sm"
           >
-            Cancel
+            Back
           </button>
           <button
-            onClick={handleSaveAndContinue}
+            onClick={handleSaveAndContinueWithValidation}
             className="px-8 py-2 bg-[#003366] text-white font-[500] rounded-lg hover:opacity-90 transition text-sm flex items-center gap-2"
           >
             Save and Continue <span>→</span>

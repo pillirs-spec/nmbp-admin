@@ -122,7 +122,16 @@ CREATE TABLE m_districts (
 CREATE TABLE m_activities (
     activity_id SERIAL PRIMARY KEY,
     activity_name VARCHAR(500) NOT NULL,
-    activity_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activity_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: t_feedback
+CREATE TABLE t_feedback (
+    feedback_id SERIAL PRIMARY KEY,
+    feedback TEXT NOT NULL,
+    created_by INT REFERENCES m_users(user_id),
+    date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 

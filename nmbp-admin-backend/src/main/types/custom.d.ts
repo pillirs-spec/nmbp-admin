@@ -149,3 +149,10 @@ export interface IProject {
   dateUpdated?: Date;
   description?: string;
 }
+
+export interface IDocument {
+  document_id: number;
+  document_name: string;
+  file: string;
+  is_published: boolean;
+}

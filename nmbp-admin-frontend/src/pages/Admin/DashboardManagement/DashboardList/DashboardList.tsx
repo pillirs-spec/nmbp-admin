@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { debounce } from "lodash";
 import searchIcon from "../../../../assets/search-icon.svg";
-import AnnouncementIcon from "../../../../assets/announcement.svg";
-import LocationIcon from "../../../../assets/location.svg";
-import PrizeIcon from "../../../../assets/prize.svg";
 import { useNavigate } from "react-router-dom";
 import { LogLevel } from "../../../../enums";
-import { useLogger } from "../../../../hooks";
+import { useLogger, useToast } from "../../../../hooks";
+import dashboardListService from "./dashboardListService";
+import addEventService from "../../../../components/AddEvent/addEventService";
+import { ToastType } from "../../../../enums";
+import DeleteIcon from "../../../../assets/delete.svg";
 
 interface Submission {
-  id: number;
+  event_id: string;
   state_name: string;
   district_name: string;
-  activity: string;
+  activity_title: string;
   activity_date: string;
-  participants: number;
-  male_participants: number;
-  female_participants: number;
-  cordinating_department: string;
-  no_of_educational_institutions: number;
+  number_of_participants: number;
+  number_of_male: number;
+  number_of_female: number;
+  coordinating_department_name: string;
+  number_of_educational_institutions: number;
   location: string;
-  created_at: string;
+  updated_by_name: string;
+  date_updated: string;
 }
 
 interface DashboardListProps {
@@ -32,115 +34,18 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [filterLocation, setFilterLocation] = useState<string>("All Location");
-  const [filterActivity, setFilterActivity] = useState<string>("All Activity");
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    show: boolean;
+    eventId: string;
+    eventTitle: string;
+  }>({ show: false, eventId: "", eventTitle: "" });
   const navigate = useNavigate();
   const { log } = useLogger();
-
-  const pageSize = 150;
-
-  const mockSubmissions: Submission[] = [
-    {
-      id: 1,
-      state_name: "Uttar Pradesh",
-      district_name: "Lucknow",
-      activity: "Community Awareness",
-      activity_date: "2024-01-15",
-      participants: 45,
-      male_participants: 28,
-      female_participants: 17,
-      cordinating_department: "Department of Social Welfare",
-      no_of_educational_institutions: 5,
-      location: "Community Center, Lucknow",
-      created_at: "2024-01-16T10:30:00Z",
-    },
-    {
-      id: 2,
-      state_name: "Maharashtra",
-      district_name: "Pune",
-      activity: "Training Program",
-      activity_date: "2024-02-20",
-      participants: 62,
-      male_participants: 35,
-      female_participants: 27,
-      cordinating_department: "Department of Health",
-      no_of_educational_institutions: 3,
-      location: "Training Hall, Pune",
-      created_at: "2024-02-21T14:45:00Z",
-    },
-    {
-      id: 3,
-      state_name: "Tamil Nadu",
-      district_name: "Chennai",
-      activity: "Health Camp",
-      activity_date: "2024-03-10",
-      participants: 38,
-      male_participants: 22,
-      female_participants: 16,
-      cordinating_department: "Department of Health",
-      no_of_educational_institutions: 4,
-      location: "Community Hall, Chennai",
-      created_at: "2024-03-11T09:15:00Z",
-    },
-    {
-      id: 4,
-      state_name: "West Bengal",
-      district_name: "Kolkata",
-      activity: "Educational Workshop",
-      activity_date: "2024-04-05",
-      participants: 55,
-      male_participants: 31,
-      female_participants: 24,
-      cordinating_department: "Department of Education",
-      no_of_educational_institutions: 6,
-      location: "Education Center, Kolkata",
-      created_at: "2024-04-06T11:00:00Z",
-    },
-    {
-      id: 5,
-      state_name: "Rajasthan",
-      district_name: "Jaipur",
-      activity: "Women Empowerment",
-      activity_date: "2024-05-12",
-      participants: 78,
-      male_participants: 28,
-      female_participants: 50,
-      cordinating_department: "Department of Social Welfare",
-      no_of_educational_institutions: 2,
-      location: "Community Center, Jaipur",
-      created_at: "2024-05-13T13:30:00Z",
-    },
-  ];
-
-  const handleListSubmissions = () => {
-    try {
-      let filtered = mockSubmissions;
-
-      if (searchQuery) {
-        filtered = filtered.filter((item) =>
-          item.activity.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
-      }
-
-      setTotalCount(filtered.length);
-      setSubmissions(filtered);
-
-      log(
-        LogLevel.INFO,
-        "DistrictDashboard :: handleListSubmissions",
-        filtered,
-      );
-    } catch (error) {
-      log(LogLevel.ERROR, "DistrictDashboard :: handleListSubmissions", error);
-    }
-  };
-
-  useEffect(() => {
-    handleListSubmissions();
-  }, [currentPage, searchQuery, filterLocation, filterActivity]);
+  const { showToast } = useToast();
 
   const handleSearch = (value: string) => {
-    if (value.length > 0) {
+    if (value.length >= 3) {
       setSearchQuery(value);
       setCurrentPage(1);
     } else {
@@ -155,17 +60,51 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, submissions.length);
-  const paginatedSubmissions = submissions.slice(startIndex, endIndex);
+  const handleDeleteClick = (eventId: string, eventTitle: string) => {
+    setDeleteConfirm({ show: true, eventId, eventTitle });
+  };
 
-  const totalSubmissions = submissions.length;
-  const totalLocations = 110;
-  const totalPeopleReached = 13723;
+  const handleConfirmDelete = async () => {
+    try {
+      await addEventService.deleteEvent(deleteConfirm.eventId);
+      showToast("Event deleted successfully", ToastType.SUCCESS);
+      setDeleteConfirm({ show: false, eventId: "", eventTitle: "" });
+      getAllEvents();
+    } catch (error) {
+      log(LogLevel.ERROR, "DashboardList :: handleConfirmDelete", error);
+      showToast("Failed to delete event", ToastType.ERROR);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirm({ show: false, eventId: "", eventTitle: "" });
+  };
+
+  const getAllEvents = useCallback(async () => {
+    try {
+      const payload = {
+        currentPage,
+        pageSize,
+        search: searchQuery,
+      };
+      const response = await dashboardListService.getAllEventsList(payload);
+      if (response.status === 200) {
+        setSubmissions(response.data.data.events);
+        setTotalCount(response.data.data.totalCount);
+      }
+      log(LogLevel.INFO, "DashboardList :: getAllEvents", response);
+    } catch (error) {
+      log(LogLevel.ERROR, "DashboardList :: getAllEvents", error);
+    }
+  }, [currentPage, pageSize, searchQuery, log]);
+
+  useEffect(() => {
+    getAllEvents();
+  }, [getAllEvents]);
 
   return (
     <div>
-      {role}
+      {/* {role} */}
 
       <div className="w-full h-full p-2 overflow-y-auto">
         <div className="">
@@ -179,12 +118,14 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 Last updated: 27 Aug 2024, 02:00 PM
               </p> */}
             </div>
-            <button
-              onClick={handleAddEvent}
-              className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
-            >
-              Add Event +
-            </button>
+            {role?.toLowerCase().includes("state") ? null : (
+              <button
+                onClick={handleAddEvent}
+                className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
+              >
+                Add Event +
+              </button>
+            )}
           </div>
 
           {/* KPI Cards */}
@@ -260,7 +201,7 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 <input
                   type="search"
                   className="w-full outline-none text-[#6B7280] placeholder-[#6B7280] bg-[#F9FAFB] text-sm"
-                  placeholder="Search"
+                  placeholder="Search by State, District, Activity..."
                   onChange={(e) => debouncedHandleSearch(e.target.value)}
                 />
                 <img
@@ -270,7 +211,7 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                 />
               </div>
 
-              <div className="relative col-span-3">
+              {/* <div className="relative col-span-3">
                 <select
                   value={filterLocation}
                   onChange={(e) => {
@@ -284,25 +225,22 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                   <option>Location 2</option>
                   <option>Location 3</option>
                 </select>
-              </div>
+              </div> */}
 
-              <div className="relative col-span-3">
+              {/* <div className="relative col-span-6">
                 <select
                   value={filterActivity}
                   onChange={(e) => {
-                    setFilterActivity(e.target.value);
+                    setSearchQuery(e.target.value);
                     setCurrentPage(1);
                   }}
                   className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
                 >
-                  <option>All Activity</option>
-                  <option>Community Awareness</option>
-                  <option>Training Program</option>
-                  <option>Health Camp</option>
-                  <option>Educational Workshop</option>
-                  <option>Women Empowerment</option>
+                  {submissions.length > 0 && (
+                    <option value="">All Activity</option>
+                  )}
                 </select>
-              </div>
+              </div> */}
             </div>
 
             <div className="max-h-[500px] mb-6 overflow-x-scroll overflow-y-auto rounded-lg border border-[#E5E7EB]">
@@ -321,14 +259,15 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Activity Date
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                      Participants
-                    </th>
+
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Male Participants
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Female Participants
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      Total Participants
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Cordinating Department
@@ -340,16 +279,21 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                       Location
                     </th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                      Created By
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                       Created At
                     </th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                      Action
-                    </th>
+                    {role?.toLowerCase().includes("state") ? null : (
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                        Action
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedSubmissions.length > 0 ? (
-                    paginatedSubmissions.map((submission, index) => (
+                  {submissions.length > 0 ? (
+                    submissions.map((submission, index) => (
                       <tr
                         key={index}
                         className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0"
@@ -362,42 +306,72 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
                           {submission.district_name}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151]">
-                          {submission.activity}
+                          {submission.activity_title}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151]">
-                          {submission.activity_date}
+                          {submission.activity_date
+                            .split("T")[0]
+                            .split("-")
+                            .reverse()
+                            .join("-")}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
+                          {submission.number_of_male}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                          {submission.participants}
+                          {submission.number_of_female}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                          {submission.male_participants}
+                          {submission.number_of_participants}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                          {submission.female_participants}
+                          {submission.coordinating_department_name}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                          {submission.cordinating_department}
+                          {submission.number_of_educational_institutions}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                          {submission.no_of_educational_institutions}
+                          {submission.district_name}
+                        </td>
+
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center">
+                          {submission.updated_by_name}
                         </td>
                         <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                          {submission.location}
+                          {submission.date_updated
+                            .split("T")[0]
+                            .split("-")
+                            .reverse()
+                            .join("-")}
                         </td>
-                        <td>{submission.created_at}</td>
-                        {/* <td className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]">
-                          View
-                        </td> */}
+
+                        {role?.toLowerCase().includes("state") ? null : (
+                          <td
+                            className="px-6 py-4 text-sm text-[#003366] font-semibold cursor-pointer hover:text-[#002244]"
+                            onClick={() =>
+                              handleDeleteClick(
+                                submission.event_id,
+                                submission.activity_title,
+                              )
+                            }
+                          >
+                            <img
+                              src={DeleteIcon}
+                              alt="delete-icon"
+                              className="w-4 h-4"
+                            />
+                          </td>
+                        )}
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td
-                        colSpan={6}
-                        className="px-6 py-8 text-center text-[#374151] font-semibold"
+                        colSpan={12}
+                        className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                       >
-                        No Data Found
+                        No data found
                       </td>
                     </tr>
                   )}
@@ -468,10 +442,17 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
               </div>
               <div className="text-sm text-[#6B7280]">
                 Showing{" "}
-                <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                  <option>2</option>
-                  <option>50</option>
-                  <option>200</option>
+                <select
+                  value={pageSize}
+                  className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
                 </select>
                 of <span className="font-semibold">{totalCount}</span> items
               </div>
@@ -479,6 +460,38 @@ const DashboardList: React.FC<DashboardListProps> = ({ role }) => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <h2 className="text-xl font-semibold text-[#374151] mb-2">
+              Delete Event
+            </h2>
+            <p className="text-sm text-[#6B7280] mb-6">
+              Are you sure you want to delete the event{" "}
+              <span className="font-bold text-red-500">
+                {deleteConfirm.eventTitle}
+              </span>
+              <span className="ml-1">this action cannot be undone.</span>
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="p-2 border border-[#E5E7EB] text-[#374151] text-sm font-medium rounded hover:bg-[#F9FAFB] transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="p-2 bg-red-600 text-white font-medium text-sm rounded hover:bg-red-700 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

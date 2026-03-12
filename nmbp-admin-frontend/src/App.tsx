@@ -44,6 +44,8 @@ const AddWebexFacebook = lazy(
 
 const AddDocument = lazy(() => import("./components/AddDocument/AddDocument"));
 
+const AddFeedback = lazy(() => import("./components/AddFeedback/AddFeedback"));
+
 const PledgeReportManagement = lazy(
   () => import("./pages/Admin/PledgeReportManagement/PledgeReportManagement"),
 );
@@ -218,6 +220,11 @@ function App() {
             <Route
               path="/important-documents/add"
               element={<PrivateRoutes element={<AddDocument />} />}
+            />
+
+            <Route
+              path="/feedback/add"
+              element={<PrivateRoutes element={<AddFeedback />} />}
             />
 
             <Route

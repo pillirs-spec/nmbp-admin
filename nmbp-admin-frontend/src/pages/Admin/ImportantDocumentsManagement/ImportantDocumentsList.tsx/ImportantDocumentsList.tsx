@@ -3,13 +3,28 @@ import { Link } from "react-router-dom";
 import { debounce } from "lodash";
 import searchIcon from "../../../../assets/search-icon.svg";
 import { useNavigate } from "react-router-dom";
+import { importantDocumentService } from "./importantDocumentService";
+import {
+  IconFileTypePdf,
+  IconFileTypeCsv,
+  IconFileExcel,
+  IconFileTypeJpg,
+  IconFileTypePng,
+  IconVideo,
+  IconEdit,
+  IconEye,
+  IconDownload,
+} from "@tabler/icons-react";
+import { useAuth, useLogger, useToast } from "../../../../hooks";
+import { LogLevel, ToastType } from "../../../../enums";
 
 interface Document {
-  id: string;
-  documentName: string;
-  uploadedOn: string;
-  uploadedBy: string;
-  type: string;
+  document_id: string;
+  document_name: string;
+  file_type: string;
+  date_updated: string;
+  updated_by: string;
+  is_published: boolean;
 }
 
 const ImportantDocumentsList = () => {
@@ -17,62 +32,14 @@ const ImportantDocumentsList = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<number>(10);
   const navigate = useNavigate();
-
-  const pageSize = 200;
-
-  // Mock data - Replace with actual API call
-  const mockDocuments: Document[] = [
-    {
-      id: "1",
-      documentName: "DO Letter to DNOs",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "letter",
-    },
-    {
-      id: "2",
-      documentName: "SOP for the MyGov Competitions",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "sop",
-    },
-    {
-      id: "3",
-      documentName: "DO Letter Regarding the Competitions on MyGov",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "letter",
-    },
-    {
-      id: "4",
-      documentName: "DO Letters to States and UTs",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "letter",
-    },
-    {
-      id: "5",
-      documentName: "PPT for SNOs and DNOs regarding Dashboard",
-      uploadedOn: "09-10-2025 02:10 PM",
-      uploadedBy: "Deepshikha Goel (Admin)",
-      type: "presentation",
-    },
-  ];
-
-  useEffect(() => {
-    try {
-      // Simulate API call - Replace with actual API
-      setDocuments(mockDocuments);
-      setTotalCount(1500); // Mock total count
-    } catch (error) {
-      console.error("Error loading documents:", error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery]);
+  const { showToast } = useToast();
+  const { log } = useLogger();
+  const { userDetails } = useAuth();
 
   const handleSearch = (value: string) => {
-    if (value.length > 0) {
+    if (value.length >= 3) {
       setSearchQuery(value);
       setCurrentPage(1);
     } else {
@@ -83,17 +50,78 @@ const ImportantDocumentsList = () => {
 
   const debouncedHandleSearch = debounce(handleSearch, 300);
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, documents.length);
-  const paginatedDocuments = documents.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * pageSize;
+  // const endIndex = Math.min(startIndex + pageSize, documents.length);
+  // const paginatedDocuments = documents.slice(startIndex, endIndex);
 
   const handleViewDocument = () => {
-    alert("View Document functionality to be implemented");
+    showToast(
+      "View Document functionality to be implemented",
+      "info",
+      ToastType.INFO,
+    );
+  };
+
+  const handleEditDocument = (documentId: string) => {
+    navigate(`/important-documents/add`, { state: { documentId } });
   };
 
   const handleAddDocument = () => {
     navigate("/important-documents/add");
   };
+
+  const handleDownloadDocument = async (document_id: string) => {
+    try {
+      const response =
+        await importantDocumentService.downloadDocument(document_id);
+      if (response.status === 200) {
+        const downloadUrl = response.data.data.download_url;
+        const documentName = response.data.data.document_name;
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.setAttribute("download", documentName);
+        link.setAttribute("target", "_blank");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast(
+          "Document downloaded successfully",
+          "success",
+          ToastType.SUCCESS,
+        );
+      }
+    } catch (error) {
+      log(
+        LogLevel.ERROR,
+        "ImportantDocumentsList :: handleDownloadDocument",
+        error,
+      );
+    }
+  };
+
+  const getAllDocumentsList = async () => {
+    try {
+      const payload = {
+        pageSize,
+        currentPage,
+        searchFilter: searchQuery,
+      };
+      const response =
+        await importantDocumentService.getAllDocumentsList(payload);
+      if (response.status === 200) {
+        // showToast(response.data.message, "success", ToastType.SUCCESS);
+        setDocuments(response.data.data.documentsList);
+        setTotalCount(response.data.data.totalDocumentsCount);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "PledgeReportList :: getPledgesList", error);
+    }
+  };
+
+  useEffect(() => {
+    getAllDocumentsList();
+  }, [pageSize, currentPage, searchQuery]);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
@@ -141,47 +169,133 @@ const ImportantDocumentsList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Uploaded By
                   </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
+                    Published
+                  </th>
+
                   <th className="px-6 py-4 text-center text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Action
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedDocuments.length > 0 ? (
-                  paginatedDocuments.map((document, index) => (
+                {documents.length > 0 ? (
+                  documents.map((document) => (
                     <tr
-                      key={index}
+                      key={document.document_id}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg">📄</span>
-                          {document.documentName}
+                          <span className="text-lg">
+                            {document.file_type.includes("pdf") ? (
+                              <IconFileTypePdf color="red" />
+                            ) : document.file_type.includes("csv") ? (
+                              <IconFileTypeCsv color="green" />
+                            ) : document.file_type.includes("excel") ||
+                              document.file_type.includes("spreadsheet") ? (
+                              <IconFileExcel color="green" />
+                            ) : document.file_type.includes("jpeg") ? (
+                              <IconFileTypeJpg color="blue" />
+                            ) : document.file_type.includes("jpg") ? (
+                              <IconFileTypeJpg color="blue" />
+                            ) : document.file_type.includes("png") ? (
+                              <IconFileTypePng color="blue" />
+                            ) : document.file_type.includes("mp4") ||
+                              document.file_type.includes("video") ? (
+                              <IconVideo color="pink" />
+                            ) : (
+                              <IconFileTypePdf />
+                            )}
+                          </span>
+                          {document.document_name}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {document.uploadedOn}
+                        {document.date_updated
+                          .split("T")[0]
+                          .split("-")
+                          .reverse()
+                          .join("-")}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {document.uploadedBy}
+                        {document.updated_by}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#374151] text-center">
-                        <button
-                          className="text-[#003366] font-[500]"
-                          onClick={handleViewDocument}
-                        >
-                          View <span>↗</span>
-                        </button>
+
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        {document.is_published ? (
+                          <span className="px-2 py-1 bg-green-100 text-green-600 text-xs font-semibold rounded">
+                            Published
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-yellow-100 text-red-600 text-xs font-semibold rounded">
+                            Draft
+                          </span>
+                        )}
                       </td>
+                      {userDetails?.role_name
+                        .toLowerCase()
+                        .includes("state") ? (
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={() =>
+                              handleDownloadDocument(document.document_id)
+                            }
+                          >
+                            <IconDownload size={20} color="red" />
+                          </button>
+                        </td>
+                      ) : userDetails?.role_name
+                          .toLowerCase()
+                          .includes("district") ? (
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={() =>
+                              handleDownloadDocument(document.document_id)
+                            }
+                          >
+                            <IconDownload size={20} color="red" />
+                          </button>
+                        </td>
+                      ) : (
+                        <td className="px-6 py-4 text-sm text-[#374151] text-center flex items-center justify-center gap-4">
+                          {/* <button
+                            className="text-[#003366] font-[500]"
+                            onClick={handleViewDocument}
+                          >
+                            <IconEye size={20} color="red" />
+                          </button> */}
+
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={() =>
+                              handleEditDocument(document.document_id)
+                            }
+                          >
+                            <IconEdit size={20} />
+                          </button>
+
+                          <button
+                            className="text-[#003366] font-[500]"
+                            onClick={() =>
+                              handleDownloadDocument(document.document_id)
+                            }
+                          >
+                            <IconDownload size={20} color="red" />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td
-                      colSpan={4}
-                      className="px-6 py-8 text-center text-[#374151] font-semibold"
+                      colSpan={12}
+                      className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                     >
-                      No Data Found
+                      No data found
                     </td>
                   </tr>
                 )}
@@ -197,7 +311,7 @@ const ImportantDocumentsList = () => {
                 disabled={currentPage === 1}
                 className="w-7 h-7 flex items-center justify-center text-sm font-bold text-[#9161FF] hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
-                &lt;
+                +
               </button>
 
               {Array.from(
@@ -238,17 +352,28 @@ const ImportantDocumentsList = () => {
                   )
                 }
                 disabled={currentPage === Math.ceil(totalCount / pageSize)}
-                className="w-7 h-7 flex items-center justify-center text-sm font-bold text-[#9161FF] hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className={`w-7 h-7 flex items-center justify-center text-sm font-bold transition ${
+                  currentPage === Math.ceil(totalCount / pageSize)
+                    ? " text-[#9161FF] cursor-not-allowed"
+                    : "  hover:bg-pink-50"
+                }`}
               >
-                &gt;
+                +
               </button>
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>200</option>
-                <option>50</option>
-                <option>100</option>
+              <select
+                value={pageSize}
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
               of <span className="font-semibold">{totalCount}</span> items
             </div>

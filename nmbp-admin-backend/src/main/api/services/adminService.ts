@@ -2,6 +2,8 @@ import { STATUS, logger, redis } from "ts-commons";
 import { adminRepository } from "../repositories";
 import { redisKeysFormatter } from "../../helpers";
 import { CacheTTL, pgQueries, RedisKeys } from "../../enums";
+import { IDocument } from "../../types/custom";
+import { uploadToS3, getSignedS3Url } from "../../config/uploadToS3";
 
 const adminService = {
   getPledges: async (
@@ -289,8 +291,10 @@ const adminService = {
     currentPage: number,
     searchFilter: string,
     selectedState: number,
+    stateId: number,
+    userRoleName: string,
   ) => {
-    const logPrefix = `adminService :: getDnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState}`;
+    const logPrefix = `adminService :: getDnoList :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter} :: selectedState :: ${selectedState} :: stateId :: ${stateId} :: userRoleName :: ${userRoleName}`;
     try {
       logger.info(`${logPrefix} :: Fetching DNO list from database`);
       let key = redisKeysFormatter.getFormattedRedisKey(RedisKeys.DNO_LIST, {});
@@ -314,6 +318,9 @@ const adminService = {
         key += `|state:${selectedState}`;
         whereQuery += ` AND state_id = '${selectedState}'`;
       }
+      if (userRoleName) {
+        key += `|role:${userRoleName}`;
+      }
 
       const cachedSnoList = await redis.GetKeyRedis(key);
       if (cachedSnoList) {
@@ -327,6 +334,8 @@ const adminService = {
         currentPage,
         searchFilter,
         selectedState,
+        stateId,
+        userRoleName,
       );
       if (snoList && snoList.length > 0)
         redis.SetRedis(key, snoList, CacheTTL.LONG);
@@ -393,6 +402,754 @@ const adminService = {
         `${logPrefix} :: Error counting total DNOs :: ${error.message} :: ${error}`,
       );
       throw error;
+    }
+  },
+
+  listDocuments: async (
+    pageSize: number,
+    currentPage: number,
+    searchFilter: string,
+  ) => {
+    const logPrefix = `adminService :: listDocuments :: Parameters :: pageSize :: ${pageSize} :: currentPage :: ${currentPage} :: searchFilter :: ${searchFilter}`;
+    try {
+      logger.info(`${logPrefix} :: Fetching documents from database`);
+      let key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_LIST,
+        {},
+      );
+
+      if (searchFilter) {
+        key += `|search:${searchFilter}`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+      }
+
+      if (currentPage) {
+        key += `|offset:${currentPage}`;
+      }
+
+      const cachedDocumentsList = await redis.GetKeyRedis(key);
+      if (cachedDocumentsList) {
+        logger.info(
+          `${logPrefix} :: cached result of documents :: ${cachedDocumentsList}`,
+        );
+        return JSON.parse(cachedDocumentsList);
+      }
+
+      const documentsList = await adminRepository.listDocuments(
+        pageSize,
+        currentPage,
+        searchFilter,
+      );
+      if (documentsList && documentsList.length > 0)
+        redis.SetRedis(key, documentsList, CacheTTL.LONG);
+
+      return documentsList;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error fetching documents :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  documentsCount: async (searchFilter: string) => {
+    const logPrefix = `adminService :: documentsCount :: Parameters :: searchFilter :: ${searchFilter}`;
+    try {
+      logger.info(`${logPrefix} :: Counting documents in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_COUNT,
+        { searchFilter },
+      );
+
+      const cachedCount = await redis.GetKeyRedis(key);
+      if (cachedCount) {
+        logger.info(
+          `${logPrefix} :: cached count of documents :: ${cachedCount}`,
+        );
+        return JSON.parse(cachedCount);
+      }
+
+      const count = await adminRepository.documentsCount(searchFilter);
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting documents :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  totalDocumentsCount: async () => {
+    const logPrefix = `adminService :: totalDocumentsCount`;
+    try {
+      logger.info(`${logPrefix} :: Counting total documents in database`);
+      const key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_TOTAL_COUNT,
+        {},
+      );
+
+      const cachedTotalCount = await redis.GetKeyRedis(key);
+      if (cachedTotalCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of documents :: ${cachedTotalCount}`,
+        );
+        return JSON.parse(cachedTotalCount);
+      }
+
+      const count = await adminRepository.totalDocumentsCount();
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting total documents :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  addDocuments: async (
+    document_id: string,
+    document_name: string,
+    file: string,
+    userId: number,
+    file_type: string,
+    file_size: number,
+    is_published: boolean,
+  ) => {
+    const logPrefix = `adminService :: addDocuments :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: file_type :: ${file_type} :: file_size :: ${file_size} :: userId :: ${userId} :: is_published :: ${is_published} :: `;
+    try {
+      logger.info(`${logPrefix} :: Adding document to database`);
+      const addedDocument = await uploadToS3(file, userId, document_name);
+      await adminRepository.addDocument(
+        document_id,
+        document_name,
+        addedDocument,
+        userId,
+        file_type,
+        file_size,
+        is_published,
+      );
+
+      await adminService.clearDocumentsRedisCache();
+      logger.info(
+        `${logPrefix} :: Document added and cache invalidated successfully`,
+      );
+
+      return addedDocument;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error adding document :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  getDocumentById: async (document_id: string) => {
+    const logPrefix = `adminService :: getDocumentById :: document_id :: ${document_id}`;
+    try {
+      logger.info(`${logPrefix} :: Fetching document details from database`);
+      const document = await adminRepository.getDocumentById(document_id);
+      return document;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error fetching document :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  getDocumentDownloadUrl: async (document_id: string) => {
+    const logPrefix = `adminService :: getDocumentDownloadUrl :: document_id :: ${document_id}`;
+    try {
+      logger.info(
+        `${logPrefix} :: Fetching document and generating download URL`,
+      );
+      const document = await adminRepository.getDocumentById(document_id);
+
+      if (!document) {
+        logger.warn(`${logPrefix} :: Document not found`);
+        return null;
+      }
+
+      const downloadUrl = await getSignedS3Url(document.file_url, 300); // 5 minutes validity
+      logger.info(
+        `${logPrefix} :: Download URL generated successfully for file: ${document.file_url}`,
+      );
+      return downloadUrl;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error generating download URL :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  getDocumentPreviewUrl: async (document_id: string) => {
+    const logPrefix = `adminService :: getDocumentPreviewUrl :: document_id :: ${document_id}`;
+    try {
+      logger.info(
+        `${logPrefix} :: Fetching document and generating preview URL`,
+      );
+      const document = await adminRepository.getDocumentById(document_id);
+      if (!document) {
+        logger.warn(`${logPrefix} :: Document not found`);
+        return null;
+      }
+      const previewUrl = await getSignedS3Url(document.file_url, 300);
+      logger.info(
+        `${logPrefix} :: Preview URL generated successfully for file: ${document.file_url}`,
+      );
+      return previewUrl;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error generating preview URL :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  updateDocument: async (
+    document_id: string,
+    document_name: string,
+    file: any,
+    userId: number,
+    is_published: boolean,
+  ) => {
+    const logPrefix = `adminService :: updateDocument :: Parameters :: document_id :: ${document_id} :: document_name :: ${document_name} :: userId :: ${userId} :: is_published :: ${is_published}`;
+    try {
+      logger.info(`${logPrefix} :: Updating document in database`);
+
+      let file_url = null;
+      let file_type = null;
+      let file_size = null;
+
+      // If a new file is provided, upload it to S3
+      if (file) {
+        file_url = await uploadToS3(file, userId, document_name);
+        file_type = file.mimetype;
+        file_size = file.size;
+        logger.info(`${logPrefix} :: New file uploaded to S3: ${file_url}`);
+      }
+
+      const updatedDocument = await adminRepository.updateDocument(
+        document_id,
+        document_name,
+        file_url,
+        file_type,
+        file_size,
+        is_published,
+        userId,
+      );
+
+      await adminService.clearDocumentsRedisCache();
+      logger.info(
+        `${logPrefix} :: Document updated and cache invalidated successfully`,
+      );
+
+      return updatedDocument;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error updating document :: ${error.message} :: ${error}`,
+      );
+      throw error;
+    }
+  },
+
+  clearDocumentsRedisCache: async () => {
+    const logPrefix = `adminService :: clearDocumentsRedisCache`;
+    try {
+      const documentsKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_LIST,
+        {},
+      );
+      const documentsCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_COUNT,
+        {},
+      );
+      const documentsTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.DOCUMENTS_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${documentsKey}*`);
+      await redis.deleteRedis(documentsCountKey);
+      await redis.deleteRedis(documentsTotalCountKey);
+
+      logger.info(`${logPrefix} :: Documents cache cleared successfully`);
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  addEvent: async (
+    event_id: string | null,
+    activity_id: number | null,
+    activity_date: string | null,
+    activity_title: string | null,
+    coordinating_department_name: string | null,
+    number_of_participants: number | null,
+    number_of_female: number | null,
+    number_of_male: number | null,
+    number_of_educational_institutions: number | null,
+    description: string | null,
+    state_id: number | null,
+    district_id: number | null,
+    latitude: number | null,
+    longitude: number | null,
+    event_submitted: boolean,
+    media_files: any[],
+    userId: number,
+  ) => {
+    const logPrefix = `adminService :: addEvent :: event_id :: ${event_id}`;
+    try {
+      logger.info(
+        `${logPrefix} :: ${event_id ? "Updating" : "Creating"} event`,
+      );
+
+      // Add/Update event in database
+      const eventResult = await adminRepository.addEvent(
+        event_id,
+        activity_id,
+        activity_date,
+        activity_title,
+        coordinating_department_name,
+        number_of_participants,
+        number_of_female,
+        number_of_male,
+        number_of_educational_institutions,
+        description,
+        state_id,
+        district_id,
+        latitude,
+        longitude,
+        event_submitted,
+        userId,
+      );
+
+      if (!eventResult) {
+        throw new Error(`Failed to ${event_id ? "update" : "add"} event`);
+      }
+
+      // Upload media files to S3 and save to database (if provided)
+      const mediaResults = [];
+      if (media_files && media_files.length > 0) {
+        for (const file of media_files) {
+          try {
+            // Upload to S3
+            const fileName = `events/${eventResult.event_id}/${Date.now()}_${file.name}`;
+            const s3Url = await uploadToS3(file, userId, fileName);
+
+            if (s3Url) {
+              // Save media info to database
+              const mediaType = file.mimetype.startsWith("image/")
+                ? "image"
+                : "video";
+              const mediaResult = await adminRepository.addEventMedia(
+                eventResult.event_id,
+                s3Url,
+                mediaType,
+                file.size,
+              );
+              mediaResults.push(mediaResult);
+            }
+          } catch (fileError) {
+            logger.error(
+              `${logPrefix} :: Error uploading file ${file.name} :: ${fileError.message}`,
+            );
+            // Continue with other files even if one fails
+          }
+        }
+      }
+
+      logger.info(
+        `${logPrefix} :: Event ${event_id ? "updated" : "created"} successfully with ${mediaResults.length} media files`,
+      );
+
+      const eventsKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_LIST,
+        {},
+      );
+      const eventsCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_COUNT,
+        {},
+      );
+      const eventsTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${eventsKey}*`);
+      await redis.deleteRedis(eventsCountKey);
+      await redis.deleteRedis(eventsTotalCountKey);
+
+      return {
+        event: eventResult,
+        media: mediaResults,
+      };
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listSubmittedEvents: async (
+    pageSize: number = 10,
+    pageNumber: number = 1,
+    search: string = "",
+    userId: number,
+    userRoleName: string = "",
+  ) => {
+    const logPrefix = `adminService :: listSubmittedEvents`;
+    try {
+      logger.info(
+        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search} :: userId :: ${userId} :: userRoleName :: ${userRoleName}`,
+      );
+
+      let key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_LIST,
+        {},
+      );
+
+      if (search) {
+        key += `|search:${search}`;
+      }
+
+      if (userId) {
+        key += `|userId:${userId}`;
+      }
+
+      if (userRoleName) {
+        key += `|role:${userRoleName}`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+      }
+
+      if (pageNumber) {
+        key += `|offset:${pageNumber}`;
+      }
+
+      const cachedEvents = await redis.GetKeyRedis(key);
+      if (cachedEvents) {
+        logger.info(
+          `${logPrefix} :: cached result of submitted events :: ${cachedEvents}`,
+        );
+        return JSON.parse(cachedEvents);
+      }
+
+      const events = await adminRepository.listSubmittedEvents(
+        pageSize,
+        pageNumber,
+        search,
+        userId,
+        userRoleName,
+      );
+
+      if (events && events.length > 0) {
+        redis.SetRedis(key, events, CacheTTL.LONG);
+      }
+
+      return events;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getSubmittedEventsCount: async (
+    search: string = "",
+    userId: number,
+    userRoleName: string = "",
+  ) => {
+    const logPrefix = `adminService :: getSubmittedEventsCount`;
+    try {
+      logger.info(
+        `${logPrefix} :: search :: ${search} :: userId :: ${userId} :: userRoleName :: ${userRoleName}`,
+      );
+
+      const count = await adminRepository.getSubmittedEventsCount(
+        search,
+        userId,
+        userRoleName,
+      );
+
+      logger.info(`${logPrefix} :: Total count :: ${count}`);
+      return count;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listDraftEvents: async (
+    userId: number,
+    pageSize: number = 10,
+    pageNumber: number = 1,
+  ) => {
+    const logPrefix = `adminService :: listDraftEvents :: userId :: ${userId}`;
+    try {
+      logger.info(
+        `${logPrefix} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber}`,
+      );
+
+      const events = await adminRepository.listDraftEvents(
+        userId,
+        pageSize,
+        pageNumber,
+      );
+
+      logger.info(`${logPrefix} :: Retrieved ${events.length} draft events`);
+      return events;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  getEventById: async (event_id: string) => {
+    const logPrefix = `adminService :: getEventById :: event_id :: ${event_id}`;
+    try {
+      const event = await adminRepository.getEventById(event_id);
+
+      if (!event) {
+        throw new Error("Event not found");
+      }
+
+      logger.info(`${logPrefix} :: Event retrieved successfully`);
+      return event;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  deleteEvent: async (event_id: string) => {
+    const logPrefix = `adminService :: deleteEvent :: event_id :: ${event_id}`;
+    try {
+      const result = await adminRepository.deleteEvent(event_id);
+
+      logger.info(`${logPrefix} :: Event deleted successfully`);
+      const eventsKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_LIST,
+        {},
+      );
+      const eventsCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_COUNT,
+        {},
+      );
+      const eventsTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.EVENTS_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${eventsKey}*`);
+      await redis.deleteRedis(eventsCountKey);
+      await redis.deleteRedis(eventsTotalCountKey);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  addFeedback: async (userId: number, feedback: string) => {
+    const logPrefix = `adminService :: addFeedback :: userId :: ${userId}`;
+    try {
+      logger.info(`${logPrefix} :: Adding feedback to database`);
+
+      const feedbackResult = await adminRepository.addFeedback(
+        userId,
+        feedback,
+      );
+
+      if (!feedbackResult) {
+        throw new Error(`Failed to add feedback`);
+      }
+
+      logger.info(`${logPrefix} :: Feedback added successfully`);
+
+      const feedbackKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_LIST,
+        {},
+      );
+      const feedbackCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_COUNT,
+        {},
+      );
+      const feedbackTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${feedbackKey}*`);
+      await redis.deleteRedis(feedbackCountKey);
+      await redis.deleteRedis(feedbackTotalCountKey);
+      return feedbackResult;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  listFeedback: async (
+    pageSize: number = 10,
+    pageNumber: number = 1,
+    search: string = "",
+    userId: number,
+    userRoleName: string = "",
+  ) => {
+    const logPrefix = `adminService :: listFeedback`;
+    try {
+      logger.info(
+        `${logPrefix} :: userId :: ${userId} :: pageSize :: ${pageSize} :: pageNumber :: ${pageNumber} :: search :: ${search} :: userRoleName :: ${userRoleName}`,
+      );
+
+      let key = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_LIST,
+        {},
+      );
+
+      if (userId) {
+        key += `|userId:${userId}`;
+      }
+
+      if (search) {
+        key += `|search:${search}`;
+      }
+
+      if (pageSize) {
+        key += `|limit:${pageSize}`;
+      }
+
+      if (pageNumber) {
+        key += `|offset:${pageNumber}`;
+      }
+
+      if (userRoleName) {
+        key += `|role:${userRoleName}`;
+      }
+
+      const cachedFeedback = await redis.GetKeyRedis(key);
+      if (cachedFeedback) {
+        logger.info(
+          `${logPrefix} :: cached result of feedback :: ${cachedFeedback}`,
+        );
+        return JSON.parse(cachedFeedback);
+      }
+
+      const feedbackList = await adminRepository.listFeedback(
+        pageSize,
+        pageNumber,
+        search,
+        userId,
+        userRoleName,
+      );
+
+      if (feedbackList && feedbackList.length > 0) {
+        redis.SetRedis(key, feedbackList, CacheTTL.LONG);
+      }
+
+      return feedbackList;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  feedbackCount: async (
+    search: string = "",
+    userId: number,
+    userRoleName: string = "",
+  ) => {
+    const logPrefix = `adminService :: feedbackCount`;
+    try {
+      logger.info(
+        `${logPrefix} :: userId :: ${userId} :: search :: ${search} :: userRoleName :: ${userRoleName}`,
+      );
+
+      const count = await adminRepository.feedbackCount(
+        search,
+        userId,
+        userRoleName,
+      );
+
+      logger.info(`${logPrefix} :: Total count :: ${count}`);
+      return count;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
+    }
+  },
+
+  totalFeedbackCount: async (userId: number) => {
+    const logPrefix = `adminService :: totalFeedbackCount`;
+    try {
+      logger.info(
+        `${logPrefix} :: userId :: ${userId} :: Counting total feedback in database`,
+      );
+      const key =
+        redisKeysFormatter.getFormattedRedisKey(
+          RedisKeys.FEEDBACK_TOTAL_COUNT,
+          {},
+        ) + `|userId:${userId}`;
+
+      const cachedTotalCount = await redis.GetKeyRedis(key);
+      if (cachedTotalCount) {
+        logger.info(
+          `${logPrefix} :: cached total count of feedback :: ${cachedTotalCount}`,
+        );
+        return JSON.parse(cachedTotalCount);
+      }
+
+      const count = await adminRepository.totalFeedbackCount(userId);
+      if (count !== null && count !== undefined) {
+        redis.SetRedis(key, count, CacheTTL.LONG);
+      }
+      return count;
+    } catch (error) {
+      logger.error(
+        `${logPrefix} :: Error counting total feedback :: ${error.message} :: ${error}`,
+      );
+      throw new Error(error.message);
+    }
+  },
+
+  deleteFeedback: async (feedback_id: number) => {
+    const logPrefix = `adminService :: deleteFeedback :: feedback_id :: ${feedback_id}`;
+    try {
+      const result = await adminRepository.deleteFeedback(feedback_id);
+
+      logger.info(`${logPrefix} :: Feedback deleted successfully`);
+      const feedbackKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_LIST,
+        {},
+      );
+      const feedbackCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_COUNT,
+        {},
+      );
+      const feedbackTotalCountKey = redisKeysFormatter.getFormattedRedisKey(
+        RedisKeys.FEEDBACK_TOTAL_COUNT,
+        {},
+      );
+
+      await redis.deleteRedisKeyWithPattern(`${feedbackKey}*`);
+      await redis.deleteRedis(feedbackCountKey);
+      await redis.deleteRedis(feedbackTotalCountKey);
+      return result;
+    } catch (error) {
+      logger.error(`${logPrefix} :: Error :: ${error.message} :: ${error}`);
+      throw new Error(error.message);
     }
   },
 };

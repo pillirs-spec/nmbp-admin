@@ -5,16 +5,18 @@ import CopyIcon from "../../../../assets/copy.svg";
 import ExcelIcon from "../../../../assets/excel.svg";
 import PdfIcon from "../../../../assets/pdf.svg";
 import PrintIcon from "../../../../assets/print.svg";
+import { useNavigate } from "react-router-dom";
+import feedbackService from "./feedbackService";
+import { LogLevel, ToastType } from "../../../../enums";
+import { useAuth, useLogger, useToast } from "../../../../hooks";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Feedback {
-  id: string;
-  email: string;
-  websiteHelpful: string;
-  feedbackText: string;
-  category: string;
-  issueDetails: string;
-  satisfaction: string;
-  createdAt: string;
+  feedback_id: string;
+  feedback: string;
+  date_updated: string;
 }
 
 const FeedbackList = () => {
@@ -27,77 +29,13 @@ const FeedbackList = () => {
   const [selectedFeedbackId, setSelectedFeedbackId] = useState<string | null>(
     null,
   );
-
-  // Mock data - Replace with actual API call
-  const mockFeedbacks: Feedback[] = [
-    {
-      id: "1",
-      email: "shishpalmandali974@mail.com",
-      websiteHelpful: "Yes",
-      feedbackText: "Appreciate work",
-      category: "Others",
-      issueDetails: "H.No.262 Sector 33 U.E. Karnal Haryana pin code 132001",
-      satisfaction: "Satisfied",
-      createdAt: "27 Oct 2025 10:43 AM",
-    },
-    {
-      id: "2",
-      email: "shivakumari8221@gmail.com",
-      websiteHelpful: "Yes",
-      feedbackText: "Thankyou",
-      category: "Others",
-      issueDetails: "Icds Narsapur",
-      satisfaction: "Satisfied",
-      createdAt: "26 Oct 2025 02:14 PM",
-    },
-    {
-      id: "3",
-      email: "anjaligolkar8@gmail.com",
-      websiteHelpful: "Yes",
-      feedbackText: "pm distic khargone tah zirniya plase rufata",
-      category: "Civil Society Organisation Level",
-      issueDetails: "Mp distic khargone tah zirniya place rufata",
-      satisfaction: "Very Dissatisfied",
-      createdAt: "6 Oct 2025 06:53 PM",
-    },
-    {
-      id: "4",
-      email: "venkatadri.divyala@gmail.com",
-      websiteHelpful: "Yes",
-      feedbackText:
-        "I am r/o Hyd. I messaged you about my grand son's addiction to Alcohol & Drug. Write to me or Call",
-      category: "Others",
-      issueDetails:
-        "I am r/o Hyd. I messaged you about my grand son's addiction to Alcohol & Drug. Write to me or Call me and help me please.",
-      satisfaction: "Satisfied",
-      createdAt: "3 Oct 2025 04:29 PM",
-    },
-    {
-      id: "5",
-      email: "somnath7791@gmail.com",
-      websiteHelpful: "Maybe",
-      feedbackText: "ok",
-      category: "Others",
-      issueDetails:
-        "how can the dashboard show that they have covered more than 5 lakh + educational institutes while we only have approximately 139,936 much.",
-      satisfaction: "Neutral",
-      createdAt: "26 Sep 2025 01:07 PM",
-    },
-  ];
-
-  useEffect(() => {
-    try {
-      // Simulate API call - Replace with actual API
-      setFeedbacks(mockFeedbacks);
-      setTotalCount(150); // Mock total count
-    } catch (error) {
-      console.error("Error loading feedbacks:", error);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery, pageSize]);
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+  const { userDetails } = useAuth();
+  const { log } = useLogger();
 
   const handleSearch = (value: string) => {
-    if (value.length > 0) {
+    if (value.length >= 3) {
       setSearchQuery(value);
       setCurrentPage(1);
     } else {
@@ -113,11 +51,23 @@ const FeedbackList = () => {
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log("Deleting feedback:", selectedFeedbackId);
-    // Add delete API call here
-    setShowDeleteModal(false);
-    setSelectedFeedbackId(null);
+  const handleConfirmDelete = async () => {
+    if (selectedFeedbackId) {
+      const response =
+        await feedbackService.deleteFeedbackById(selectedFeedbackId);
+      if (response.status === 200) {
+        setShowDeleteModal(false);
+        setSelectedFeedbackId(null);
+        showToast(
+          "Feedback deleted successfully",
+          "Success",
+          ToastType.SUCCESS,
+        );
+        getAllFeedbacksList();
+      } else {
+        showToast("Failed to delete feedback", "Error", ToastType.ERROR);
+      }
+    }
   };
 
   const handleCancelDelete = () => {
@@ -126,36 +76,301 @@ const FeedbackList = () => {
   };
 
   const handleExport = (type: string) => {
-    console.log(`Exporting as ${type}`);
-    // Add export logic here
+    switch (type) {
+      case "pdf":
+        handleExportToPDF();
+        break;
+      case "excel":
+        handleExportCSV();
+        break;
+      case "print":
+        handlePrint();
+        break;
+      case "copy":
+        handleCopy();
+        break;
+      default:
+        showToast("Invalid export type", "Error", ToastType.ERROR);
+    }
   };
 
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, feedbacks.length);
-  const paginatedFeedbacks = feedbacks.slice(startIndex, endIndex);
+  const handleAddFeedback = () => {
+    navigate("/feedback/add");
+    // Add navigation logic here (e.g., using React Router)
+  };
+
+  const getAllFeedbacksList = async () => {
+    try {
+      const payload = {
+        pageSize,
+        currentPage,
+        searchFilter: searchQuery,
+      };
+
+      const response = await feedbackService.getAllFeedbacks(payload);
+      if (response.status === 200) {
+        setFeedbacks(response.data.data);
+        setTotalCount(response.data.totalFeedbackCount);
+      }
+    } catch (error) {
+      log(LogLevel.ERROR, "FeedbackList :: getAllFeedbacksList", error);
+    }
+  };
+
+  const handleExportToPDF = () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to export", "Error", ToastType.ERROR);
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(14);
+    doc.text("State Nodal Officer List", 14, 15);
+
+    // Table Columns
+    const tableColumn = ["Feedback", "Posted On"];
+
+    // Table Rows
+    const tableRows = feedbacks.map((feedback: any) => [
+      feedback.feedback,
+      feedback.date_updated.split("T")[0].split("-").reverse().join("-"),
+    ]);
+
+    // Generate Table
+    autoTable(doc, {
+      startY: 20,
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    // Download
+    doc.save("feedback_list.pdf");
+  };
+
+  const handleExportCSV = () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to export", "Error", ToastType.ERROR);
+      return;
+    }
+
+    // Define CSV headers
+    const headers = ["Feedback", "Posted On"];
+
+    // Convert data to CSV rows
+    const rows = feedbacks.map((feedback) => [
+      feedback.feedback,
+      feedback.date_updated.split("T")[0].split("-").reverse().join("-"),
+    ]);
+
+    // Combine headers + rows
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    // Create Blob
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+    // Download file
+    saveAs(blob, "feedback_list.csv");
+  };
+
+  const handlePrint = () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to print", "Error", ToastType.ERROR);
+      return;
+    }
+
+    const tableRows = feedbacks
+      .map(
+        (feedback) => `
+        <tr>
+          <td>${feedback.feedback}</td>
+          <td>${feedback.date_updated.split("T")[0].split("-").reverse().join("-")}</td>
+         
+         
+        </tr>
+      `,
+      )
+      .join("");
+
+    const printWindow = window.open("", "", "width=1000,height=700");
+
+    if (!printWindow) {
+      showToast("Unable to open print window", "Error", ToastType.ERROR);
+      return;
+    }
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Feedback List</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            th { background-color: #003366; color: white; }
+          </style>
+        </head>
+        <body>
+          <h2>Feedback List</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Feedback</th>
+                <th>Posted On</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const handleCopy = async () => {
+    if (!feedbacks || feedbacks.length === 0) {
+      showToast("No data available to copy", "Error", ToastType.ERROR);
+      return;
+    }
+
+    try {
+      const headers = ["Feedback", "Posted On"];
+      const plainTextData = [
+        headers.join("\t"),
+        ...feedbacks.map((feedback) =>
+          [
+            feedback.feedback,
+            feedback.date_updated.split("T")[0].split("-").reverse().join("-"),
+          ].join("\t"),
+        ),
+      ].join("\n");
+
+      const tableRows = feedbacks
+        .map(
+          (feedback) => `
+        <tr>
+          <td>${feedback.feedback}</td>
+          <td>${feedback.date_updated.split("T")[0].split("-").reverse().join("-")}</td>
+         
+        </tr>
+      `,
+        )
+        .join("");
+
+      const htmlTable = `
+      <table border="1" style="border-collapse: collapse; font-family: Arial;">
+        <thead>
+          <tr style="background-color:#003366; color:white;">
+            <th>Feedback</th>
+            <th>Posted On</th>
+           
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+    `;
+
+      // Copy both formats
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([htmlTable], { type: "text/html" }),
+          "text/plain": new Blob([plainTextData], { type: "text/plain" }),
+        }),
+      ]);
+
+      showToast("Table copied successfully!", "Success", ToastType.SUCCESS);
+    } catch (error) {
+      log(LogLevel.ERROR, "Error copying to clipboard", error);
+      showToast("Failed to copy data", "Error", ToastType.ERROR);
+    }
+  };
+
+  useEffect(() => {
+    getAllFeedbacksList();
+  }, [pageSize, currentPage, searchQuery]);
 
   return (
     <div className="w-full h-full p-2 overflow-y-auto">
       <div className="p-5">
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+        <div className="mb-5 flex flex-col sm:flex-row sm:justify-between gap-4 items-center">
           <h2 className="text-2xl font-semibold text-[#374151]">
             Feedback & Grievance Redressal
           </h2>
-          <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end">
-            <button onClick={() => handleExport("copy")} className="">
-              <img src={CopyIcon} alt="copy" className="w-16 h-16" />
+          {userDetails.role_name.toLowerCase().includes("admin") ? null : (
+            <button
+              onClick={handleAddFeedback}
+              className="bg-[#003366] ml-2 text-nowrap px-4 py-2 text-sm text-white font-[500] rounded-lg hover:opacity-90 transition"
+            >
+              Add Feedback +
             </button>
-            <button onClick={() => handleExport("excel")} className="">
-              <img src={ExcelIcon} alt="excel" className="w-16 h-16" />
-            </button>
-            <button onClick={() => handleExport("pdf")} className="">
-              <img src={PdfIcon} alt="pdf" className="w-16 h-16" />
-            </button>
-            <button onClick={() => handleExport("print")} className="">
-              <img src={PrintIcon} alt="print" className="w-16 h-16" />
-            </button>
-          </div>
+          )}
         </div>
+        <div className="flex flex-wrap items-center gap-2 justify-start md:justify-end mb-4">
+          <button onClick={() => handleExport("copy")} className="">
+            <img src={CopyIcon} alt="copy" className="w-16 h-16" />
+          </button>
+          <button onClick={() => handleExport("excel")} className="">
+            <img src={ExcelIcon} alt="excel" className="w-16 h-16" />
+          </button>
+          <button onClick={() => handleExport("pdf")} className="">
+            <img src={PdfIcon} alt="pdf" className="w-16 h-16" />
+          </button>
+          <button onClick={() => handleExport("print")} className="">
+            <img src={PrintIcon} alt="print" className="w-16 h-16" />
+          </button>
+        </div>
+
+        {userDetails.role_name.toLowerCase().includes("admin") ? null : (
+          <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  State Name
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.state_name}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  District Name
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.district_name}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  Officer Name
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.display_name}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">Email</p>
+                <p className="text-sm text-[#374151]">{userDetails.email_id}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] font-medium mb-1">
+                  Contact Number
+                </p>
+                <p className="text-sm text-[#374151]">
+                  {userDetails.mobile_number}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-md border border-[#E5E7EB]">
           {/* Export Buttons and Controls */}
@@ -180,27 +395,13 @@ const FeedbackList = () => {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     S.No.
                   </th>
+
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Email
+                    Feedback
                   </th>
+
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Did you find the website/dashboard helpful?
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Please provide your valuable feedback on the
-                    website/dashboard?
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Category
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Details of the issues to be addressed
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    How satisfied are you with the website/dashboard
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
-                    Created At
+                    Posted On
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-[#6B7280] border-b border-gray-300">
                     Action
@@ -208,39 +409,30 @@ const FeedbackList = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedFeedbacks.length > 0 ? (
-                  paginatedFeedbacks.map((feedback, index) => (
+                {feedbacks && feedbacks.length > 0 ? (
+                  feedbacks.map((feedback, index) => (
                     <tr
-                      key={feedback.id}
+                      key={feedback.feedback_id}
                       className="bg-white hover:bg-[#F9FAFB] border-b border-[#E5E7EB] last:border-b-0]"
                     >
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {startIndex + index + 1}
+                        {index + 1}
                       </td>
+
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {feedback.email}
+                        {feedback.feedback}
                       </td>
+
                       <td className="px-6 py-4 text-sm text-[#374151]">
-                        {feedback.websiteHelpful}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151]">
-                        {feedback.feedbackText}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151]">
-                        {feedback.category}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151]">
-                        {feedback.issueDetails}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151]">
-                        {feedback.satisfaction}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#374151]">
-                        {feedback.createdAt}
+                        {feedback.date_updated
+                          .split("T")[0]
+                          .split("-")
+                          .reverse()
+                          .join("-")}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#374151]">
                         <button
-                          onClick={() => handleDelete(feedback.id)}
+                          onClick={() => handleDelete(feedback.feedback_id)}
                           className="text-[#E91E63] hover:text-[#C2185B] transition"
                         >
                           <img src={DeleteIcon} alt="Delete" className="" />
@@ -251,10 +443,10 @@ const FeedbackList = () => {
                 ) : (
                   <tr>
                     <td
-                      colSpan={9}
-                      className="px-6 py-8 text-center text-[#374151] font-semibold"
+                      colSpan={12}
+                      className="px-6 py-2 text-center text-red-500 font-semibold animate-pulse"
                     >
-                      No Data Found
+                      No data found
                     </td>
                   </tr>
                 )}
@@ -300,10 +492,17 @@ const FeedbackList = () => {
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
-              <select className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white">
-                <option>200</option>
-                <option>50</option>
-                <option>100</option>
+              <select
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+              >
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
               of{" "}
               <span className="font-medium text-[#374151]">{totalCount}</span>{" "}

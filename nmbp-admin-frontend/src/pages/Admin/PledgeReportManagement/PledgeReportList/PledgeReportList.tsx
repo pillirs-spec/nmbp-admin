@@ -6,7 +6,6 @@ import { LogLevel, ToastType } from "../../../../enums";
 import PledgeContributionIcon from "../../../../assets/total_pledge.svg";
 import { pledgeReportService } from "./pledgeReportService";
 import usersListService from "../../UserManagement/UserList/usersListService";
-
 import { DatePickerInput } from "@mantine/dates";
 import "@mantine/dates/styles.css";
 import dayjs from "dayjs";
@@ -169,7 +168,7 @@ const PledgeReportList = () => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
-                  Total Pledge
+                  Total Pledges
                 </p>
                 <p className="text-3xl font-semibold text-[#003366]">
                   {totalPledgeCount}
@@ -185,7 +184,7 @@ const PledgeReportList = () => {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-semibold text-[#6B7280] mb-2">
-                  Total Pledge Today
+                  Total Pledge Taken (Today)
                 </p>
                 <p className="text-3xl font-semibold text-[#003366]">
                   {totalPledgeTodayCount}
@@ -241,7 +240,7 @@ const PledgeReportList = () => {
                 }}
                 className="w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm"
               >
-                <option value="">Select State</option>
+                <option value="">All States</option>
                 {states.map((state: any) => (
                   <option key={state.state_id} value={state.state_id}>
                     {state.state_name}
@@ -260,7 +259,7 @@ const PledgeReportList = () => {
                 }}
                 className={`w-full px-4 py-2 outline-none border border-[#E5E7EB] rounded-md  bg-white text-[#6B7280] cursor-pointer text-sm ${!selectedState ? "bg-gray-100 !cursor-not-allowed" : "bg-white cursor-pointer"}`}
               >
-                <option value="">Select District</option>
+                <option value="">All Districts</option>
                 {districts.map((district: any) => (
                   <option
                     key={district.district_id}

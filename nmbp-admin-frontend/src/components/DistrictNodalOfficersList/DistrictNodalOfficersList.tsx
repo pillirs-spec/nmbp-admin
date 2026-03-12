@@ -5,7 +5,7 @@ import ExcelIcon from "../../assets/excel.svg";
 import PrintIcon from "../../assets/print.svg";
 import CopyIcon from "../../assets/copy.svg";
 import PDFIcon from "../../assets/pdf.svg";
-import { useLogger, useToast } from "../../hooks";
+import { useAuth, useLogger, useToast } from "../../hooks";
 import { LogLevel, ToastType } from "../../enums";
 import nodalOfficersService from "../../pages/Admin/NodalOfficersManagement/NodalOfficersList/nodalOfficersService";
 import { saveAs } from "file-saver";
@@ -35,6 +35,7 @@ const DistrictNodalOfficersList = () => {
   const [pageSize, setPageSize] = useState<number>(10);
   const { log } = useLogger();
   const { showToast } = useToast();
+  const { userDetails } = useAuth();
 
   // useEffect(() => {
   //   try {
@@ -395,15 +396,15 @@ const DistrictNodalOfficersList = () => {
         </div>
 
         {/* Selected Officer Info Card */}
-        {/* {selectedOfficer && (
-          <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-6">
+        {userDetails.role_name.toLowerCase().includes("district") && (
+          <div className="bg-white rounded-md p-5 border border-[#E5E7EB] mb-6 relative">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">
                   State Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.state_name}
+                  {userDetails.state_name}
                 </p>
               </div>
               <div>
@@ -411,7 +412,7 @@ const DistrictNodalOfficersList = () => {
                   District Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.district_name}
+                  {userDetails.district_name}
                 </p>
               </div>
               <div>
@@ -419,26 +420,27 @@ const DistrictNodalOfficersList = () => {
                   Officer Name
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.display_name}
+                  {userDetails.display_name}
                 </p>
               </div>
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">Email</p>
-                <p className="text-sm text-[#374151]">
-                  {selectedOfficer.contactEmail}
-                </p>
+                <p className="text-sm text-[#374151]">{userDetails.email_id}</p>
               </div>
               <div>
                 <p className="text-xs text-[#6B7280] font-medium mb-1">
                   Contact Number
                 </p>
                 <p className="text-sm text-[#374151]">
-                  {selectedOfficer.mobile_number}
+                  {userDetails.mobile_number}
                 </p>
               </div>
             </div>
+            <p className="absolute right-0 top-0 bg-[#003366] px-4 py-1 text-white rounded-bl-md text-xs font-semibold">
+              Self
+            </p>
           </div>
-        )} */}
+        )}
 
         {/* Table Container */}
         <div className="bg-white rounded-md p-5 border border-[#E5E7EB]">
@@ -557,7 +559,7 @@ const DistrictNodalOfficersList = () => {
                 disabled={currentPage === 1}
                 className="w-7 h-7 flex items-center justify-center text-sm font-bold text-[#9161FF] hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
-                &lt;
+                +
               </button>
 
               {Array.from(
@@ -598,23 +600,30 @@ const DistrictNodalOfficersList = () => {
                   )
                 }
                 disabled={currentPage === Math.ceil(totalCount / pageSize)}
-                className="w-7 h-7 flex items-center justify-center text-sm font-bold text-[#9161FF] hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className={`w-7 h-7 flex items-center justify-center text-sm font-bold transition ${
+                  currentPage === Math.ceil(totalCount / pageSize)
+                    ? " text-[#9161FF] cursor-not-allowed"
+                    : "  hover:bg-pink-50"
+                }`}
               >
-                &gt;
+                +
               </button>
             </div>
             <div className="text-sm text-[#6B7280]">
               Showing{" "}
               <select
-                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
                 value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="text-[#374151] mx-1 px-2 py-1 border border-gray-300 rounded text-sm font-semibold cursor-pointer bg-white"
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
               >
                 <option value={10}>10</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
               </select>
-              of <span className="font-semibold">{officers?.length}</span> items
+              of <span className="font-semibold">{totalCount}</span> items
             </div>
           </div>
         </div>
